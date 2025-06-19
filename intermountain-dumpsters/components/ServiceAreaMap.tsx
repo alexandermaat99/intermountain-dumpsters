@@ -2,8 +2,6 @@
 import "mapbox-gl/dist/mapbox-gl.css";
 import Map, { Marker } from "react-map-gl/maplibre";
 
-const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
-
 const serviceAreaCities = [
   { name: "Salt Lake City", lat: 40.7608, lng: -111.8910 },
   { name: "Provo", lat: 40.2338, lng: -111.6585 },
