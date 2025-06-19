@@ -26,7 +26,7 @@ const supabase = createClient(
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN as string;
 
 // 15 miles in kilometers
-const RADIUS_IN_KM = 7 * 1.60934;
+const RADIUS_IN_KM = 6 * 1.60934;
 
 export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -111,7 +111,7 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
           paint: {
             'line-color': '#3B82F6',
             'line-width': 2,
-            'line-opacity': 0.5
+            'line-opacity': 0.3
           }
         });
 
@@ -133,7 +133,8 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
 
         // Create marker
         const marker = new mapboxgl.Marker({
-          color: '#3B82F6'
+          color: '#3B82F6',
+          scale: 0.8
         })
           .setLngLat([area.longitude, area.latitude])
           .setPopup(popup)
@@ -182,10 +183,35 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
     // Reset all circles and popups to default style
     serviceAreas.forEach(area => {
       if (map.current!.getLayer(`circle-fill-${area.id}`)) {
+        map.current!.setPaintProperty(`circle-fill-${area.id}`, 'fill-color', '#5B8DEF');
         map.current!.setPaintProperty(`circle-fill-${area.id}`, 'fill-opacity', 0.05);
+        map.current!.setPaintProperty(`circle-outline-${area.id}`, 'line-color', '#3B82F6');
         map.current!.setPaintProperty(`circle-outline-${area.id}`, 'line-opacity', 0.5);
         map.current!.setPaintProperty(`circle-outline-${area.id}`, 'line-width', 2);
-        markersRef.current[area.id]?.getElement().classList.remove('marker-selected');
+        
+        // Reset marker
+        const marker = markersRef.current[area.id];
+        if (marker) {
+          marker.remove();
+          const newMarker = new mapboxgl.Marker({
+            color: '#3B82F6',
+            scale: 0.8
+          })
+            .setLngLat([area.longitude, area.latitude])
+            .setPopup(popupsRef.current[area.id])
+            .addTo(map.current!);
+          
+          markersRef.current[area.id] = newMarker;
+          
+          // Add hover events to marker element
+          const markerElement = newMarker.getElement();
+          markerElement.addEventListener('mouseenter', () => popupsRef.current[area.id].addTo(map.current!));
+          markerElement.addEventListener('mouseleave', () => {
+            if (!selectedArea || selectedArea.id !== area.id) {
+              popupsRef.current[area.id].remove();
+            }
+          });
+        }
         popupsRef.current[area.id]?.remove();
       }
     });
@@ -196,12 +222,35 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
       const popup = popupsRef.current[selectedArea.id];
       
       if (map.current!.getLayer(`circle-fill-${selectedArea.id}`)) {
+        // Change colors for selected state
+        map.current!.setPaintProperty(`circle-fill-${selectedArea.id}`, 'fill-color', '#FB923C');
         map.current!.setPaintProperty(`circle-fill-${selectedArea.id}`, 'fill-opacity', 0.15);
+        map.current!.setPaintProperty(`circle-outline-${selectedArea.id}`, 'line-color', '#F97316');
         map.current!.setPaintProperty(`circle-outline-${selectedArea.id}`, 'line-opacity', 1);
         map.current!.setPaintProperty(`circle-outline-${selectedArea.id}`, 'line-width', 3);
         
-        // Add selected class to marker
-        marker?.getElement().classList.add('marker-selected');
+        // Change marker color for selected state
+        if (marker) {
+          marker.remove();
+          const newMarker = new mapboxgl.Marker({
+            color: '#F97316',
+            scale: 1
+          })
+            .setLngLat([selectedArea.longitude, selectedArea.latitude])
+            .setPopup(popup)
+            .addTo(map.current!);
+          
+          markersRef.current[selectedArea.id] = newMarker;
+          
+          // Add hover events to marker element
+          const markerElement = newMarker.getElement();
+          markerElement.addEventListener('mouseenter', () => popup.addTo(map.current!));
+          markerElement.addEventListener('mouseleave', () => {
+            if (!selectedArea || selectedArea.id !== selectedArea.id) {
+              popup.remove();
+            }
+          });
+        }
 
         // Fly to the selected area
         map.current!.flyTo({
@@ -217,7 +266,7 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
   }, [selectedArea, mounted, serviceAreas]);
 
   return (
-    <div className="w-full h-[400px] relative">
+    <div className="w-full h-full relative">
       <div ref={mapContainer} className="w-full h-full" />
       <style jsx global>{`
         .marker-selected {
