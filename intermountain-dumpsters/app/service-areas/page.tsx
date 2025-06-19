@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import ServiceAreaMap from "@/components/ServiceAreaMap";
-import ServiceAreasList from "@/components/ServiceAreasList";
+import ServiceAreasList from "../../components/ServiceAreasList";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useState } from "react";
 
