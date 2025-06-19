@@ -33,7 +33,7 @@ export default function ContactPage() {
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold">Contact Us</h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Have questions about our dumpster rental services? We&apos;re here to help! 
+              Have questions about our residential or commercial dumpster rental services? We&apos;re here to help! 
               Reach out to us through any of the methods below.
             </p>
           </div>
@@ -114,6 +114,8 @@ export default function ContactPage() {
                   >
                     <option value="">Select a subject</option>
                     <option value="general">General Inquiry</option>
+                    <option value="residential">Residential Dumpster Rental</option>
+                    <option value="commercial">Commercial Dumpster Rental</option>
                     <option value="pricing">Pricing Question</option>
                     <option value="service-area">Service Area Question</option>
                     <option value="booking">Booking Assistance</option>
@@ -159,7 +161,7 @@ export default function ContactPage() {
         {/* Footer */}
         <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
           <p>&copy; 2024 Intermountain Dumpsters. All rights reserved.</p>
-          <p>Professional dumpster rental services</p>
+          <p>Residential & commercial dumpster rental services</p>
           <ThemeSwitcher />
         </footer>
       </div>

@@ -32,11 +32,12 @@ export default function Home() {
         <div className="flex-1 flex flex-col gap-20 max-w-5xl p-5">
           <div className="text-center space-y-8">
             <h1 className="text-5xl font-bold tracking-tight">
-              Professional Dumpster Rentals
+              Residential & Commercial Dumpster Rentals
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Reliable dumpster rental services for construction, renovation, and cleanup projects. 
-              Fast delivery, competitive pricing, and exceptional customer service.
+              Reliable dumpster rental services for residential and commercial projects. 
+              From home renovations to large construction sites, we provide fast delivery, 
+              competitive pricing, and exceptional customer service.
             </p>
             <div className="flex gap-4 justify-center">
               <Link 
@@ -64,7 +65,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold">Fast Delivery</h3>
               <p className="text-muted-foreground">
-                Same-day or next-day delivery available in most service areas
+                Same-day or next-day delivery available for residential and commercial projects
               </p>
             </div>
             <div className="text-center space-y-4">
@@ -75,7 +76,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold">Competitive Pricing</h3>
               <p className="text-muted-foreground">
-                Transparent pricing with no hidden fees or surprise charges
+                Transparent pricing for both residential and commercial customers with no hidden fees
               </p>
             </div>
             <div className="text-center space-y-4">
@@ -86,7 +87,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold">Flexible Rentals</h3>
               <p className="text-muted-foreground">
-                Rent by the day or week with easy pickup and delivery scheduling
+                Rent by the day or week for any project size with easy pickup and delivery scheduling
               </p>
             </div>
           </div>
@@ -101,8 +102,9 @@ export default function Home() {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Intermountain Dumpsters</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Professional dumpster rental services for construction, renovation, and cleanup projects. 
-                  Fast delivery, competitive pricing, and exceptional customer service.
+                  Professional dumpster rental services for residential and commercial projects. 
+                  From home renovations to large construction sites, we provide fast delivery, 
+                  competitive pricing, and exceptional customer service.
                 </p>
               </div>
 

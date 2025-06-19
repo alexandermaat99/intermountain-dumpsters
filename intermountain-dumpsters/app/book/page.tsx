@@ -32,7 +32,7 @@ export default function BookPage() {
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold">Book Your Dumpster</h1>
             <p className="text-muted-foreground">
-              Fill out the form below to reserve your dumpster rental
+              Fill out the form below to reserve your residential or commercial dumpster rental
             </p>
           </div>
 
@@ -89,6 +89,32 @@ export default function BookPage() {
                   required
                   className="w-full px-3 py-2 border border-input rounded-md bg-background"
                 />
+              </div>
+            </div>
+
+            {/* Project Type */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Project Information</h2>
+              <div>
+                <label htmlFor="projectType" className="block text-sm font-medium mb-2">
+                  Project Type *
+                </label>
+                <select
+                  id="projectType"
+                  name="projectType"
+                  required
+                  className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                >
+                  <option value="">Select project type</option>
+                  <option value="residential-renovation">Residential Renovation</option>
+                  <option value="residential-cleanup">Residential Cleanup</option>
+                  <option value="residential-construction">Residential Construction</option>
+                  <option value="commercial-construction">Commercial Construction</option>
+                  <option value="commercial-renovation">Commercial Renovation</option>
+                  <option value="commercial-cleanup">Commercial Cleanup</option>
+                  <option value="demolition">Demolition</option>
+                  <option value="other">Other</option>
+                </select>
               </div>
             </div>
 
@@ -206,23 +232,6 @@ export default function BookPage() {
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Additional Information</h2>
               <div>
-                <label htmlFor="projectType" className="block text-sm font-medium mb-2">
-                  Project Type
-                </label>
-                <select
-                  id="projectType"
-                  name="projectType"
-                  className="w-full px-3 py-2 border border-input rounded-md bg-background"
-                >
-                  <option value="">Select project type</option>
-                  <option value="construction">Construction</option>
-                  <option value="renovation">Renovation</option>
-                  <option value="cleanup">Cleanup</option>
-                  <option value="demolition">Demolition</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div>
                 <label htmlFor="specialInstructions" className="block text-sm font-medium mb-2">
                   Special Instructions
                 </label>
@@ -251,7 +260,7 @@ export default function BookPage() {
         {/* Footer */}
         <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
           <p>&copy; 2024 Intermountain Dumpsters. All rights reserved.</p>
-          <p>Professional dumpster rental services</p>
+          <p>Residential & commercial dumpster rental services</p>
           <ThemeSwitcher />
         </footer>
       </div>

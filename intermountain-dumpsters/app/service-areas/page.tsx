@@ -48,7 +48,7 @@ export default function ServiceAreasPage() {
           <div className="text-center space-y-4 mb-8">
             <h1 className="text-4xl font-bold">Service Areas</h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              We provide dumpster rental services throughout the Intermountain region. 
+              We provide residential and commercial dumpster rental services throughout the Intermountain region. 
               Check if we serve your area and view our coverage map below.
             </p>
           </div>
@@ -71,7 +71,7 @@ export default function ServiceAreasPage() {
       {/* Footer */}
       <footer className="w-full flex items-center justify-center border-t text-center text-xs gap-8 py-8 mt-16">
         <p>&copy; 2024 Intermountain Dumpsters. All rights reserved.</p>
-        <p>Professional dumpster rental services</p>
+        <p>Residential & commercial dumpster rental services</p>
         <ThemeSwitcher />
       </footer>
     </main>

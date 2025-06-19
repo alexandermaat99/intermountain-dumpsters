@@ -9,9 +9,9 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Intermountain Dumpsters - Professional Dumpster Rental Services",
-  description: "Reliable dumpster rental services for construction, renovation, and cleanup projects. Fast delivery, competitive pricing, and exceptional customer service.",
-  keywords: "dumpster rental, construction waste, renovation cleanup, waste disposal, Intermountain Dumpsters",
+  title: "Intermountain Dumpsters - Residential & Commercial Dumpster Rental Services",
+  description: "Reliable residential and commercial dumpster rental services for construction, renovation, and cleanup projects. Fast delivery, competitive pricing, and exceptional customer service.",
+  keywords: "dumpster rental, residential dumpster, commercial dumpster, construction waste, renovation cleanup, waste disposal, Intermountain Dumpsters",
 };
 
 const geistSans = Geist({
