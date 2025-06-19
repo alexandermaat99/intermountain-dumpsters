@@ -1,6 +1,6 @@
 "use client";
-import { useMemo } from "react";
-import Map, { Marker } from "react-map-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+import Map, { Marker } from "react-map-gl/maplibre";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
@@ -15,34 +15,50 @@ const serviceAreaCities = [
 ];
 
 export default function ServiceAreaMap() {
-  const initialViewState = useMemo(
-    () => ({
-      longitude: -111.8910,
-      latitude: 40.7608,
-      zoom: 8,
-    }),
-    []
-  );
-
   return (
     <Map
-      initialViewState={initialViewState}
-      mapStyle="mapbox://styles/mapbox/streets-v11"
-      mapboxAccessToken={MAPBOX_TOKEN}
-      style={{ width: "100%", height: "100%" }}
+      initialViewState={{
+        longitude: -111.8910,
+        latitude: 40.7608,
+        zoom: 8,
+        bearing: 0,
+        pitch: 0,
+      }}
+      style={{ width: "100%", height: 400 }}
+      mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
     >
-      {serviceAreaCities.map((city) => (
-        <Marker
-          key={city.name}
-          longitude={city.lng}
-          latitude={city.lat}
-          anchor="bottom"
-        >
-          <div style={{ color: "#2563eb", fontWeight: 700, fontSize: 18, textShadow: "0 1px 2px #fff" }}>
-            •
-          </div>
-        </Marker>
-      ))}
+      {serviceAreaCities.map((city) => {
+        console.log(`Marker for ${city.name}: longitude=${city.lng}, latitude=${city.lat}`);
+        return (
+          <Marker
+            key={city.name}
+            longitude={city.lng}
+            latitude={city.lat}
+          >
+            <div
+              style={{
+                background: "#2563eb",
+                borderRadius: "50%",
+                width: 24,
+                height: 24,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: 14,
+                border: "2px solid #fff",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+                transform: "translate(-50%, -50%)",
+                position: "absolute"
+              }}
+              title={city.name}
+            >
+              {city.name[0]}
+            </div>
+          </Marker>
+        );
+      })}
     </Map>
   );
 } 
