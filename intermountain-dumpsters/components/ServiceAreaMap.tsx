@@ -26,12 +26,13 @@ const supabase = createClient(
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN as string;
 
 // 15 miles in kilometers
-const RADIUS_IN_KM = 15 * 1.60934;
+const RADIUS_IN_KM = 7 * 1.60934;
 
 export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<{ [key: number]: mapboxgl.Marker }>({});
+  const popupsRef = useRef<{ [key: number]: mapboxgl.Popup }>({});
   const [mounted, setMounted] = useState(false);
   const [serviceAreas, setServiceAreas] = useState<ServiceArea[]>([]);
 
@@ -78,7 +79,7 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
 
     map.current.on('load', () => {
       // Create circles for each service area
-      serviceAreas.forEach((area, index) => {
+      serviceAreas.forEach((area) => {
         const center = turf.point([area.longitude, area.latitude]);
         const circle = turf.circle(center, RADIUS_IN_KM, {
           steps: 64,
@@ -97,8 +98,8 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
           type: 'fill',
           source: `circle-${area.id}`,
           paint: {
-            'fill-color': '#3B82F6',
-            'fill-opacity': 0.05
+            'fill-color': '#5B8DEF',
+            'fill-opacity': 0.02
           }
         });
 
@@ -108,19 +109,47 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
           type: 'line',
           source: `circle-${area.id}`,
           paint: {
-            'line-color': '#2563EB',
+            'line-color': '#3B82F6',
             'line-width': 2,
             'line-opacity': 0.5
           }
         });
 
+        // Create custom popup
+        const popup = new mapboxgl.Popup({
+          offset: 25,
+          closeButton: false,
+          closeOnClick: false,
+          className: 'custom-popup'
+        })
+        .setHTML(`
+          <div class="popup-content">
+            <h3>${area.name}</h3>
+          </div>
+        `);
+
+        // Store popup reference
+        popupsRef.current[area.id] = popup;
+
         // Create marker
-        const marker = new mapboxgl.Marker()
+        const marker = new mapboxgl.Marker({
+          color: '#3B82F6'
+        })
           .setLngLat([area.longitude, area.latitude])
-          .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(area.name))
+          .setPopup(popup)
           .addTo(map.current!);
 
+        // Store marker reference
         markersRef.current[area.id] = marker;
+
+        // Add hover events to marker element
+        const markerElement = marker.getElement();
+        markerElement.addEventListener('mouseenter', () => popup.addTo(map.current!));
+        markerElement.addEventListener('mouseleave', () => {
+          if (!selectedArea || selectedArea.id !== area.id) {
+            popup.remove();
+          }
+        });
       });
 
       // Fit the map to show all service areas with padding
@@ -150,19 +179,21 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
   useEffect(() => {
     if (!map.current || !mounted) return;
 
-    // Reset all circles to default style
+    // Reset all circles and popups to default style
     serviceAreas.forEach(area => {
       if (map.current!.getLayer(`circle-fill-${area.id}`)) {
         map.current!.setPaintProperty(`circle-fill-${area.id}`, 'fill-opacity', 0.05);
         map.current!.setPaintProperty(`circle-outline-${area.id}`, 'line-opacity', 0.5);
         map.current!.setPaintProperty(`circle-outline-${area.id}`, 'line-width', 2);
         markersRef.current[area.id]?.getElement().classList.remove('marker-selected');
+        popupsRef.current[area.id]?.remove();
       }
     });
 
     // Highlight selected area
     if (selectedArea) {
       const marker = markersRef.current[selectedArea.id];
+      const popup = popupsRef.current[selectedArea.id];
       
       if (map.current!.getLayer(`circle-fill-${selectedArea.id}`)) {
         map.current!.setPaintProperty(`circle-fill-${selectedArea.id}`, 'fill-opacity', 0.15);
@@ -179,8 +210,8 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
           duration: 1500
         });
 
-        // Open the popup
-        marker?.togglePopup();
+        // Show the popup
+        popup?.addTo(map.current);
       }
     }
   }, [selectedArea, mounted, serviceAreas]);
@@ -192,6 +223,29 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
         .marker-selected {
           filter: hue-rotate(15deg) saturate(150%);
           transform: scale(1.2);
+        }
+        .custom-popup {
+          font-family: var(--font-geist-sans);
+        }
+        .custom-popup .mapboxgl-popup-content {
+          padding: 15px;
+          border-radius: 8px;
+          border: 1px solid rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .custom-popup .popup-content h3 {
+          margin: 0;
+          font-size: 14px;
+          font-weight: 600;
+          color: #1a1a1a;
+        }
+        .custom-popup .popup-content p {
+          margin: 4px 0 0;
+          font-size: 12px;
+          color: #666;
+        }
+        .mapboxgl-popup-tip {
+          border-top-color: rgba(0, 0, 0, 0.1) !important;
         }
       `}</style>
     </div>
