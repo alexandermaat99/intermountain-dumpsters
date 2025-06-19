@@ -1,9 +1,23 @@
+'use client';
+
 import Link from "next/link";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import ServiceAreaMap from "@/components/ServiceAreaMap";
+import ServiceAreasList from "@/components/ServiceAreasList";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { useState } from "react";
+
+interface ServiceArea {
+  id: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+  created_at: string;
+}
 
 export default function ServiceAreasPage() {
+  const [selectedArea, setSelectedArea] = useState<ServiceArea | null>(null);
+
   return (
     <main className="min-h-screen flex flex-col items-center">
       <div className="flex-1 w-full flex flex-col gap-20 items-center">
@@ -41,54 +55,12 @@ export default function ServiceAreasPage() {
 
           {/* Mapbox Map */}
           <div className="w-full h-96 rounded-lg overflow-hidden border-2 border-muted-foreground/25">
-            <ServiceAreaMap />
+            <ServiceAreaMap selectedArea={selectedArea} />
           </div>
 
           {/* Service Areas List */}
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <h2 className="text-2xl font-semibold">Primary Service Areas</h2>
-              <div className="space-y-4">
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-semibold text-lg">Salt Lake City Metro</h3>
-                  <p className="text-muted-foreground">Salt Lake City, West Valley City, Murray, Sandy, West Jordan</p>
-                </div>
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-semibold text-lg">Utah County</h3>
-                  <p className="text-muted-foreground">Provo, Orem, Lehi, American Fork, Pleasant Grove</p>
-                </div>
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-semibold text-lg">Davis County</h3>
-                  <p className="text-muted-foreground">Layton, Clearfield, Bountiful, Farmington, Kaysville</p>
-                </div>
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-semibold text-lg">Weber County</h3>
-                  <p className="text-muted-foreground">Ogden, Roy, Clearfield, North Ogden, Riverdale</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <h2 className="text-2xl font-semibold">Extended Service Areas</h2>
-              <div className="space-y-4">
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-semibold text-lg">Summit County</h3>
-                  <p className="text-muted-foreground">Park City, Coalville, Kamas, Oakley</p>
-                </div>
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-semibold text-lg">Tooele County</h3>
-                  <p className="text-muted-foreground">Tooele, Grantsville, Stansbury Park</p>
-                </div>
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-semibold text-lg">Cache County</h3>
-                  <p className="text-muted-foreground">Logan, Smithfield, Hyrum, Providence</p>
-                </div>
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-semibold text-lg">Box Elder County</h3>
-                  <p className="text-muted-foreground">Brigham City, Tremonton, Willard, Perry</p>
-                </div>
-              </div>
-            </div>
+          <div className="w-full">
+            <ServiceAreasList onAreaSelect={setSelectedArea} selectedArea={selectedArea} />
           </div>
 
           {/* Delivery Information */}
@@ -98,10 +70,10 @@ export default function ServiceAreasPage() {
               <div>
                 <h3 className="font-semibold mb-2">Standard Delivery</h3>
                 <ul className="space-y-2 text-muted-foreground">
-                  <li>• Same-day delivery available in primary service areas</li>
-                  <li>• Next-day delivery for extended service areas</li>
+                  <li>• Same-day delivery available in our service areas</li>
                   <li>• Free delivery within standard service radius</li>
                   <li>• Additional fees may apply for remote locations</li>
+                  <li>• Contact us for delivery outside our standard areas</li>
                 </ul>
               </div>
               <div>
