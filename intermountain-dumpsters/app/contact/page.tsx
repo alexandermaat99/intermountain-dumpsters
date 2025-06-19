@@ -23,7 +23,6 @@ export default function ContactPage() {
               <Link href="/contact" className="hover:underline font-semibold">
                 Contact
               </Link>
-              <ThemeSwitcher />
             </div>
           </div>
         </nav>
@@ -214,6 +213,7 @@ export default function ContactPage() {
         <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
           <p>&copy; 2024 Intermountain Dumpsters. All rights reserved.</p>
           <p>Professional dumpster rental services</p>
+          <ThemeSwitcher />
         </footer>
       </div>
     </main>
