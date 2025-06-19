@@ -1,7 +1,6 @@
 'use client';
 
 import Link from "next/link";
-import { ThemeSwitcher } from "@/components/theme-switcher";
 import ServiceAreaMap from "@/components/ServiceAreaMap";
 import ServiceAreasList from "../../components/ServiceAreasList";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -19,7 +18,7 @@ export default function ServiceAreasPage() {
   const [selectedArea, setSelectedArea] = useState<ServiceArea | null>(null);
 
   return (
-    <main className="min-h-screen flex flex-col">
+    <div className="w-full flex flex-col">
       {/* Navigation */}
       <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
         <div className="w-full max-w-7xl flex justify-between items-center p-3 px-5 text-sm">
@@ -67,13 +66,6 @@ export default function ServiceAreasPage() {
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="w-full flex items-center justify-center border-t text-center text-xs gap-8 py-8 mt-16">
-        <p>&copy; 2024 Intermountain Dumpsters. All rights reserved.</p>
-        <p>Residential & commercial dumpster rental services</p>
-        <ThemeSwitcher />
-      </footer>
-    </main>
+    </div>
   );
 }
