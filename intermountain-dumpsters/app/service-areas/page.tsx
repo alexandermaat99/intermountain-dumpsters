@@ -54,15 +54,15 @@ export default function ServiceAreasPage() {
           </div>
 
           {/* Main Content Grid */}
-          <div className="grid lg:grid-cols-[350px,1fr] gap-8">
+          <div className="grid lg:grid-cols-[1fr,350px] gap-8">
+            {/* Mapbox Map */}
+            <div className="h-[400px] lg:h-[600px] rounded-lg overflow-hidden border-2 border-muted-foreground/25">
+              <ServiceAreaMap selectedArea={selectedArea} />
+            </div>
+
             {/* Service Areas List */}
             <div>
               <ServiceAreasList onAreaSelect={setSelectedArea} selectedArea={selectedArea} />
-            </div>
-
-            {/* Mapbox Map */}
-            <div className="h-[600px] rounded-lg overflow-hidden border-2 border-muted-foreground/25">
-              <ServiceAreaMap selectedArea={selectedArea} />
             </div>
           </div>
         </div>
@@ -76,4 +76,4 @@ export default function ServiceAreasPage() {
       </footer>
     </main>
   );
-} 
+}

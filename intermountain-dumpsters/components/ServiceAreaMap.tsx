@@ -178,16 +178,20 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
 
   // Handle selected area changes
   useEffect(() => {
-    if (!map.current || !mounted) return;
+    if (!map.current || !mounted || !map.current.isStyleLoaded()) return;
 
     // Reset all circles and popups to default style
     serviceAreas.forEach(area => {
-      if (map.current!.getLayer(`circle-fill-${area.id}`)) {
-        map.current!.setPaintProperty(`circle-fill-${area.id}`, 'fill-color', '#5B8DEF');
-        map.current!.setPaintProperty(`circle-fill-${area.id}`, 'fill-opacity', 0.05);
-        map.current!.setPaintProperty(`circle-outline-${area.id}`, 'line-color', '#3B82F6');
-        map.current!.setPaintProperty(`circle-outline-${area.id}`, 'line-opacity', 0.5);
-        map.current!.setPaintProperty(`circle-outline-${area.id}`, 'line-width', 2);
+      const fillLayerId = `circle-fill-${area.id}`;
+      const outlineLayerId = `circle-outline-${area.id}`;
+      
+      // Check if layers exist before trying to access them
+      if (map.current!.getLayer(fillLayerId) && map.current!.getLayer(outlineLayerId)) {
+        map.current!.setPaintProperty(fillLayerId, 'fill-color', '#5B8DEF');
+        map.current!.setPaintProperty(fillLayerId, 'fill-opacity', 0.05);
+        map.current!.setPaintProperty(outlineLayerId, 'line-color', '#3B82F6');
+        map.current!.setPaintProperty(outlineLayerId, 'line-opacity', 0.5);
+        map.current!.setPaintProperty(outlineLayerId, 'line-width', 2);
         
         // Reset marker
         const marker = markersRef.current[area.id];
@@ -220,14 +224,17 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
     if (selectedArea) {
       const marker = markersRef.current[selectedArea.id];
       const popup = popupsRef.current[selectedArea.id];
+      const selectedFillLayerId = `circle-fill-${selectedArea.id}`;
+      const selectedOutlineLayerId = `circle-outline-${selectedArea.id}`;
       
-      if (map.current!.getLayer(`circle-fill-${selectedArea.id}`)) {
+      // Check if layers exist before trying to access them
+      if (map.current!.getLayer(selectedFillLayerId) && map.current!.getLayer(selectedOutlineLayerId)) {
         // Change colors for selected state
-        map.current!.setPaintProperty(`circle-fill-${selectedArea.id}`, 'fill-color', '#FB923C');
-        map.current!.setPaintProperty(`circle-fill-${selectedArea.id}`, 'fill-opacity', 0.15);
-        map.current!.setPaintProperty(`circle-outline-${selectedArea.id}`, 'line-color', '#F97316');
-        map.current!.setPaintProperty(`circle-outline-${selectedArea.id}`, 'line-opacity', 1);
-        map.current!.setPaintProperty(`circle-outline-${selectedArea.id}`, 'line-width', 3);
+        map.current!.setPaintProperty(selectedFillLayerId, 'fill-color', '#FB923C');
+        map.current!.setPaintProperty(selectedFillLayerId, 'fill-opacity', 0.15);
+        map.current!.setPaintProperty(selectedOutlineLayerId, 'line-color', '#F97316');
+        map.current!.setPaintProperty(selectedOutlineLayerId, 'line-opacity', 1);
+        map.current!.setPaintProperty(selectedOutlineLayerId, 'line-width', 3);
         
         // Change marker color for selected state
         if (marker) {
