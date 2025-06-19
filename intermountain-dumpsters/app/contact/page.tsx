@@ -33,7 +33,7 @@ export default function ContactPage() {
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold">Contact Us</h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Have questions about our dumpster rental services? We're here to help! 
+              Have questions about our dumpster rental services? We&apos;re here to help! 
               Reach out to us through any of the methods below.
             </p>
           </div>

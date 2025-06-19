@@ -130,7 +130,7 @@ export default function ServiceAreasPage() {
           <div className="text-center space-y-4">
             <h2 className="text-2xl font-semibold">Ready to Book Your Dumpster?</h2>
             <p className="text-muted-foreground">
-              If you're in our service area, we're ready to help with your project!
+              If you&apos;re in our service area, we&apos;re ready to help with your project!
             </p>
             <Link 
               href="/book" 
