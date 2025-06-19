@@ -1,62 +1,47 @@
-"use client";
-import "mapbox-gl/dist/mapbox-gl.css";
-import Map, { Marker } from "react-map-gl/maplibre";
+'use client';
+
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 const serviceAreaCities = [
-  { name: "Salt Lake City", lat: 40.7608, lng: -111.8910 },
-  { name: "Provo", lat: 40.2338, lng: -111.6585 },
-  { name: "Ogden", lat: 41.2230, lng: -111.9738 },
-  { name: "Park City", lat: 40.6461, lng: -111.4980 },
-  { name: "Tooele", lat: 40.5308, lng: -112.2983 },
-  { name: "Logan", lat: 41.7369, lng: -111.8338 },
-  { name: "Brigham City", lat: 41.5102, lng: -112.0155 },
+  { name: 'Salt Lake City', lat: 40.7608, lng: -111.8910 },
+  { name: 'West Valley City', lat: 40.6916, lng: -112.0011 },
+  { name: 'West Jordan', lat: 40.6097, lng: -111.9391 },
+  { name: 'Sandy', lat: 40.5714, lng: -111.8391 },
+  { name: 'Ogden', lat: 41.2230, lng: -111.9738 },
+  { name: 'Logan', lat: 41.7370, lng: -111.8338 },
+  { name: 'Layton', lat: 41.0602, lng: -111.9710 },
+  { name: 'Evanston', lat: 41.2683, lng: -110.9632 }
 ];
+
+const mapContainerStyle = {
+  width: '100%',
+  height: '400px'
+};
+
+const center = {
+  lat: 41.0602, // Centered on Layton
+  lng: -111.9710
+};
+
+const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string;
+if (!apiKey) throw new Error('Google Maps API key is required');
 
 export default function ServiceAreaMap() {
   return (
-    <Map
-      initialViewState={{
-        longitude: -111.8910,
-        latitude: 40.7608,
-        zoom: 8,
-        bearing: 0,
-        pitch: 0,
-      }}
-      style={{ width: "100%", height: 400 }}
-      mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
-    >
-      {serviceAreaCities.map((city) => {
-        console.log(`Marker for ${city.name}: longitude=${city.lng}, latitude=${city.lat}`);
-        return (
+    <LoadScript googleMapsApiKey={apiKey}>
+      <GoogleMap
+        mapContainerStyle={mapContainerStyle}
+        center={center}
+        zoom={9}
+      >
+        {serviceAreaCities.map((city) => (
           <Marker
             key={city.name}
-            longitude={city.lng}
-            latitude={city.lat}
-          >
-            <div
-              style={{
-                background: "#2563eb",
-                borderRadius: "50%",
-                width: 24,
-                height: 24,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#fff",
-                fontWeight: 700,
-                fontSize: 14,
-                border: "2px solid #fff",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-                transform: "translate(-50%, -50%)",
-                position: "absolute"
-              }}
-              title={city.name}
-            >
-              {city.name[0]}
-            </div>
-          </Marker>
-        );
-      })}
-    </Map>
+            position={{ lat: city.lat, lng: city.lng }}
+            title={city.name}
+          />
+        ))}
+      </GoogleMap>
+    </LoadScript>
   );
-} 
+}
