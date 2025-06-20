@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import * as turf from '@turf/turf';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { supabase } from '@/lib/supabaseClient';
 
 interface ServiceArea {
   id: number;

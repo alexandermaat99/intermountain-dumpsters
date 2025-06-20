@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
 import { MapPin } from 'lucide-react';
 
 interface ServiceArea {

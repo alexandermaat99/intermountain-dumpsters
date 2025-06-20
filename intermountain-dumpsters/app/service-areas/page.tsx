@@ -34,7 +34,7 @@ export default function ServiceAreasPage() {
           return;
         }
         setServiceAreas(data || []);
-      } catch (err) {
+      } catch {
         setError('Failed to load service areas');
       }
     }
