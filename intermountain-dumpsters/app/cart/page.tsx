@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 export default function CartPage() {
-  const { cart, updateQuantity, removeFromCart, clearCart } = useCartContext();
+  const { cart, updateQuantity, removeFromCart } = useCartContext();
   const [removingId, setRemovingId] = useState<number | null>(null);
 
   const handleRemoveItem = async (itemId: number) => {

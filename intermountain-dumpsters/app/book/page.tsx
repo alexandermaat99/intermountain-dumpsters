@@ -81,7 +81,7 @@ export default function BookPage() {
   const [dumpsters, setDumpsters] = useState<Dumpster[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { addToCart, isInCart, getItemQuantity } = useCartContext();
+  const { addToCart, isInCart } = useCartContext();
   const router = useRouter();
   const [addingId, setAddingId] = useState<number | null>(null);
 
@@ -163,7 +163,6 @@ export default function BookPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {dumpsters.map((dumpster) => {
                 const inCart = isInCart(dumpster.id);
-                const quantity = getItemQuantity(dumpster.id);
                 
                 return (
                   <Card key={dumpster.id} className="flex flex-col hover:shadow-lg transition-shadow">
