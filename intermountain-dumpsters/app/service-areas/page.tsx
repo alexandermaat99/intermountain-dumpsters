@@ -5,6 +5,7 @@ import ServiceAreasList from "../../components/ServiceAreasList";
 import Navigation from "@/components/Navigation";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useState, useEffect } from "react";
+import { supabase } from '@/lib/supabaseClient';
 
 interface ServiceArea {
   id: number;
@@ -17,13 +18,31 @@ interface ServiceArea {
 export default function ServiceAreasPage() {
   const [selectedArea, setSelectedArea] = useState<ServiceArea | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
+  const [serviceAreas, setServiceAreas] = useState<ServiceArea[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    async function fetchServiceAreas() {
+      try {
+        setError(null);
+        const { data, error } = await supabase
+          .from('service_areas')
+          .select('*')
+          .order('name');
+        if (error) {
+          setError('Failed to load service areas');
+          return;
+        }
+        setServiceAreas(data || []);
+      } catch (err) {
+        setError('Failed to load service areas');
+      }
+    }
+    fetchServiceAreas();
     // Simulate a brief loading time to ensure smooth transitions
     const timer = setTimeout(() => {
       setPageLoading(false);
     }, 500);
-
     return () => clearTimeout(timer);
   }, []);
 
@@ -66,17 +85,19 @@ export default function ServiceAreasPage() {
                 </div>
               </div>
             </div>
+          ) : error ? (
+            <div className="text-center text-destructive py-8">{error}</div>
           ) : (
             /* Main Content Grid */
             <div className="grid lg:grid-cols-[1fr,350px] gap-8">
               {/* Mapbox Map */}
               <div className="h-[400px] lg:h-[600px] rounded-lg overflow-hidden border-2 border-muted-foreground/25">
-                <ServiceAreaMap selectedArea={selectedArea} />
+                <ServiceAreaMap selectedArea={selectedArea} serviceAreas={serviceAreas} loading={pageLoading} />
               </div>
 
               {/* Service Areas List */}
               <div>
-                <ServiceAreasList onAreaSelect={setSelectedArea} selectedArea={selectedArea} />
+                <ServiceAreasList onAreaSelect={setSelectedArea} selectedArea={selectedArea} serviceAreas={serviceAreas} loading={pageLoading} error={error} />
               </div>
             </div>
           )}

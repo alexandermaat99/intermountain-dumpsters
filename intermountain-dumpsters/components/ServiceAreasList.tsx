@@ -15,42 +15,12 @@ interface ServiceArea {
 interface ServiceAreasListProps {
   onAreaSelect: (area: ServiceArea | null) => void;
   selectedArea: ServiceArea | null;
+  serviceAreas: ServiceArea[];
+  loading: boolean;
+  error: string | null;
 }
 
-export default function ServiceAreasList({ onAreaSelect, selectedArea }: ServiceAreasListProps) {
-  const [serviceAreas, setServiceAreas] = useState<ServiceArea[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchServiceAreas() {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from('service_areas')
-          .select('*')
-          .order('name');
-        
-        if (error) {
-          console.error('Error fetching service areas:', error);
-          setError('Failed to load service areas');
-          return;
-        }
-
-        if (data) {
-          setServiceAreas(data);
-        }
-      } catch (err) {
-        console.error('Error fetching service areas:', err);
-        setError('Failed to load service areas');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchServiceAreas();
-  }, []);
-
+export default function ServiceAreasList({ onAreaSelect, selectedArea, serviceAreas, loading, error }: ServiceAreasListProps) {
   const handleAreaClick = (area: ServiceArea) => {
     if (selectedArea?.id === area.id) {
       onAreaSelect(null); // Deselect if clicking the same area

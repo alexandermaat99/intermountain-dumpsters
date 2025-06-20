@@ -16,6 +16,8 @@ interface ServiceArea {
 
 interface ServiceAreaMapProps {
   selectedArea: ServiceArea | null;
+  serviceAreas: ServiceArea[];
+  loading: boolean;
 }
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN as string;
@@ -28,43 +30,16 @@ if (!process.env.NEXT_PUBLIC_MAPBOX_TOKEN) {
 // 15 miles in kilometers
 const RADIUS_IN_KM = 6 * 1.60934;
 
-export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
+export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: ServiceAreaMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<{ [key: number]: mapboxgl.Marker }>({});
   const popupsRef = useRef<{ [key: number]: mapboxgl.Popup }>({});
   const [mounted, setMounted] = useState(false);
-  const [serviceAreas, setServiceAreas] = useState<ServiceArea[]>([]);
-  const [mapLoading, setMapLoading] = useState(true);
   const cleanupRef = useRef(false);
 
   useEffect(() => {
     setMounted(true);
-    
-    async function fetchServiceAreas() {
-      try {
-        setMapLoading(true);
-        const { data, error } = await supabase
-          .from('service_areas')
-          .select('*')
-          .order('name');
-        
-        if (error) {
-          console.error('Error fetching service areas:', error);
-          return;
-        }
-
-        if (data) {
-          setServiceAreas(data);
-        }
-      } catch (err) {
-        console.error('Error fetching service areas:', err);
-      } finally {
-        setMapLoading(false);
-      }
-    }
-
-    fetchServiceAreas();
   }, []);
 
   // Initialize map
@@ -230,7 +205,17 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
   // Handle selected area changes
   useEffect(() => {
     if (cleanupRef.current || !map.current || !mounted || !map.current.isStyleLoaded()) return;
-
+    if (selectedArea) {
+      // Defensive: check if marker and layers exist
+      const marker = markersRef.current[selectedArea.id];
+      const popup = popupsRef.current[selectedArea.id];
+      const selectedFillLayerId = `circle-fill-${selectedArea.id}`;
+      const selectedOutlineLayerId = `circle-outline-${selectedArea.id}`;
+      if (!marker || !popup || !map.current.getLayer(selectedFillLayerId) || !map.current.getLayer(selectedOutlineLayerId)) {
+        // If not ready, skip
+        return;
+      }
+    }
     // Reset all circles and popups to default style
     serviceAreas.forEach(area => {
       const fillLayerId = `circle-fill-${area.id}`;
@@ -327,7 +312,7 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
             <p className="text-sm text-muted-foreground">Map not available - Mapbox token not configured</p>
           </div>
         </div>
-      ) : mapLoading ? (
+      ) : loading ? (
         <div className="w-full h-full flex items-center justify-center bg-muted/20 rounded-lg">
           <div className="text-center space-y-2">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
