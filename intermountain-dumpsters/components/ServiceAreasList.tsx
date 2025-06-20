@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabaseClient';
 import { MapPin } from 'lucide-react';
 
 interface ServiceArea {
@@ -16,11 +16,6 @@ interface ServiceAreasListProps {
   onAreaSelect: (area: ServiceArea | null) => void;
   selectedArea: ServiceArea | null;
 }
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export default function ServiceAreasList({ onAreaSelect, selectedArea }: ServiceAreasListProps) {
   const [serviceAreas, setServiceAreas] = useState<ServiceArea[]>([]);

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import * as turf from '@turf/turf';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabaseClient';
 
 interface ServiceArea {
   id: number;
@@ -18,12 +18,12 @@ interface ServiceAreaMapProps {
   selectedArea: ServiceArea | null;
 }
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN as string;
+
+// Check if Mapbox token is available
+if (!process.env.NEXT_PUBLIC_MAPBOX_TOKEN) {
+  console.error('Mapbox token is not configured. Please set NEXT_PUBLIC_MAPBOX_TOKEN in your environment variables.');
+}
 
 // 15 miles in kilometers
 const RADIUS_IN_KM = 6 * 1.60934;
@@ -36,6 +36,7 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
   const [mounted, setMounted] = useState(false);
   const [serviceAreas, setServiceAreas] = useState<ServiceArea[]>([]);
   const [mapLoading, setMapLoading] = useState(true);
+  const cleanupRef = useRef(false);
 
   useEffect(() => {
     setMounted(true);
@@ -69,6 +70,12 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
   // Initialize map
   useEffect(() => {
     if (!mounted || !mapContainer.current || map.current || serviceAreas.length === 0) return;
+    
+    // Check if Mapbox token is available
+    if (!process.env.NEXT_PUBLIC_MAPBOX_TOKEN) {
+      console.error('Mapbox token is not configured');
+      return;
+    }
 
     const defaultCenter: [number, number] = [-111.8505, 40.3916]; // Lehi coordinates
     const center: [number, number] = serviceAreas.length > 0 
@@ -83,9 +90,39 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
     });
 
     // Add navigation controls
+    // Note: The passive event listener warning is a known Mapbox issue
+    // and doesn't affect functionality - it's just a performance optimization suggestion
     map.current.addControl(new mapboxgl.NavigationControl());
 
     map.current.on('load', () => {
+      // Ensure the map style is fully loaded before adding layers
+      // Add a small delay to ensure style is fully loaded
+      setTimeout(() => {
+        if (!map.current?.isStyleLoaded()) {
+          // Retry after a short delay
+          setTimeout(() => {
+            if (map.current?.isStyleLoaded()) {
+              addMapLayers();
+            }
+          }, 100);
+          return;
+        }
+        addMapLayers();
+      }, 50);
+    });
+
+    // Function to add map layers
+    const addMapLayers = () => {
+      if (cleanupRef.current || !map.current?.isStyleLoaded()) {
+        if (cleanupRef.current) {
+          // Map cleanup in progress, skipping layer addition
+          return;
+        } else {
+          // Map style still not loaded, skipping layer addition
+          return;
+        }
+      }
+
       // Create circles for each service area
       serviceAreas.forEach((area) => {
         const center = turf.point([area.longitude, area.latitude]);
@@ -177,16 +214,22 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
       map.current!.fitBounds(bounds, {
         padding: 50
       });
+    };
+
+    // Add error handling for map loading
+    map.current.on('error', (e) => {
+      console.error('Mapbox error:', e);
     });
 
     return () => {
+      cleanupRef.current = true;
       map.current?.remove();
     };
   }, [mounted, serviceAreas]);
 
   // Handle selected area changes
   useEffect(() => {
-    if (!map.current || !mounted || !map.current.isStyleLoaded()) return;
+    if (cleanupRef.current || !map.current || !mounted || !map.current.isStyleLoaded()) return;
 
     // Reset all circles and popups to default style
     serviceAreas.forEach(area => {
@@ -278,7 +321,13 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
 
   return (
     <div className="w-full h-full relative">
-      {mapLoading ? (
+      {!process.env.NEXT_PUBLIC_MAPBOX_TOKEN ? (
+        <div className="w-full h-full flex items-center justify-center bg-muted/20 rounded-lg">
+          <div className="text-center space-y-2">
+            <p className="text-sm text-muted-foreground">Map not available - Mapbox token not configured</p>
+          </div>
+        </div>
+      ) : mapLoading ? (
         <div className="w-full h-full flex items-center justify-center bg-muted/20 rounded-lg">
           <div className="text-center space-y-2">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
