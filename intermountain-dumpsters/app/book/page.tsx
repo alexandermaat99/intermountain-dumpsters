@@ -119,8 +119,7 @@ export default function BookPage() {
 
   const handleAddToCart = async (dumpster: Dumpster) => {
     setAddingId(dumpster.id);
-    const { ...dumpsterWithoutQuantity } = dumpster;
-    addToCart(dumpsterWithoutQuantity);
+    addToCart(dumpster);
     await new Promise(res => setTimeout(res, 600));
     router.push('/cart');
   };

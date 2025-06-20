@@ -11,14 +11,7 @@ import { useState } from "react";
 
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart, clearCart } = useCartContext();
-  const [isClearing, setIsClearing] = useState(false);
   const [removingId, setRemovingId] = useState<number | null>(null);
-
-  const handleClearCart = () => {
-    setIsClearing(true);
-    clearCart();
-    setTimeout(() => setIsClearing(false), 1000);
-  };
 
   const handleRemoveItem = async (itemId: number) => {
     setRemovingId(itemId);
