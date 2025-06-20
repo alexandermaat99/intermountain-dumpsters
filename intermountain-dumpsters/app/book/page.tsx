@@ -115,7 +115,7 @@ export default function BookPage() {
   };
 
   const handleAddToCart = (dumpster: Dumpster) => {
-    const { quantity, ...dumpsterWithoutQuantity } = dumpster;
+    const { ...dumpsterWithoutQuantity } = dumpster;
     addToCart(dumpsterWithoutQuantity);
   };
 

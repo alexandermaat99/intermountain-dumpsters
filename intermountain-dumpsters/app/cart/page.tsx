@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCartContext } from "@/lib/contexts/CartContext";
 import Image from "next/image";
 import { Minus, Plus, Trash2, ShoppingCart, ArrowLeft } from "lucide-react";

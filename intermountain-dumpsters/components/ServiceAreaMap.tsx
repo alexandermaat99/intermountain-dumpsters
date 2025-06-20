@@ -225,7 +225,7 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
       cleanupRef.current = true;
       map.current?.remove();
     };
-  }, [mounted, serviceAreas]);
+  }, [mounted, selectedArea, serviceAreas]);
 
   // Handle selected area changes
   useEffect(() => {
