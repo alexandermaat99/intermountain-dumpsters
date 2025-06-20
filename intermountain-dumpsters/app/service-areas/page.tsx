@@ -3,6 +3,7 @@
 import Link from "next/link";
 import ServiceAreaMap from "@/components/ServiceAreaMap";
 import ServiceAreasList from "../../components/ServiceAreasList";
+import Navigation from "@/components/Navigation";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useState } from "react";
 
@@ -20,26 +21,7 @@ export default function ServiceAreasPage() {
   return (
     <div className="w-full flex flex-col gap-10">
       {/* Navigation */}
-      <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-        <div className="w-full max-w-6xl flex justify-between items-center p-3 px-5 text-sm">
-          <div className="flex gap-5 items-center font-semibold">
-            <Link href={"/"} className="text-xl font-bold">
-              Intermountain Dumpsters
-            </Link>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/book" className="hover:underline">
-              Book Now
-            </Link>
-            <Link href="/service-areas" className="hover:underline font-semibold">
-              Service Areas
-            </Link>
-            <Link href="/contact" className="hover:underline">
-              Contact
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navigation currentPage="service-areas" />
 
       {/* Main Content */}
       <div className="flex-1 w-full flex justify-center">

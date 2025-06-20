@@ -1,30 +1,12 @@
 import Link from "next/link";
+import Navigation from "@/components/Navigation";
 
 export default function BookPage() {
   return (
     <div className="w-full flex flex-col items-center">
       <div className="w-full flex flex-col gap-10 items-center">
         {/* Navigation */}
-        <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-          <div className="w-full max-w-6xl flex justify-between items-center p-3 px-5 text-sm">
-            <div className="flex gap-5 items-center font-semibold">
-              <Link href={"/"} className="text-xl font-bold">
-                Intermountain Dumpsters
-              </Link>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link href="/book" className="hover:underline font-semibold">
-                Book Now
-              </Link>
-              <Link href="/service-areas" className="hover:underline">
-                Service Areas
-              </Link>
-              <Link href="/contact" className="hover:underline">
-                Contact
-              </Link>
-            </div>
-          </div>
-        </nav>
+        <Navigation currentPage="book" />
 
         {/* Booking Form */}
         <div className="flex-1 flex flex-col gap-8 max-w-6xl p-5 w-full">
