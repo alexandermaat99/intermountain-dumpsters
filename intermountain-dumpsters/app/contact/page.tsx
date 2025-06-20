@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ThemeSwitcher } from "@/components/theme-switcher";
 import ContactInfo from "@/components/ContactInfo";
 
 export default function ContactPage() {
@@ -145,15 +144,6 @@ export default function ContactPage() {
               </button>
             </form>
           </div>
-        </div>
-
-        {/* Emergency Contact */}
-        <div className="bg-primary/10 p-6 rounded-lg text-center">
-          <h2 className="text-xl font-semibold mb-2">Emergency Service</h2>
-          <p className="text-muted-foreground mb-4">
-            Need immediate assistance outside of business hours?
-          </p>
-          <p className="font-semibold text-lg">Emergency Hotline: (801) 555-9999</p>
         </div>
       </div>
     </div>
