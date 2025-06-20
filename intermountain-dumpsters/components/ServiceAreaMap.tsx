@@ -266,7 +266,7 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
         }
       }
     }
-  }, [mounted, serviceAreas, selectedArea]);
+  }, [mounted, selectedArea, serviceAreas]);
 
   return (
     <div className="w-full h-full relative">

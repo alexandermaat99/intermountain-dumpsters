@@ -63,7 +63,7 @@ export default async function BookPage() {
                   </div>
                   <p className="font-semibold text-lg">${dumpster.price}</p>
                   <p className="text-sm text-muted-foreground">
-                    Dimensions: {dumpster.length}'L x {dumpster.width}'W x {dumpster.height}'H
+                    Dimensions: {dumpster.length}&apos;L x {dumpster.width}&apos;W x {dumpster.height}&apos;H
                   </p>
                   <p className="text-sm">
                     <span className="font-semibold">Best for:</span> {dumpster.uses}
