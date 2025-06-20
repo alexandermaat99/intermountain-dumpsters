@@ -37,14 +37,15 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
   const popupsRef = useRef<{ [key: number]: mapboxgl.Popup }>({});
   const [mounted, setMounted] = useState(false);
   const cleanupRef = useRef(false);
+  const initializedRef = useRef(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Initialize map
+  // Initialize map - only run once when mounted and serviceAreas are available
   useEffect(() => {
-    if (!mounted || !mapContainer.current || map.current || serviceAreas.length === 0) return;
+    if (!mounted || !mapContainer.current || map.current || serviceAreas.length === 0 || initializedRef.current) return;
     
     // Check if Mapbox token is available
     if (!process.env.NEXT_PUBLIC_MAPBOX_TOKEN) {
@@ -52,6 +53,7 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
       return;
     }
 
+    initializedRef.current = true;
     const defaultCenter: [number, number] = [-111.8505, 40.3916]; // Lehi coordinates
     const center: [number, number] = serviceAreas.length > 0 
       ? [serviceAreas[0].longitude, serviceAreas[0].latitude]
@@ -65,13 +67,10 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
     });
 
     // Add navigation controls
-    // Note: The passive event listener warning is a known Mapbox issue
-    // and doesn't affect functionality - it's just a performance optimization suggestion
     map.current.addControl(new mapboxgl.NavigationControl());
 
     map.current.on('load', () => {
       // Ensure the map style is fully loaded before adding layers
-      // Add a small delay to ensure style is fully loaded
       setTimeout(() => {
         if (!map.current?.isStyleLoaded()) {
           // Retry after a short delay
@@ -89,13 +88,7 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
     // Function to add map layers
     const addMapLayers = () => {
       if (cleanupRef.current || !map.current?.isStyleLoaded()) {
-        if (cleanupRef.current) {
-          // Map cleanup in progress, skipping layer addition
-          return;
-        } else {
-          // Map style still not loaded, skipping layer addition
-          return;
-        }
+        return;
       }
 
       // Create circles for each service area
@@ -198,24 +191,18 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
 
     return () => {
       cleanupRef.current = true;
-      map.current?.remove();
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
+      initializedRef.current = false;
     };
-  }, [mounted, selectedArea, serviceAreas]);
+  }, [mounted, serviceAreas]); // Removed selectedArea from dependencies
 
-  // Handle selected area changes
+  // Handle selected area changes - separate effect
   useEffect(() => {
     if (cleanupRef.current || !map.current || !mounted || !map.current.isStyleLoaded()) return;
-    if (selectedArea) {
-      // Defensive: check if marker and layers exist
-      const marker = markersRef.current[selectedArea.id];
-      const popup = popupsRef.current[selectedArea.id];
-      const selectedFillLayerId = `circle-fill-${selectedArea.id}`;
-      const selectedOutlineLayerId = `circle-outline-${selectedArea.id}`;
-      if (!marker || !popup || !map.current.getLayer(selectedFillLayerId) || !map.current.getLayer(selectedOutlineLayerId)) {
-        // If not ready, skip
-        return;
-      }
-    }
+
     // Reset all circles and popups to default style
     serviceAreas.forEach(area => {
       const fillLayerId = `circle-fill-${area.id}`;
@@ -302,7 +289,7 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
         }
       }
     }
-  }, [mounted, selectedArea, serviceAreas]);
+  }, [selectedArea, serviceAreas, mounted]);
 
   return (
     <div className="w-full h-full relative">
