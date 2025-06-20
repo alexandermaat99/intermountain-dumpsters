@@ -15,7 +15,7 @@ export default function CartPage() {
 
   const handleRemoveItem = async (itemId: number) => {
     setRemovingId(itemId);
-    await new Promise(res => setTimeout(res, 300));
+    await new Promise(res => setTimeout(res, 500));
     removeFromCart(itemId);
     setRemovingId(null);
   };
