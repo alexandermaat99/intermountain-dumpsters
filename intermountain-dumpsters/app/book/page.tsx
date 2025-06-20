@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useCartContext } from "@/lib/contexts/CartContext";
 import Image from "next/image";
 import { ShoppingCart, Check } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type Dumpster = {
   id: number;
@@ -81,6 +82,8 @@ export default function BookPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { addToCart, isInCart, getItemQuantity } = useCartContext();
+  const router = useRouter();
+  const [addingId, setAddingId] = useState<number | null>(null);
 
   const fetchDumpsters = async () => {
     try {
@@ -114,9 +117,12 @@ export default function BookPage() {
     fetchDumpsters();
   };
 
-  const handleAddToCart = (dumpster: Dumpster) => {
+  const handleAddToCart = async (dumpster: Dumpster) => {
+    setAddingId(dumpster.id);
     const { ...dumpsterWithoutQuantity } = dumpster;
     addToCart(dumpsterWithoutQuantity);
+    await new Promise(res => setTimeout(res, 600));
+    router.push('/cart');
   };
 
   return (
@@ -183,20 +189,19 @@ export default function BookPage() {
                       <p className="text-sm">
                         <span className="font-semibold">Best for:</span> {dumpster.uses}
                       </p>
-                      {inCart && (
-                        <div className="flex items-center gap-2 text-sm text-green-600">
-                          <Check className="w-4 h-4" />
-                          <span>In cart ({quantity})</span>
-                        </div>
-                      )}
                     </CardContent>
                     <CardFooter>
                       <Button 
                         className="w-full" 
                         onClick={() => handleAddToCart(dumpster)}
-                        disabled={inCart}
+                        disabled={inCart || addingId === dumpster.id}
                       >
-                        {inCart ? (
+                        {addingId === dumpster.id ? (
+                          <span className="flex items-center justify-center gap-2">
+                            <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>
+                            Adding...
+                          </span>
+                        ) : inCart ? (
                           <>
                             <Check className="w-4 h-4 mr-2" />
                             Added to Cart

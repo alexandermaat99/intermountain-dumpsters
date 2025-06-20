@@ -7,9 +7,25 @@ import { useCartContext } from "@/lib/contexts/CartContext";
 import Image from "next/image";
 import { Minus, Plus, Trash2, ShoppingCart, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function CartPage() {
-  const { cart, updateQuantity, removeFromCart} = useCartContext();
+  const { cart, updateQuantity, removeFromCart, clearCart } = useCartContext();
+  const [isClearing, setIsClearing] = useState(false);
+  const [removingId, setRemovingId] = useState<number | null>(null);
+
+  const handleClearCart = () => {
+    setIsClearing(true);
+    clearCart();
+    setTimeout(() => setIsClearing(false), 1000);
+  };
+
+  const handleRemoveItem = async (itemId: number) => {
+    setRemovingId(itemId);
+    await new Promise(res => setTimeout(res, 300));
+    removeFromCart(itemId);
+    setRemovingId(null);
+  };
 
   const handleCheckout = () => {
     // TODO: Integrate with Squarespace checkout
@@ -34,7 +50,7 @@ export default function CartPage() {
 
             <div className="text-center space-y-4">
               <Link href="/book">
-                <Button className="flex items-center gap-2">
+                <Button className="flex items-center gap-2 mx-auto">
                   <ArrowLeft className="w-4 h-4" />
                   Continue Shopping
                 </Button>
@@ -94,10 +110,18 @@ export default function CartPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => removeFromCart(item.id)}
+                          onClick={() => handleRemoveItem(item.id)}
+                          disabled={removingId === item.id}
                           className="text-destructive hover:text-destructive"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          {removingId === item.id ? (
+                            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                            </svg>
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
                         </Button>
                       </div>
 
