@@ -35,23 +35,31 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
   const popupsRef = useRef<{ [key: number]: mapboxgl.Popup }>({});
   const [mounted, setMounted] = useState(false);
   const [serviceAreas, setServiceAreas] = useState<ServiceArea[]>([]);
+  const [mapLoading, setMapLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
     
     async function fetchServiceAreas() {
-      const { data, error } = await supabase
-        .from('service_areas')
-        .select('*')
-        .order('name');
-      
-      if (error) {
-        console.error('Error fetching service areas:', error);
-        return;
-      }
+      try {
+        setMapLoading(true);
+        const { data, error } = await supabase
+          .from('service_areas')
+          .select('*')
+          .order('name');
+        
+        if (error) {
+          console.error('Error fetching service areas:', error);
+          return;
+        }
 
-      if (data) {
-        setServiceAreas(data);
+        if (data) {
+          setServiceAreas(data);
+        }
+      } catch (err) {
+        console.error('Error fetching service areas:', err);
+      } finally {
+        setMapLoading(false);
       }
     }
 
@@ -270,7 +278,16 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
 
   return (
     <div className="w-full h-full relative">
-      <div ref={mapContainer} className="w-full h-full" />
+      {mapLoading ? (
+        <div className="w-full h-full flex items-center justify-center bg-muted/20 rounded-lg">
+          <div className="text-center space-y-2">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <p className="text-sm text-muted-foreground">Loading map...</p>
+          </div>
+        </div>
+      ) : (
+        <div ref={mapContainer} className="w-full h-full" />
+      )}
       <style jsx global>{`
         .marker-selected {
           filter: hue-rotate(15deg) saturate(150%);
