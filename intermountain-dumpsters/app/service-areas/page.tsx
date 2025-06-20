@@ -19,7 +19,7 @@ export default function ServiceAreasPage() {
   const [selectedArea, setSelectedArea] = useState<ServiceArea | null>(null);
 
   return (
-    <div className="w-full flex flex-col gap-10">
+    <div className="w-full flex flex-col gap-5 md:gap-10">
       {/* Navigation */}
       <Navigation currentPage="service-areas" />
 

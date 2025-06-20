@@ -4,7 +4,7 @@ import Navigation from "@/components/Navigation";
 export default function BookPage() {
   return (
     <div className="w-full flex flex-col items-center">
-      <div className="w-full flex flex-col gap-10 items-center">
+      <div className="w-full flex flex-col gap-5 md:gap-10 items-center">
         {/* Navigation */}
         <Navigation currentPage="book" />
 
