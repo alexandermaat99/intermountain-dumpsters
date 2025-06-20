@@ -249,28 +249,24 @@ export default function ServiceAreaMap({ selectedArea }: ServiceAreaMapProps) {
           
           markersRef.current[selectedArea.id] = newMarker;
           
-          // Add hover events to marker element
-          const markerElement = newMarker.getElement();
-          markerElement.addEventListener('mouseenter', () => popup.addTo(map.current!));
-          markerElement.addEventListener('mouseleave', () => {
-            if (!selectedArea || selectedArea.id !== selectedArea.id) {
-              popup.remove();
-            }
-          });
+          const newMarkerElement = newMarker.getElement();
+          newMarkerElement.addEventListener('mouseenter', () => popup.addTo(map.current!));
+          newMarkerElement.addEventListener('mouseleave', () => popup.remove());
         }
-
-        // Fly to the selected area
+        
+        // Fly to selected area
         map.current!.flyTo({
           center: [selectedArea.longitude, selectedArea.latitude],
           zoom: 10,
-          duration: 1500
+          essential: true
         });
 
-        // Show the popup
-        popup?.addTo(map.current);
+        if (popup) {
+          popup.addTo(map.current!);
+        }
       }
     }
-  }, [selectedArea, mounted, serviceAreas]);
+  }, [mounted, serviceAreas, selectedArea]);
 
   return (
     <div className="w-full h-full relative">
