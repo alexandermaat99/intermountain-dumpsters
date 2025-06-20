@@ -5,7 +5,9 @@ import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/lib/supabaseClient";
+import { useCartContext } from "@/lib/contexts/CartContext";
 import Image from "next/image";
+import { ShoppingCart, Check } from "lucide-react";
 
 type Dumpster = {
   id: number;
@@ -78,6 +80,7 @@ export default function BookPage() {
   const [dumpsters, setDumpsters] = useState<Dumpster[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { addToCart, isInCart, getItemQuantity } = useCartContext();
 
   const fetchDumpsters = async () => {
     try {
@@ -109,6 +112,11 @@ export default function BookPage() {
 
   const handleRetry = () => {
     fetchDumpsters();
+  };
+
+  const handleAddToCart = (dumpster: Dumpster) => {
+    const { quantity, ...dumpsterWithoutQuantity } = dumpster;
+    addToCart(dumpsterWithoutQuantity);
   };
 
   return (
@@ -148,35 +156,62 @@ export default function BookPage() {
           {/* Success State */}
           {!loading && !error && dumpsters.length > 0 && (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {dumpsters.map((dumpster) => (
-                <Card key={dumpster.id} className="flex flex-col hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <CardTitle>{dumpster.name}</CardTitle>
-                    <CardDescription>{dumpster.descriptor}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-grow space-y-4">
-                    <div className="relative w-full h-48">
-                      <Image
-                        src={dumpster.image_path}
-                        alt={`Image of ${dumpster.name}`}
-                        fill
-                        style={{ objectFit: "cover" }}
-                        className="rounded-md"
-                      />
-                    </div>
-                    <p className="font-semibold text-lg">${dumpster.price}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Dimensions: {dumpster.length}&apos;L x {dumpster.width}&apos;W x {dumpster.height}&apos;H
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-semibold">Best for:</span> {dumpster.uses}
-                    </p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button className="w-full">Book Online</Button>
-                  </CardFooter>
-                </Card>
-              ))}
+              {dumpsters.map((dumpster) => {
+                const inCart = isInCart(dumpster.id);
+                const quantity = getItemQuantity(dumpster.id);
+                
+                return (
+                  <Card key={dumpster.id} className="flex flex-col hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                      <CardTitle>{dumpster.name}</CardTitle>
+                      <CardDescription>{dumpster.descriptor}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-grow space-y-4">
+                      <div className="relative w-full h-48">
+                        <Image
+                          src={dumpster.image_path}
+                          alt={`Image of ${dumpster.name}`}
+                          fill
+                          style={{ objectFit: "cover" }}
+                          className="rounded-md"
+                        />
+                      </div>
+                      <p className="font-semibold text-lg">${dumpster.price}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Dimensions: {dumpster.length}&apos;L x {dumpster.width}&apos;W x {dumpster.height}&apos;H
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-semibold">Best for:</span> {dumpster.uses}
+                      </p>
+                      {inCart && (
+                        <div className="flex items-center gap-2 text-sm text-green-600">
+                          <Check className="w-4 h-4" />
+                          <span>In cart ({quantity})</span>
+                        </div>
+                      )}
+                    </CardContent>
+                    <CardFooter>
+                      <Button 
+                        className="w-full" 
+                        onClick={() => handleAddToCart(dumpster)}
+                        disabled={inCart}
+                      >
+                        {inCart ? (
+                          <>
+                            <Check className="w-4 h-4 mr-2" />
+                            Added to Cart
+                          </>
+                        ) : (
+                          <>
+                            <ShoppingCart className="w-4 h-4 mr-2" />
+                            Add to Cart
+                          </>
+                        )}
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
             </div>
           )}
         </div>

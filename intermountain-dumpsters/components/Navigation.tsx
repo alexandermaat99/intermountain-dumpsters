@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import CartIcon from "./CartIcon";
 
 interface NavigationProps {
-  currentPage: 'home' | 'book' | 'service-areas' | 'contact';
+  currentPage: 'home' | 'book' | 'service-areas' | 'contact' | 'cart';
 }
 
 export default function Navigation({ currentPage }: NavigationProps) {
@@ -49,27 +50,31 @@ export default function Navigation({ currentPage }: NavigationProps) {
               {item.label}
             </Link>
           ))}
+          <CartIcon />
         </div>
 
         {/* Mobile Hamburger Button */}
-        <button
-          className="md:hidden p-2 hover:bg-accent rounded-md transition-all duration-200"
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
-        >
-          <div className="relative w-5 h-5">
-            <Menu 
-              className={`absolute inset-0 transition-all duration-200 ${
-                isMenuOpen ? 'opacity-0 rotate-90' : 'opacity-100 rotate-0'
-              }`}
-            />
-            <X 
-              className={`absolute inset-0 transition-all duration-200 ${
-                isMenuOpen ? 'opacity-100 rotate-0' : 'opacity-0 -rotate-90'
-              }`}
-            />
-          </div>
-        </button>
+        <div className="md:hidden flex items-center gap-2">
+          <CartIcon />
+          <button
+            className="p-2 hover:bg-accent rounded-md transition-all duration-200"
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
+            <div className="relative w-5 h-5">
+              <Menu 
+                className={`absolute inset-0 transition-all duration-200 ${
+                  isMenuOpen ? 'opacity-0 rotate-90' : 'opacity-100 rotate-0'
+                }`}
+              />
+              <X 
+                className={`absolute inset-0 transition-all duration-200 ${
+                  isMenuOpen ? 'opacity-100 rotate-0' : 'opacity-0 -rotate-90'
+                }`}
+              />
+            </div>
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu Overlay */}
