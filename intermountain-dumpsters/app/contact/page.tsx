@@ -3,10 +3,10 @@ import ContactInfo from "@/components/ContactInfo";
 
 export default function ContactPage() {
   return (
-    <div className="w-full flex flex-col gap-20 items-center">
+    <div className="w-full flex flex-col gap-10 items-center">
       {/* Navigation */}
       <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-        <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
+        <div className="w-full max-w-6xl flex justify-between items-center p-3 px-5 text-sm">
           <div className="flex gap-5 items-center font-semibold">
             <Link href={"/"} className="text-xl font-bold">
               Intermountain Dumpsters
@@ -27,7 +27,7 @@ export default function ContactPage() {
       </nav>
 
       {/* Contact Content */}
-      <div className="flex-1 flex flex-col gap-8 max-w-4xl p-5 w-full">
+      <div className="flex-1 flex flex-col gap-8 max-w-6xl p-5 w-full">
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold">Contact Us</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">

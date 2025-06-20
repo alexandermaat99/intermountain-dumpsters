@@ -18,10 +18,10 @@ export default function ServiceAreasPage() {
   const [selectedArea, setSelectedArea] = useState<ServiceArea | null>(null);
 
   return (
-    <div className="w-full flex flex-col">
+    <div className="w-full flex flex-col gap-10">
       {/* Navigation */}
       <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-        <div className="w-full max-w-7xl flex justify-between items-center p-3 px-5 text-sm">
+        <div className="w-full max-w-6xl flex justify-between items-center p-3 px-5 text-sm">
           <div className="flex gap-5 items-center font-semibold">
             <Link href={"/"} className="text-xl font-bold">
               Intermountain Dumpsters
@@ -43,7 +43,7 @@ export default function ServiceAreasPage() {
 
       {/* Main Content */}
       <div className="flex-1 w-full flex justify-center">
-        <div className="w-full max-w-7xl p-5">
+        <div className="w-full max-w-6xl p-5">
           <div className="text-center space-y-4 mb-8">
             <h1 className="text-4xl font-bold">Service Areas</h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
