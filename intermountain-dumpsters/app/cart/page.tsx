@@ -8,17 +8,10 @@ import Image from "next/image";
 import { Minus, Plus, Trash2, ShoppingCart, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { CartItem } from "@/lib/types";
 
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart } = useCartContext();
-  const [removingId, setRemovingId] = useState<number | null>(null);
-
-  const handleRemoveItem = async (itemId: number) => {
-    setRemovingId(itemId);
-    await new Promise(res => setTimeout(res, 500));
-    removeFromCart(itemId);
-    setRemovingId(null);
-  };
 
   const handleCheckout = () => {
     // TODO: Integrate with Squarespace checkout
@@ -76,7 +69,7 @@ export default function CartPage() {
               </div>
 
               <div className="space-y-4">
-                {cart.items.map((item) => (
+                {cart.items.map((item: CartItem) => (
                   <Card key={item.id} className="flex flex-col md:flex-row">
                     <div className="md:w-48 h-48 md:h-auto relative">
                       <Image
@@ -103,18 +96,10 @@ export default function CartPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleRemoveItem(item.id)}
-                          disabled={removingId === item.id}
+                          onClick={() => removeFromCart(item.id)}
                           className="text-destructive hover:text-destructive"
                         >
-                          {removingId === item.id ? (
-                            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-                            </svg>
-                          ) : (
-                            <Trash2 className="w-4 h-4" />
-                          )}
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
 
@@ -133,6 +118,7 @@ export default function CartPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            disabled={item.quantity >= item.availableQuantity}
                           >
                             <Plus className="w-4 h-4" />
                           </Button>
@@ -156,7 +142,7 @@ export default function CartPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    {cart.items.map((item) => (
+                    {cart.items.map((item: CartItem) => (
                       <div key={item.id} className="flex justify-between text-sm">
                         <span className="flex-1">
                           {item.name} × {item.quantity}

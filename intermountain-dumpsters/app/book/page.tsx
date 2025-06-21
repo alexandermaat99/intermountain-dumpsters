@@ -9,18 +9,10 @@ import { useCartContext } from "@/lib/contexts/CartContext";
 import Image from "next/image";
 import { ShoppingCart, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { DumpsterType } from '@/lib/types';
 
-type Dumpster = {
-  id: number;
-  name: string;
-  descriptor: string;
-  length: number;
-  width: number;
-  height: number;
-  uses: string;
-  quantity: number;
-  image_path: string;
-  price: number;
+type DumpsterTypeWithCount = Omit<DumpsterType, 'quantity'> & {
+  dumpsters: [{ count: number }];
 };
 
 // Loading skeleton component
@@ -78,31 +70,36 @@ function EmptyState() {
 }
 
 export default function BookPage() {
-  const [dumpsters, setDumpsters] = useState<Dumpster[]>([]);
+  const [dumpsterTypes, setDumpsterTypes] = useState<DumpsterType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { addToCart, isInCart } = useCartContext();
   const router = useRouter();
   const [addingId, setAddingId] = useState<number | null>(null);
 
-  const fetchDumpsters = async () => {
+  const fetchDumpsterTypes = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      const { data, error: supabaseError } = await supabase.from('dumpsters').select('*');
+      const { data, error: supabaseError } = await supabase.from('dumpster_types').select('*, dumpsters(count)');
       
       if (supabaseError) {
-        console.error('Error fetching dumpsters:', supabaseError);
+        console.error('Error fetching dumpster types:', supabaseError);
         setError('Failed to load dumpsters. Please try again.');
         return;
       }
       
-      console.log('Fetched dumpsters:', data);
-      console.log('Number of dumpsters:', data?.length);
-      setDumpsters(data || []);
+      const formattedData: DumpsterType[] = (data as DumpsterTypeWithCount[]).map(d => ({
+        ...d,
+        quantity: d.dumpsters[0]?.count ?? 0,
+      }));
+
+      console.log('Fetched dumpster types:', formattedData);
+      console.log('Number of dumpster types:', formattedData.length);
+      setDumpsterTypes(formattedData);
     } catch (err) {
-      console.error('Error fetching dumpsters:', err);
+      console.error('Error fetching dumpster types:', err);
       setError('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
@@ -110,16 +107,16 @@ export default function BookPage() {
   };
 
   useEffect(() => {
-    fetchDumpsters();
+    fetchDumpsterTypes();
   }, []);
 
   const handleRetry = () => {
-    fetchDumpsters();
+    fetchDumpsterTypes();
   };
 
-  const handleAddToCart = async (dumpster: Dumpster) => {
-    setAddingId(dumpster.id);
-    addToCart(dumpster);
+  const handleAddToCart = async (dumpsterType: DumpsterType) => {
+    setAddingId(dumpsterType.id);
+    addToCart(dumpsterType);
     await new Promise(res => setTimeout(res, 600));
     router.push('/cart');
   };
@@ -154,47 +151,51 @@ export default function BookPage() {
           )}
 
           {/* Empty State */}
-          {!loading && !error && dumpsters.length === 0 && (
+          {!loading && !error && dumpsterTypes.length === 0 && (
             <EmptyState />
           )}
 
           {/* Success State */}
-          {!loading && !error && dumpsters.length > 0 && (
+          {!loading && !error && dumpsterTypes.length > 0 && (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {dumpsters.map((dumpster) => {
-                const inCart = isInCart(dumpster.id);
+              {dumpsterTypes.map((dumpsterType) => {
+                const inCart = isInCart(dumpsterType.id);
+                const isAvailable = dumpsterType.quantity > 0;
                 
                 return (
-                  <Card key={dumpster.id} className="flex flex-col hover:shadow-lg transition-shadow">
+                  <Card key={dumpsterType.id} className={`flex flex-col hover:shadow-lg transition-shadow ${!isAvailable ? 'opacity-50' : ''}`}>
                     <CardHeader>
-                      <CardTitle>{dumpster.name}</CardTitle>
-                      <CardDescription>{dumpster.descriptor}</CardDescription>
+                      <CardTitle>{dumpsterType.name}</CardTitle>
+                      <CardDescription>{dumpsterType.descriptor}</CardDescription>
                     </CardHeader>
                     <CardContent className="flex-grow space-y-4">
                       <div className="relative w-full h-48">
                         <Image
-                          src={dumpster.image_path}
-                          alt={`Image of ${dumpster.name}`}
+                          src={dumpsterType.image_path}
+                          alt={`Image of ${dumpsterType.name}`}
                           fill
                           style={{ objectFit: "cover" }}
                           className="rounded-md"
                         />
                       </div>
-                      <p className="font-semibold text-lg">${dumpster.price}</p>
+                      <p className="font-semibold text-lg">${dumpsterType.price}</p>
                       <p className="text-sm text-muted-foreground">
-                        Dimensions: {dumpster.length}&apos;L x {dumpster.width}&apos;W x {dumpster.height}&apos;H
+                        Dimensions: {dumpsterType.length}&apos;L x {dumpsterType.width}&apos;W x {dumpsterType.height}&apos;H
                       </p>
                       <p className="text-sm">
-                        <span className="font-semibold">Best for:</span> {dumpster.uses}
+                        <span className="font-semibold">Best for:</span> {dumpsterType.uses}
+                      </p>
+                      <p className={`text-sm font-semibold ${isAvailable ? 'text-green-600' : 'text-red-600'}`}>
+                        {isAvailable ? `${dumpsterType.quantity} Available` : 'Out of Stock'}
                       </p>
                     </CardContent>
                     <CardFooter>
                       <Button 
                         className="w-full" 
-                        onClick={() => handleAddToCart(dumpster)}
-                        disabled={inCart || addingId === dumpster.id}
+                        onClick={() => handleAddToCart(dumpsterType)}
+                        disabled={inCart || addingId === dumpsterType.id || !isAvailable}
                       >
-                        {addingId === dumpster.id ? (
+                        {addingId === dumpsterType.id ? (
                           <span className="flex items-center justify-center gap-2">
                             <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>
                             Adding...
@@ -204,6 +205,8 @@ export default function BookPage() {
                             <Check className="w-4 h-4 mr-2" />
                             Added to Cart
                           </>
+                        ) : !isAvailable ? (
+                          'Out of Stock'
                         ) : (
                           <>
                             <ShoppingCart className="w-4 h-4 mr-2" />
