@@ -7,7 +7,6 @@ import { useCartContext } from "@/lib/contexts/CartContext";
 import Image from "next/image";
 import { Minus, Plus, Trash2, ShoppingCart, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
 import { CartItem } from "@/lib/types";
 
 export default function CartPage() {

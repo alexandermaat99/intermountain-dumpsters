@@ -196,7 +196,7 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
       }
       initializedRef.current = false;
     };
-  }, [mounted, serviceAreas]); // Removed selectedArea from dependencies
+  }, [mounted, serviceAreas]);
 
   // Handle selected area changes - separate effect
   useEffect(() => {
@@ -288,7 +288,7 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
         }
       }
     }
-  }, [selectedArea, serviceAreas, mounted]);
+  }, [mounted, serviceAreas, selectedArea]);
 
   return (
     <div className="w-full h-full relative">
