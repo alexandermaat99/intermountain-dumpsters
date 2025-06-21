@@ -4,38 +4,44 @@ import Navigation from "@/components/Navigation";
 export default function Home() {
   return (
     <div className="w-full flex flex-col items-center">
-      <div className="w-full flex flex-col gap-5 md:gap-10 items-center">
+      <div className="w-full flex flex-col items-center">
         {/* Navigation */}
         <Navigation currentPage="home" />
 
         {/* Hero Section */}
-        <div className="flex flex-col gap-20 max-w-6xl p-5">
-          <div className="text-center space-y-8">
-            <h1 className="text-5xl font-bold tracking-tight">
+        <div 
+          className="w-full h-[60vh] bg-cover bg-center bg-no-repeat relative"
+          style={{ backgroundImage: "url('/hero_image.png')" }}
+        >
+          <div className="absolute inset-0 bg-black/50" />
+          <div className="relative z-10 flex flex-col items-start justify-center h-full text-white text-left max-w-6xl w-full mx-auto p-5">
+            <h1 className="text-6xl font-bold tracking-tight [text-shadow:_0_2px_4px_rgb(0_0_0_/_40%)]">
               Residential & Commercial Dumpster Rentals
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl text-white/80 max-w-3xl mt-6 font-semibold">
               Reliable dumpster rental services for residential and commercial projects. 
               From home renovations to large construction sites, we provide fast delivery, 
               competitive pricing, and exceptional customer service.
             </p>
-            <div className="flex gap-4 justify-center">
-              <Link 
-                href="/book" 
-                className="bg-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
-              >
-                Book Your Dumpster
-              </Link>
+            <div className="flex gap-4 justify-start mt-8">
               <Link 
                 href="/service-areas" 
-                className="border border-input bg-background px-8 py-3 rounded-lg font-semibold hover:bg-accent transition-colors"
+                className="border border-white/50 bg-transparent px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors"
               >
                 View Service Areas
               </Link>
+              <Link 
+                href="/book" 
+                className="bg-brand-orange text-white px-8 py-3 rounded-lg font-semibold hover:bg-brand-orange/90 transition-colors"
+              >
+                Book Your Dumpster
+              </Link>
             </div>
           </div>
+        </div>
 
-          {/* Features Section */}
+        {/* Features Section */}
+        <div className="max-w-6xl w-full p-5 py-20">
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center space-y-4">
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import CartIcon from "./CartIcon";
+import Image from "next/image";
 
 interface NavigationProps {
   currentPage: 'home' | 'book' | 'service-areas' | 'contact' | 'cart';
@@ -33,7 +34,13 @@ export default function Navigation({ currentPage }: NavigationProps) {
         {/* Logo */}
         <div className="flex gap-5 items-center font-semibold">
           <Link href={"/"} className="text-xl font-bold" onClick={closeMenu}>
-            Intermountain Dumpsters
+            <Image
+              src="/logo_horizontal-10.svg"
+              alt="Intermountain Dumpsters Logo"
+              width={200}
+              height={40}
+              priority
+            />
           </Link>
         </div>
 
