@@ -12,7 +12,6 @@ export default function SuccessPage() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const [loading, setLoading] = useState(true);
-  const [orderDetails, setOrderDetails] = useState<any>(null);
   const { clearCart } = useCartContext();
 
   useEffect(() => {
@@ -62,9 +61,9 @@ export default function SuccessPage() {
           <div className="bg-muted/50 p-4 rounded-lg">
             <h4 className="font-medium mb-2">What happens next?</h4>
             <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• You'll receive a confirmation email shortly</li>
-              <li>• We'll deliver your dumpster on the scheduled date</li>
-              <li>• Call us when you're ready for pickup</li>
+              <li>• You&apos;ll receive a confirmation email shortly</li>
+              <li>• We&apos;ll deliver your dumpster on the scheduled date</li>
+              <li>• Call us when you&apos;re ready for pickup</li>
             </ul>
           </div>
 
