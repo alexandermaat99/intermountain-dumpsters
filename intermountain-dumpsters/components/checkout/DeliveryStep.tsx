@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { DeliveryDetails } from '@/lib/types';
-import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
+import PlacesAutocomplete from 'react-places-autocomplete';
 import { validateDeliveryAddress, quickCityValidation, AddressValidationResult } from '@/lib/address-validation';
 import { AlertCircle, CheckCircle, AlertTriangle } from 'lucide-react';
 
@@ -17,10 +17,27 @@ interface DeliveryStepProps {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const SuggestionItem = ({ suggestion, getSuggestionItemProps }: { suggestion: any; getSuggestionItemProps: (input: any) => any; }) => {
+const SuggestionItem = ({ suggestion, getSuggestionItemProps, onSelect }: { suggestion: any; getSuggestionItemProps: (input: any) => any; onSelect: (address: string) => void; }) => {
+  const props = getSuggestionItemProps({ suggestion });
+  const { key, onClick, ...otherProps } = props;
+  
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Call the original onClick if it exists
+    if (onClick) {
+      onClick(e);
+    }
+    // Also manually trigger our handler with the suggestion description
+    console.log('Manual click handler with suggestion:', suggestion.description);
+    onSelect(suggestion.description);
+  };
+  
   return (
     <div
-      {...getSuggestionItemProps({ suggestion, index: 0 })}
+      key={key}
+      {...otherProps}
+      onClick={handleClick}
       className="p-3 hover:bg-muted cursor-pointer text-sm"
     >
       {suggestion.description}
@@ -30,7 +47,7 @@ const SuggestionItem = ({ suggestion, getSuggestionItemProps }: { suggestion: an
 
 export default function DeliveryStep({ delivery, onUpdate, onNext, onBack }: DeliveryStepProps) {
   const [errors, setErrors] = useState<Partial<DeliveryDetails>>({});
-  const [addressValue, setAddressValue] = useState(delivery.delivery_address);
+  const [addressValue, setAddressValue] = useState(delivery.delivery_address || '');
   const [addressValidation, setAddressValidation] = useState<AddressValidationResult | null>(null);
   const [validatingAddress, setValidatingAddress] = useState(false);
 
@@ -38,7 +55,7 @@ export default function DeliveryStep({ delivery, onUpdate, onNext, onBack }: Del
     const newErrors: Partial<DeliveryDetails> = {};
     
     if (!delivery.delivery_date) newErrors.delivery_date = 'Delivery date is required';
-    if (!delivery.delivery_address.trim()) newErrors.delivery_address = 'Delivery address is required';
+    if (!delivery.delivery_address?.trim()) newErrors.delivery_address = 'Delivery address is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -63,27 +80,28 @@ export default function DeliveryStep({ delivery, onUpdate, onNext, onBack }: Del
   };
 
   const handleAddressChange = (address: string) => {
-    setAddressValue(address);
-    handleInputChange('delivery_address', address);
+    const safeAddress = address || '';
+    setAddressValue(safeAddress);
+    handleInputChange('delivery_address', safeAddress);
     
     // Clear previous validation
     setAddressValidation(null);
     
     // Only validate if address is substantial enough
-    if (address.trim().length < 10) {
+    if (safeAddress.trim().length < 10) {
       return;
     }
     
     // Debounce address validation with longer delay
     const timeoutId = setTimeout(() => {
-      validateAddress(address);
+      validateAddress(safeAddress);
     }, 2000); // Increased from 1000ms to 2000ms
     
     return () => clearTimeout(timeoutId);
   };
 
   const validateAddress = async (address: string) => {
-    if (!address.trim() || address.trim().length < 10) {
+    if (!address || !address.trim() || address.trim().length < 10) {
       setAddressValidation(null);
       return;
     }
@@ -104,46 +122,13 @@ export default function DeliveryStep({ delivery, onUpdate, onNext, onBack }: Del
   };
 
   const handleAddressSelect = async (address: string) => {
-    setAddressValue(address);
+    console.log('handleAddressSelect called with:', address);
     
-    try {
-      const results = await geocodeByAddress(address);
-      const latLng = await getLatLng(results[0]);
-      console.log('Selected address coordinates:', latLng);
-      console.log('Full geocoding result:', results[0]);
-      
-      // Extract ZIP code from the geocoding result
-      let zipCode = '';
-      let enhancedAddress = address;
-      
-      if (results[0].address_components) {
-        for (const component of results[0].address_components) {
-          if (component.types.includes('postal_code')) {
-            zipCode = component.long_name;
-            break;
-          }
-        }
-      }
-      
-      // Create enhanced address with ZIP code if found
-      if (zipCode && !address.includes(zipCode)) {
-        // Insert ZIP code before the country
-        enhancedAddress = address.replace(', USA', ` ${zipCode}, USA`);
-        console.log('Enhanced address with ZIP:', enhancedAddress);
-        console.log('Extracted ZIP code:', zipCode);
-      } else {
-        console.log('ZIP code already in address or not found');
-      }
-      
-      // Update the delivery address with the enhanced version
-      handleInputChange('delivery_address', enhancedAddress);
-      
-      // Validate the enhanced address
-      await validateAddress(enhancedAddress);
-      
-    } catch (error) {
-      console.error('Error getting address coordinates:', error);
+    if (address && address.trim()) {
+      setAddressValue(address);
       handleInputChange('delivery_address', address);
+      
+      // Validate the address after selection
       await validateAddress(address);
     }
   };
@@ -209,12 +194,11 @@ export default function DeliveryStep({ delivery, onUpdate, onNext, onBack }: Del
         <div>
           <Label htmlFor="delivery_address">Delivery Address *</Label>
           <PlacesAutocomplete
-            value={addressValue}
+            value={addressValue || ''}
             onChange={handleAddressChange}
             onSelect={handleAddressSelect}
             searchOptions={{
-              componentRestrictions: { country: 'us' }, // Restrict to US addresses
-              types: ['address'] // Only return addresses, not businesses
+              componentRestrictions: { country: 'us' }
             }}
           >
             {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
@@ -239,6 +223,7 @@ export default function DeliveryStep({ delivery, onUpdate, onNext, onBack }: Del
                         key={`suggestion-${index}`}
                         suggestion={suggestion} 
                         getSuggestionItemProps={getSuggestionItemProps} 
+                        onSelect={handleAddressSelect}
                       />
                     ))}
                   </div>
