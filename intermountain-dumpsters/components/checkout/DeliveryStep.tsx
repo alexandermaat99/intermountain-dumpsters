@@ -125,7 +125,7 @@ export default function DeliveryStep({ delivery, onUpdate, onNext, onBack }: Del
                       return (
                         <div
                           {...getSuggestionItemProps(suggestion, { style })}
-                          key={suggestion.placeId || `suggestion-${index}`}
+                          key={suggestion.placeId || index}
                           className="p-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
                         >
                           <div className="text-sm font-medium">{suggestion.formattedSuggestion.mainText}</div>

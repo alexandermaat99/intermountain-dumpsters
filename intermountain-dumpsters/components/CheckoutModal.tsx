@@ -17,11 +17,11 @@ interface CheckoutModalProps {
 }
 
 const steps: { key: CheckoutStep; label: string; description: string }[] = [
-  { key: 'customer', label: 'Customer Info', description: 'Personal details' },
+  { key: 'customer', label: 'Customer Info', description: 'Name & phone' },
   { key: 'delivery', label: 'Delivery', description: 'Date & address' },
   { key: 'insurance', label: 'Insurance', description: 'Optional coverage' },
   { key: 'contract', label: 'Contract', description: 'Terms & conditions' },
-  { key: 'payment', label: 'Payment', description: 'Complete order' },
+  { key: 'payment', label: 'Payment', description: 'Billing & payment' },
 ];
 
 export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
@@ -37,6 +37,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       city: '',
       state: '',
       zip: '',
+      business: false,
     },
     delivery: {
       delivery_date: '',

@@ -27,6 +27,7 @@ export type CustomerInfo = {
   city: string;
   state: string;
   zip: string;
+  business: boolean;
 };
 
 export type DeliveryDetails = {
