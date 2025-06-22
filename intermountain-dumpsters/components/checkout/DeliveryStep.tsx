@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { DeliveryDetails } from '@/lib/types';
-import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
+import PlacesAutocomplete, { geocodeByAddress } from 'react-places-autocomplete';
 import { validateDeliveryAddress, quickCityValidation, AddressValidationResult } from '@/lib/address-validation';
 import { AlertCircle, CheckCircle, AlertTriangle } from 'lucide-react';
 
