@@ -81,7 +81,7 @@ async function getAddressCoordinates(address: string): Promise<{ lat: number; ln
     // Use the Google Maps Geocoding service with broader bounds
     const geocoder = new google.maps.Geocoder();
     
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       geocoder.geocode({ 
         address,
         region: 'us', // Restrict to US addresses

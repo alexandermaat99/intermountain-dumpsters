@@ -196,7 +196,7 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
       }
       initializedRef.current = false;
     };
-  }, [mounted, serviceAreas]);
+  }, [mounted, serviceAreas, selectedArea]);
 
   // Handle selected area changes - separate effect
   useEffect(() => {

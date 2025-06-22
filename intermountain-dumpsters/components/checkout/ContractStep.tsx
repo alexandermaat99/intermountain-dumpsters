@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, AlertCircle } from 'lucide-react';
+import { FileText } from 'lucide-react';
 
 interface ContractStepProps {
   contractAccepted: boolean;

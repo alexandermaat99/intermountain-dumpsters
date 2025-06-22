@@ -16,25 +16,14 @@ interface DeliveryStepProps {
   onBack: () => void;
 }
 
-// Separate component to handle suggestion items
-const SuggestionItem = ({ suggestion, getSuggestionItemProps, index }: any) => {
-  const suggestionProps = getSuggestionItemProps(suggestion, {
-    style: {
-      backgroundColor: suggestion.active ? 'hsl(var(--accent))' : 'transparent',
-      cursor: 'pointer',
-    }
-  });
-
-  // Remove key from props to avoid conflicts
-  const { key, ...otherProps } = suggestionProps;
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const SuggestionItem = ({ suggestion, getSuggestionItemProps }: { suggestion: any; getSuggestionItemProps: (input: any) => any; }) => {
   return (
     <div
-      {...otherProps}
-      className="p-3 hover:bg-accent border-b border-border last:border-b-0"
+      {...getSuggestionItemProps({ suggestion, index: 0 })}
+      className="p-3 hover:bg-muted cursor-pointer text-sm"
     >
-      <div className="text-sm font-medium text-popover-foreground">{suggestion.formattedSuggestion.mainText}</div>
-      <div className="text-xs text-muted-foreground">{suggestion.formattedSuggestion.secondaryText}</div>
+      {suggestion.description}
     </div>
   );
 };
@@ -250,7 +239,6 @@ export default function DeliveryStep({ delivery, onUpdate, onNext, onBack }: Del
                         key={`suggestion-${index}`}
                         suggestion={suggestion} 
                         getSuggestionItemProps={getSuggestionItemProps} 
-                        index={index} 
                       />
                     ))}
                   </div>

@@ -122,11 +122,8 @@ const LOCAL_TAX_RATES: { [zipCode: string]: number } = {
 const DEFAULT_LOCAL_TAX_RATE = 0.0165; // 1.65% - Salt Lake City rate
 
 export function calculateTax(subtotal: number, zipCode: string): TaxInfo {
-  // Clean zip code (remove any non-numeric characters)
-  const cleanZip = zipCode.replace(/\D/g, '');
-  
   // Get local tax rate for the zip code
-  const localTaxRate = LOCAL_TAX_RATES[cleanZip] || DEFAULT_LOCAL_TAX_RATE;
+  const localTaxRate = LOCAL_TAX_RATES[zipCode] || DEFAULT_LOCAL_TAX_RATE;
   
   // Calculate total tax rate
   const totalTaxRate = UTAH_STATE_TAX_RATE + localTaxRate;

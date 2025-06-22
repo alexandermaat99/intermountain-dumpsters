@@ -128,20 +128,6 @@ export default function TestValidationPage() {
                   </div>
                 )}
               </div>
-
-              {result.debug && (
-                <div className="mt-4 p-3 bg-gray-100 rounded text-xs">
-                  <div className="font-medium mb-2">Debug Information:</div>
-                  <div>Method: {result.debug.validationMethod}</div>
-                  {result.debug.coordinates && (
-                    <div>
-                      Coordinates: {result.debug.coordinates.lat.toFixed(4)}, {result.debug.coordinates.lng.toFixed(4)}
-                    </div>
-                  )}
-                  <div>Service Radius: {result.debug.serviceRadius} miles</div>
-                  <div>Surrounding Radius: {result.debug.surroundingRadius} miles</div>
-                </div>
-              )}
             </CardContent>
           </Card>
         )}

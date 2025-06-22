@@ -125,7 +125,7 @@ export default function InsuranceStep({ insurance, onUpdate, onNext, onBack }: I
                   <span className="text-sm font-semibold text-primary">{formatRushDeliveryFee()}</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Get your dumpster delivered within 2 hours of order confirmation during operating hours. <br />If not completed, the extra fee will be refunded.
+                  We&apos;ll deliver your dumpster within 2 hours of your call for an additional fee.
                 </p>
               </div>
             </div>
@@ -138,7 +138,7 @@ export default function InsuranceStep({ insurance, onUpdate, onNext, onBack }: I
         <ul className="text-sm text-muted-foreground space-y-1">
           <li>• Additional Day Rate only {formatDayRate()}/Day</li>
           <li>• All waste/debris is billed at {formatPricePerLb()}/Lb</li>
-          <li>• Call us when you're done for prompt pickup</li>
+          <li>• Call us when you&apos;re done for prompt pickup</li>
         </ul>
       </div>
 

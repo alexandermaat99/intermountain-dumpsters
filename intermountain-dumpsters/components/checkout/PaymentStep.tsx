@@ -24,7 +24,6 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
   const { contactInfo } = useContactInfo();
   const [isProcessing, setIsProcessing] = useState(false);
   const [showBillingAddress, setShowBillingAddress] = useState(true);
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'check'>('card');
   const [taxInfo, setTaxInfo] = useState<TaxInfo | null>(null);
   const [taxLoading, setTaxLoading] = useState(true);
 

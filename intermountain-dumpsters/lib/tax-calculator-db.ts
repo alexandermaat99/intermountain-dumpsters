@@ -30,43 +30,10 @@ const UTAH_STATE_TAX_RATE = 0.0485;
 // Default local tax rate if no service area is found
 const DEFAULT_LOCAL_TAX_RATE = 0.0165; // 1.65% - Salt Lake City rate
 
-// Improved ZIP code extraction function
-function extractZipCode(address: string): string {
-  console.log('🔍 Extracting ZIP from address:', address);
-  
-  // Multiple regex patterns to catch different ZIP code formats
-  const zipPatterns = [
-    /\b\d{5}\b/,                    // Standard 5-digit ZIP
-    /\b\d{5}-\d{4}\b/,              // ZIP+4 format
-    /\b\d{5}\s*-\s*\d{4}\b/,        // ZIP+4 with spaces
-    /\b\d{5}\s*[A-Z]{2}\b/,         // ZIP followed by state
-    /\b\d{5}\s*,\s*[A-Z]{2}\b/,     // ZIP, STATE format
-  ];
-  
-  for (const pattern of zipPatterns) {
-    const match = address.match(pattern);
-    if (match) {
-      const zip = match[0].replace(/[^\d]/g, '').substring(0, 5); // Extract just the 5 digits
-      console.log('✅ Found ZIP code:', zip);
-      return zip;
-    }
-  }
-  
-  console.log('❌ No ZIP code found in address');
-  return '';
-}
-
 export async function calculateTaxFromServiceArea(subtotal: number, deliveryAddress: string): Promise<TaxInfo> {
   try {
     console.log('🧮 Starting tax calculation for address:', deliveryAddress);
     
-    // Extract ZIP code from delivery address
-    const zipCode = extractZipCode(deliveryAddress);
-    
-    if (!zipCode) {
-      console.log('⚠️ No ZIP code found, using address matching instead');
-    }
-
     // Find the closest service area based on ZIP code or address
     const { data: serviceAreas, error } = await supabase
       .from('service_areas')
@@ -88,13 +55,7 @@ export async function calculateTaxFromServiceArea(subtotal: number, deliveryAddr
     // Try to find service area by ZIP code first, then by address matching
     let serviceArea = null;
     
-    if (zipCode) {
-      // For now, we'll use address matching since we don't have ZIP code mapping
-      // In the future, you could add a zip_codes table to map ZIPs to service areas
-      serviceArea = findServiceAreaByAddress(deliveryAddress, serviceAreas);
-    } else {
-      serviceArea = findServiceAreaByAddress(deliveryAddress, serviceAreas);
-    }
+    serviceArea = findServiceAreaByAddress(deliveryAddress, serviceAreas);
     
     const localTaxRate = serviceArea?.local_tax_rate || DEFAULT_LOCAL_TAX_RATE;
     
@@ -127,7 +88,7 @@ export async function calculateTaxFromServiceArea(subtotal: number, deliveryAddr
         localTaxRate: serviceArea.local_tax_rate
       } : undefined,
       debug: {
-        extractedZip: zipCode,
+        extractedZip: '',
         matchedServiceArea: serviceArea?.name || 'Default (Salt Lake City)',
         addressUsed: deliveryAddress
       }
@@ -164,7 +125,7 @@ function calculateTaxWithDefaultRate(subtotal: number): TaxInfo {
 
 // Helper function to find service area by address
 // This is a simplified approach - you might want to use geocoding for more accuracy
-function findServiceAreaByAddress(address: string, serviceAreas: any[]): any {
+function findServiceAreaByAddress(address: string, serviceAreas: Array<{id: number; name: string; local_tax_rate: number; latitude: number; longitude: number}>): {id: number; name: string; local_tax_rate: number; latitude: number; longitude: number} | null {
   const addressLower = address.toLowerCase();
   console.log('🔍 Searching for service area in address:', addressLower);
   
@@ -190,7 +151,7 @@ function findServiceAreaByAddress(address: string, serviceAreas: any[]): any {
   
   // If no match found, return the first service area as default
   console.log('⚠️ No service area match found, using default:', serviceAreas[0]?.name);
-  return serviceAreas[0];
+  return serviceAreas[0] || null;
 }
 
 // Helper function to get common city name variations
