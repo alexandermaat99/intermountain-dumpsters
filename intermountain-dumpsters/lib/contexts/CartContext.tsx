@@ -3,7 +3,7 @@
 import { createContext, useState, useEffect, ReactNode, useContext } from 'react';
 import { DumpsterType, CartItem } from '@/lib/types';
 
-type CartState = {
+export type CartState = {
   items: CartItem[];
   itemCount: number;
   total: number;
