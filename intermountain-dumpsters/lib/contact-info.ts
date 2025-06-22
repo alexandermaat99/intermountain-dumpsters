@@ -16,6 +16,11 @@ export interface ContactInfo {
   emergency_phone: string;
   created_at: string;
   updated_at: string;
+  price_per_lb?: number;
+  day_rate?: number;
+  cancelation_insurance?: number;
+  driveway_insurance?: number;
+  rush_fee?: number;
 }
 
 // Default contact information as fallback
@@ -34,13 +39,18 @@ export const defaultContactInfo: ContactInfo = {
   },
   emergency_phone: "(801) 555-9999",
   created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString()
+  updated_at: new Date().toISOString(),
+  price_per_lb: 0.03,
+  day_rate: 20,
+  cancelation_insurance: 40,
+  driveway_insurance: 40,
+  rush_fee: 60
 };
 
 export async function getContactInfo(): Promise<ContactInfo> {
   try {
     const { data, error } = await supabase
-      .from('contact_info')
+      .from('admin_info')
       .select('*')
       .single();
 
@@ -59,7 +69,7 @@ export async function getContactInfo(): Promise<ContactInfo> {
 export async function updateContactInfo(contactInfo: Partial<ContactInfo>): Promise<ContactInfo | null> {
   try {
     const { data, error } = await supabase
-      .from('contact_info')
+      .from('admin_info')
       .upsert({
         ...contactInfo,
         updated_at: new Date().toISOString()

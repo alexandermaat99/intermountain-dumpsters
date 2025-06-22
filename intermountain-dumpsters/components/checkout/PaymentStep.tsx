@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckoutData, CartItem } from '@/lib/types';
 import { CartState } from '@/lib/contexts/CartContext';
 import { CreditCard, ArrowLeft, CheckCircle, User, MapPin } from 'lucide-react';
+import { useContactInfo } from '@/lib/hooks/useContactInfo';
 
 interface PaymentStepProps {
   checkoutData: CheckoutData;
@@ -18,8 +19,26 @@ interface PaymentStepProps {
 }
 
 export default function PaymentStep({ checkoutData, cart, insuranceTotal, total, onBack }: PaymentStepProps) {
+  const { contactInfo } = useContactInfo();
   const [isProcessing, setIsProcessing] = useState(false);
   const [showBillingAddress, setShowBillingAddress] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'check'>('card');
+
+  // Format insurance prices for display
+  const formatDrivewayInsurancePrice = () => {
+    const price = contactInfo?.driveway_insurance || 40;
+    return `$${price.toFixed(2)}`;
+  };
+
+  const formatCancellationInsurancePrice = () => {
+    const price = contactInfo?.cancelation_insurance || 40;
+    return `$${price.toFixed(2)}`;
+  };
+
+  const formatRushDeliveryPrice = () => {
+    const price = contactInfo?.rush_fee || 60;
+    return `$${price.toFixed(2)}`;
+  };
 
   const handleProceedToPayment = async () => {
     setIsProcessing(true);
@@ -74,19 +93,19 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
                   {checkoutData.insurance.driveway_insurance && (
                     <div className="flex justify-between">
                       <span>Driveway Protection Insurance</span>
-                      <span>$40.00</span>
+                      <span>{formatDrivewayInsurancePrice()}</span>
                     </div>
                   )}
                   {checkoutData.insurance.cancelation_insurance && (
                     <div className="flex justify-between">
                       <span>Cancellation Insurance</span>
-                      <span>$40.00</span>
+                      <span>{formatCancellationInsurancePrice()}</span>
                     </div>
                   )}
                   {checkoutData.insurance.emergency_delivery && (
                     <div className="flex justify-between">
                       <span>Rush Delivery (2 Hours)</span>
-                      <span>$60.00</span>
+                      <span>{formatRushDeliveryPrice()}</span>
                     </div>
                   )}
                 </div>

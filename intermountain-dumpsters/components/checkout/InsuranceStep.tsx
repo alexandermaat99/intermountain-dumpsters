@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { InsuranceOptions } from '@/lib/types';
 import { Shield, Clock, AlertTriangle } from 'lucide-react';
+import { useContactInfo } from '@/lib/hooks/useContactInfo';
 
 interface InsuranceStepProps {
   insurance: InsuranceOptions;
@@ -15,8 +16,40 @@ interface InsuranceStepProps {
 }
 
 export default function InsuranceStep({ insurance, onUpdate, onNext, onBack }: InsuranceStepProps) {
+  const { contactInfo } = useContactInfo();
+  
   const handleInsuranceChange = (field: keyof InsuranceOptions, checked: boolean) => {
     onUpdate({ ...insurance, [field]: checked });
+  };
+
+  // Format the price per pound for display
+  const formatPricePerLb = () => {
+    const price = contactInfo?.price_per_lb || 0.03;
+    return `$${price.toFixed(2)}`;
+  };
+
+  // Format the day rate for display
+  const formatDayRate = () => {
+    const rate = contactInfo?.day_rate || 20;
+    return `$${rate}`;
+  };
+
+  // Format the driveway insurance price for display
+  const formatDrivewayInsurance = () => {
+    const price = contactInfo?.driveway_insurance || 40;
+    return `+$${price}`;
+  };
+
+  // Format the cancellation insurance price for display
+  const formatCancellationInsurance = () => {
+    const price = contactInfo?.cancelation_insurance || 40;
+    return `+$${price}`;
+  };
+
+  // Format the rush delivery fee for display
+  const formatRushDeliveryFee = () => {
+    const fee = contactInfo?.rush_fee || 60;
+    return `+$${fee}`;
   };
 
   return (
@@ -41,7 +74,7 @@ export default function InsuranceStep({ insurance, onUpdate, onNext, onBack }: I
                   <Label htmlFor="driveway_insurance" className="text-base font-medium cursor-pointer">
                     Driveway Protection Insurance
                   </Label>
-                  <span className="text-sm font-semibold text-primary">+$40</span>
+                  <span className="text-sm font-semibold text-primary">{formatDrivewayInsurance()}</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Protects your driveway from damage during delivery and pickup. Covers repairs up to $500.
@@ -65,10 +98,10 @@ export default function InsuranceStep({ insurance, onUpdate, onNext, onBack }: I
                   <Label htmlFor="cancelation_insurance" className="text-base font-medium cursor-pointer">
                     Cancellation Insurance
                   </Label>
-                  <span className="text-sm font-semibold text-primary">+$40</span>
+                  <span className="text-sm font-semibold text-primary">{formatCancellationInsurance()}</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Allows you to cancel your rental up to 24 hours before delivery with a full refund.
+                  Allows you to cancel your rental anytime before delivery with a full refund.
                 </p>
               </div>
             </div>
@@ -89,10 +122,10 @@ export default function InsuranceStep({ insurance, onUpdate, onNext, onBack }: I
                   <Label htmlFor="emergency_delivery" className="text-base font-medium cursor-pointer">
                     Rush Delivery (Within 2 Hours)
                   </Label>
-                  <span className="text-sm font-semibold text-primary">+$60</span>
+                  <span className="text-sm font-semibold text-primary">{formatRushDeliveryFee()}</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Get your dumpster delivered within 2 hours of order confirmation. Available 7 AM - 5 PM.
+                  Get your dumpster delivered within 2 hours of order confirmation during operating hours. <br />If not completed, the extra fee will be refunded.
                 </p>
               </div>
             </div>
@@ -101,12 +134,11 @@ export default function InsuranceStep({ insurance, onUpdate, onNext, onBack }: I
       </div>
 
       <div className="bg-muted/50 p-4 rounded-lg">
-        <h4 className="font-medium mb-2">What&apos;s Included in Your Base Rental:</h4>
+        <h4 className="font-medium mb-2">What you should know:</h4>
         <ul className="text-sm text-muted-foreground space-y-1">
-          <li>• Standard delivery (next business day)</li>
-          <li>• Basic liability coverage</li>
-          <li>• Standard pickup service</li>
-          <li>• Customer support</li>
+          <li>• Additional Day Rate only {formatDayRate()}/Day</li>
+          <li>• All waste/debris is billed at {formatPricePerLb()}/Lb</li>
+          <li>• Call us when you're done for prompt pickup</li>
         </ul>
       </div>
 

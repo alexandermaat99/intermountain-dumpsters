@@ -117,22 +117,21 @@ export default function DeliveryStep({ delivery, onUpdate, onNext, onBack }: Del
                         Loading...
                       </div>
                     )}
-                    {suggestions.map((suggestion, index) => {
-                      const style = {
-                        backgroundColor: suggestion.active ? 'hsl(var(--accent))' : 'transparent',
-                        cursor: 'pointer',
-                      };
-                      return (
-                        <div
-                          {...getSuggestionItemProps(suggestion, { style })}
-                          key={`${suggestion.placeId || 'no-id'}-${index}`}
-                          className="p-3 hover:bg-accent border-b border-border last:border-b-0"
-                        >
-                          <div className="text-sm font-medium text-popover-foreground">{suggestion.formattedSuggestion.mainText}</div>
-                          <div className="text-xs text-muted-foreground">{suggestion.formattedSuggestion.secondaryText}</div>
-                        </div>
-                      );
-                    })}
+                    {suggestions.map((suggestion, index) => (
+                      <div
+                        {...getSuggestionItemProps(suggestion, {
+                          key: `suggestion-${index}`,
+                          style: {
+                            backgroundColor: suggestion.active ? 'hsl(var(--accent))' : 'transparent',
+                            cursor: 'pointer',
+                          }
+                        })}
+                        className="p-3 hover:bg-accent border-b border-border last:border-b-0"
+                      >
+                        <div className="text-sm font-medium text-popover-foreground">{suggestion.formattedSuggestion.mainText}</div>
+                        <div className="text-xs text-muted-foreground">{suggestion.formattedSuggestion.secondaryText}</div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -141,9 +140,9 @@ export default function DeliveryStep({ delivery, onUpdate, onNext, onBack }: Del
           {errors.delivery_address && (
             <p className="text-sm text-destructive mt-1">{errors.delivery_address}</p>
           )}
-          <p className="text-sm text-muted-foreground mt-1">
+          {/* <p className="text-sm text-muted-foreground mt-1">
             Start typing to see address suggestions. Include any special instructions like gate codes or access requirements.
-          </p>
+          </p> */}
         </div>
       </div>
 

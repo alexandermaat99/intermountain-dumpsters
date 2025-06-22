@@ -10,6 +10,7 @@ import DeliveryStep from './checkout/DeliveryStep';
 import InsuranceStep from './checkout/InsuranceStep';
 import ContractStep from './checkout/ContractStep';
 import PaymentStep from './checkout/PaymentStep';
+import { useContactInfo } from '@/lib/hooks/useContactInfo';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ const steps: { key: CheckoutStep; label: string; description: string }[] = [
 
 export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   const { cart } = useCartContext();
+  const { contactInfo } = useContactInfo();
   const [currentStep, setCurrentStep] = useState<CheckoutStep>('customer');
   const [checkoutData, setCheckoutData] = useState<CheckoutData>({
     customer: {
@@ -94,9 +96,15 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
 
   const calculateInsuranceTotal = () => {
     let total = 0;
-    if (checkoutData.insurance.driveway_insurance) total += 40;
-    if (checkoutData.insurance.cancelation_insurance) total += 40;
-    if (checkoutData.insurance.emergency_delivery) total += 60;
+    if (checkoutData.insurance.driveway_insurance) {
+      total += contactInfo?.driveway_insurance || 40;
+    }
+    if (checkoutData.insurance.cancelation_insurance) {
+      total += contactInfo?.cancelation_insurance || 40;
+    }
+    if (checkoutData.insurance.emergency_delivery) {
+      total += contactInfo?.rush_fee || 60;
+    }
     return total;
   };
 
