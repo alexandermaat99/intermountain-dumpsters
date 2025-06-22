@@ -12,7 +12,7 @@ import { Laptop, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
-const ThemeSwitcher = () => {
+const ThemeSwitcher = ({ iconClassName }: { iconClassName?: string }) => {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
 
@@ -26,6 +26,7 @@ const ThemeSwitcher = () => {
   }
 
   const ICON_SIZE = 16;
+  const finalIconClassName = iconClassName || "text-muted-foreground";
 
   return (
     <DropdownMenu>
@@ -35,19 +36,19 @@ const ThemeSwitcher = () => {
             <Sun
               key="light"
               size={ICON_SIZE}
-              className={"text-muted-foreground"}
+              className={finalIconClassName}
             />
           ) : theme === "dark" ? (
             <Moon
               key="dark"
               size={ICON_SIZE}
-              className={"text-muted-foreground"}
+              className={finalIconClassName}
             />
           ) : (
             <Laptop
               key="system"
               size={ICON_SIZE}
-              className={"text-muted-foreground"}
+              className={finalIconClassName}
             />
           )}
         </Button>
