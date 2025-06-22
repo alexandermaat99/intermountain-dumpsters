@@ -155,7 +155,7 @@ export function formatTaxDisplay(taxInfo: TaxInfo): string {
 }
 
 // Helper function to check if tax should be applied
-export function shouldApplyTax(_zipCode: string): boolean {
+export function shouldApplyTax(): boolean {
   // In Utah, sales tax applies to most services including dumpster rentals
   // You may want to add business logic here for tax-exempt customers
   return true;
