@@ -318,7 +318,7 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5" />
+            
             Billing Information
           </CardTitle>
         </CardHeader>
