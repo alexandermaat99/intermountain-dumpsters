@@ -20,13 +20,10 @@ export default function CustomerInfoStep({ customer, onUpdate, onNext }: Custome
   const validateForm = () => {
     const newErrors: Partial<CustomerInfo> = {};
     
-    if (isBusiness) {
-      if (!customer.first_name.trim()) newErrors.first_name = 'Business name is required';
-    } else {
-      if (!customer.first_name.trim()) newErrors.first_name = 'First name is required';
-      if (!customer.last_name.trim()) newErrors.last_name = 'Last name is required';
-    }
+    if (!customer.first_name.trim()) newErrors.first_name = isBusiness ? 'Company name is required' : 'First name is required';
+    if (!isBusiness && !customer.last_name.trim()) newErrors.last_name = 'Last name is required';
     if (!customer.phone_number.trim()) newErrors.phone_number = 'Phone number is required';
+    if (!customer.email.trim() || !/^\S+@\S+\.\S+$/.test(customer.email)) newErrors.email = 'A valid email is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -45,16 +42,9 @@ export default function CustomerInfoStep({ customer, onUpdate, onNext }: Custome
     }
   };
 
-  const handleBusinessToggle = (checked: boolean) => {
-    setIsBusiness(checked);
-    // Update the customer data with the business flag
-    onUpdate({ ...customer, business: checked });
-    // Clear the last name field when switching to business
-    if (checked) {
-      onUpdate({ ...customer, business: checked, last_name: '' });
-    }
-    // Clear any related errors
-    setErrors(prev => ({ ...prev, first_name: undefined, last_name: undefined }));
+  const handleBusinessToggle = (isBusiness: boolean) => {
+    setIsBusiness(isBusiness);
+    onUpdate({ ...customer, business: isBusiness });
   };
 
   return (
@@ -89,53 +79,52 @@ export default function CustomerInfoStep({ customer, onUpdate, onNext }: Custome
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {isBusiness ? (
-          // Business Name Field
-          <div className="md:col-span-2">
-            <Label htmlFor="business_name">Company Name *</Label>
+        <div>
+          <Label htmlFor="first_name">{isBusiness ? 'Company Name *' : 'First Name *'}</Label>
+          <Input
+            id="first_name"
+            value={customer.first_name}
+            onChange={(e) => handleInputChange('first_name', e.target.value)}
+            placeholder={isBusiness ? 'Your Company LLC' : 'John'}
+            className={errors.first_name ? 'border-destructive' : ''}
+          />
+          {errors.first_name && (
+            <p className="text-sm text-destructive mt-1">{errors.first_name}</p>
+          )}
+        </div>
+
+        {!isBusiness && (
+          <div>
+            <Label htmlFor="last_name">Last Name *</Label>
             <Input
-              id="business_name"
-              value={customer.first_name}
-              onChange={(e) => handleInputChange('first_name', e.target.value)}
-              placeholder="Enter your company name"
-              className={errors.first_name ? 'border-destructive' : ''}
+              id="last_name"
+              value={customer.last_name}
+              onChange={(e) => handleInputChange('last_name', e.target.value)}
+              placeholder="Doe"
+              className={errors.last_name ? 'border-destructive' : ''}
             />
-            {errors.first_name && (
-              <p className="text-sm text-destructive mt-1">{errors.first_name}</p>
+            {errors.last_name && (
+              <p className="text-sm text-destructive mt-1">{errors.last_name}</p>
             )}
           </div>
-        ) : (
-          // Individual Name Fields
-          <>
-            <div>
-              <Label htmlFor="first_name">First Name *</Label>
-              <Input
-                id="first_name"
-                value={customer.first_name}
-                onChange={(e) => handleInputChange('first_name', e.target.value)}
-                className={errors.first_name ? 'border-destructive' : ''}
-              />
-              {errors.first_name && (
-                <p className="text-sm text-destructive mt-1">{errors.first_name}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="last_name">Last Name *</Label>
-              <Input
-                id="last_name"
-                value={customer.last_name}
-                onChange={(e) => handleInputChange('last_name', e.target.value)}
-                className={errors.last_name ? 'border-destructive' : ''}
-              />
-              {errors.last_name && (
-                <p className="text-sm text-destructive mt-1">{errors.last_name}</p>
-              )}
-            </div>
-          </>
         )}
 
-        <div className="md:col-span-2">
+        <div className={isBusiness ? 'md:col-span-2' : ''}>
+          <Label htmlFor="email">Email *</Label>
+          <Input
+            id="email"
+            type="email"
+            value={customer.email}
+            onChange={(e) => handleInputChange('email', e.target.value)}
+            placeholder="you@example.com"
+            className={errors.email ? 'border-destructive' : ''}
+          />
+          {errors.email && (
+            <p className="text-sm text-destructive mt-1">{errors.email}</p>
+          )}
+        </div>
+
+        <div className={isBusiness ? 'md:col-span-2' : ''}>
           <Label htmlFor="phone_number">Phone Number *</Label>
           <Input
             id="phone_number"

@@ -22,12 +22,16 @@ export async function saveCheckoutToDatabase(
     // Use resolved customer address if provided, otherwise use checkoutData.customer
     const customerToSave = resolvedCustomerAddress || checkoutData.customer;
     
+    // Log the customer data being sent to Supabase
+    console.log('Attempting to save customer:', JSON.stringify(customerToSave, null, 2));
+
     // 1. Save customer to customers table
     const { data: customerData, error: customerError } = await supabase
       .from('customers')
       .insert({
         first_name: customerToSave.first_name,
         last_name: customerToSave.last_name,
+        email: customerToSave.email,
         phone_number: customerToSave.phone_number,
         address_line_1: customerToSave.address_line_1,
         address_line_2: customerToSave.address_line_2,
@@ -40,7 +44,7 @@ export async function saveCheckoutToDatabase(
       .single();
 
     if (customerError) {
-      console.error('Error saving customer:', customerError);
+      console.error('Error saving customer:', JSON.stringify(customerError, null, 2));
       return null;
     }
 
