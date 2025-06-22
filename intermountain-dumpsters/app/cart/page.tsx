@@ -201,7 +201,7 @@ export default function CartPage() {
                   </div>
 
                   <div className="text-xs text-muted-foreground text-center">
-                    <p>Checkout will be processed through Squarespace</p>
+                    <p>Checkout will be processed through stripe</p>
                   </div>
                 </CardContent>
               </Card>

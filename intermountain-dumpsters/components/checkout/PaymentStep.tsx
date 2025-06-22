@@ -26,13 +26,13 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
     
     try {
       // TODO: Save order to database
-      // TODO: Generate Squarespace checkout URL
-      // TODO: Redirect to Squarespace
+      // TODO: Generate stripe checkout URL
+      // TODO: Redirect to stripe
       
       // For now, simulate the process
       setTimeout(() => {
-        // This would be replaced with actual Squarespace integration
-        window.open('https://www.squarespace.com', '_blank');
+        // This would be replaced with actual Stripe integration
+        window.open('https://www.stripe.com', '_blank');
         setIsProcessing(false);
       }, 2000);
     } catch (error) {
@@ -203,7 +203,7 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
               <h4 className="font-medium">Secure Payment</h4>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              Your payment will be processed securely through Squarespace. We accept all major credit cards and PayPal.
+              Your payment will be processed securely through stripe. We accept all major credit cards and PayPal.
             </p>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <CheckCircle className="w-4 h-4 text-green-600" />
