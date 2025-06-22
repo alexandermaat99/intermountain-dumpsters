@@ -24,6 +24,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-map-gl": "^8.0.4",
+    "react-places-autocomplete": "^7.3.0",
     "tailwind-merge": "^3.3.0"
   },
   "devDependencies": {
@@ -33,6 +34,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-map-gl": "^6.1.7",
+    "@types/react-places-autocomplete": "^7.2.14",
     "autoprefixer": "^10.4.20",
     "eslint": "^9",
     "eslint-config-next": "15.3.1",

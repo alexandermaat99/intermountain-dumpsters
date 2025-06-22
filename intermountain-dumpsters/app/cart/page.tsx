@@ -8,15 +8,40 @@ import Image from "next/image";
 import { Minus, Plus, Trash2, ShoppingCart, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { CartItem } from "@/lib/types";
+import { useState, useEffect } from "react";
+import CheckoutModal from "@/components/CheckoutModal";
 
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart } = useCartContext();
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleCheckout = () => {
-    // TODO: Integrate with Squarespace checkout
-    console.log('Proceeding to checkout with items:', cart.items);
-    alert('Checkout functionality will be integrated with Squarespace soon!');
+    setIsCheckoutOpen(true);
   };
+
+  // Show loading state until client-side hydration is complete
+  if (!isClient) {
+    return (
+      <div className="w-full flex flex-col items-center">
+        <div className="w-full flex flex-col gap-5 md:gap-10 items-center">
+          <Navigation currentPage="cart" />
+          <div className="flex-1 flex flex-col gap-8 max-w-6xl p-5 w-full">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 mx-auto bg-muted rounded-full flex items-center justify-center animate-pulse">
+                <ShoppingCart className="w-8 h-8 text-muted-foreground" />
+              </div>
+              <h1 className="text-4xl font-bold">Loading...</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (cart.items.length === 0) {
     return (
@@ -184,6 +209,11 @@ export default function CartPage() {
           </div>
         </div>
       </div>
+      
+      <CheckoutModal 
+        isOpen={isCheckoutOpen} 
+        onClose={() => setIsCheckoutOpen(false)} 
+      />
     </div>
   );
 } 
