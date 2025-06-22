@@ -9,29 +9,29 @@ export default function Home() {
 
       {/* Hero Section - This will now be full-width */}
       <div 
-        className="w-full h-[60vh] bg-cover bg-center bg-no-repeat relative"
+        className="w-full h-[70vh] md:h-[60vh] bg-cover bg-center bg-no-repeat relative"
         style={{ backgroundImage: "url('/hero_image.png')" }}
       >
         <div className="absolute inset-0 bg-black/50" />
-        <div className="relative z-10 flex flex-col items-start justify-center h-full text-white text-left max-w-6xl w-full mx-auto p-5">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight [text-shadow:_0_2px_4px_rgb(0_0_0_/_40%)]">
+        <div className="relative z-10 flex flex-col items-start justify-center h-full text-white text-left max-w-6xl w-full mx-auto p-5 md:p-10">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight [text-shadow:_0_2px_4px_rgb(0_0_0_/_40%)]">
             Residential & Commercial Dumpster Rentals
           </h1>
-          <p className="text-lg md:text-xl text-white/80 max-w-3xl mt-6 font-semibold">
+          <p className="text-base sm:text-lg md:text-xl text-white/80 max-w-3xl mt-4 md:mt-6 font-semibold">
             Reliable dumpster rental services for residential and commercial projects. 
             From home renovations to large construction sites, we provide fast delivery, 
             competitive pricing, and exceptional customer service.
           </p>
-          <div className="flex flex-col md:flex-row gap-4 mt-8">
+          <div className="flex flex-col sm:flex-row gap-4 mt-6 md:mt-8">
             <Link 
               href="/service-areas" 
-              className="border border-white/50 bg-transparent px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors"
+              className="border border-white/50 bg-transparent px-6 py-3 sm:px-8 rounded-lg font-semibold hover:bg-white/10 transition-colors text-center"
             >
               View Service Areas
             </Link>
             <Link 
               href="/book" 
-              className="bg-brand-orange text-white px-8 py-3 rounded-lg font-semibold hover:bg-brand-orange/90 transition-colors"
+              className="bg-brand-orange text-white px-6 py-3 sm:px-8 rounded-lg font-semibold hover:bg-brand-orange/90 transition-colors text-center"
             >
               Book Your Dumpster
             </Link>

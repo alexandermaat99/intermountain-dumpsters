@@ -1,8 +1,9 @@
 'use client';
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
+import { useTheme } from "next-themes";
 import CartIcon from "./CartIcon";
 import Image from "next/image";
 
@@ -12,6 +13,13 @@ interface NavigationProps {
 
 export default function Navigation({ currentPage }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { theme } = useTheme();
+
+  // useEffect only runs on the client, so now we can safely show the UI
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -28,14 +36,19 @@ export default function Navigation({ currentPage }: NavigationProps) {
     { href: "/contact", label: "Contact", page: 'contact' as const },
   ];
 
+  // Determine which logo to use based on theme
+  const logoSrc = mounted && theme === 'dark' 
+    ? "/WhiteHorizontalLogo.svg" 
+    : "/GreenHorizontalLogo.svg";
+
   return (
-    <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-      <div className="w-full max-w-6xl flex justify-between items-center p-3 px-5 text-sm">
+    <nav className="w-full flex justify-center border-b border-b-foreground/10 h-20">
+      <div className="w-full max-w-6xl flex justify-between items-center px-5 py-3 text-sm">
         {/* Logo */}
         <div className="flex gap-5 items-center font-semibold">
           <Link href={"/"} className="text-xl font-bold" onClick={closeMenu}>
             <Image
-              src="/logo_horizontal-10.svg"
+              src={logoSrc}
               alt="Intermountain Dumpsters Logo"
               width={200}
               height={40}
