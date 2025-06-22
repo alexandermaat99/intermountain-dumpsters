@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { DeliveryDetails } from '@/lib/types';
-import PlacesAutocomplete from 'react-places-autocomplete';
+import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import { validateDeliveryAddress, quickCityValidation, AddressValidationResult } from '@/lib/address-validation';
 import { AlertCircle, CheckCircle, AlertTriangle } from 'lucide-react';
 
@@ -125,11 +125,61 @@ export default function DeliveryStep({ delivery, onUpdate, onNext, onBack }: Del
     console.log('handleAddressSelect called with:', address);
     
     if (address && address.trim()) {
-      setAddressValue(address);
-      handleInputChange('delivery_address', address);
-      
-      // Validate the address after selection
-      await validateAddress(address);
+      try {
+        // Use geocoding to get full address details including ZIP code
+        const results = await geocodeByAddress(address);
+        console.log('Geocoding results:', results);
+        
+        if (results && results.length > 0) {
+          const result = results[0];
+          let enhancedAddress = address;
+          let zipCode = '';
+          
+          // Extract ZIP code from address components
+          if (result.address_components) {
+            for (const component of result.address_components) {
+              if (component.types.includes('postal_code')) {
+                zipCode = component.long_name;
+                break;
+              }
+            }
+          }
+          
+          // Create enhanced address with ZIP code if found and not already present
+          if (zipCode && !address.includes(zipCode)) {
+            // Insert ZIP code before the country if it ends with ", USA"
+            if (address.includes(', USA')) {
+              enhancedAddress = address.replace(', USA', ` ${zipCode}, USA`);
+            } else if (address.includes(', US')) {
+              enhancedAddress = address.replace(', US', ` ${zipCode}, US`);
+            } else {
+              // If no country suffix, just append the ZIP code
+              enhancedAddress = `${address} ${zipCode}`;
+            }
+            console.log('Enhanced address with ZIP:', enhancedAddress);
+          } else {
+            console.log('ZIP code already in address or not found');
+          }
+          
+          // Set the enhanced address
+          setAddressValue(enhancedAddress);
+          handleInputChange('delivery_address', enhancedAddress);
+          
+          // Validate the enhanced address
+          await validateAddress(enhancedAddress);
+        } else {
+          // Fallback to original address if geocoding fails
+          setAddressValue(address);
+          handleInputChange('delivery_address', address);
+          await validateAddress(address);
+        }
+      } catch (error) {
+        console.error('Geocoding failed, using original address:', error);
+        // Fallback to original address if geocoding fails
+        setAddressValue(address);
+        handleInputChange('delivery_address', address);
+        await validateAddress(address);
+      }
     }
   };
 
