@@ -151,7 +151,7 @@ export default function CustomerInfoStep({ customer, onUpdate, onNext }: Custome
         </div>
       </div>
 
-      <div className="flex justify-end pt-4">
+      <div className="flex justify-end pt-4 pb-6 md:pb-4">
         <Button onClick={handleNext} className="min-w-[120px]">
           Continue
         </Button>

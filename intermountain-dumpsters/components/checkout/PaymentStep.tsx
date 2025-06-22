@@ -319,7 +319,7 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
         </CardContent>
       </Card>
 
-      <div className="flex justify-between pt-4">
+      <div className="flex justify-between pt-4 pb-6 md:pb-4">
         <Button variant="outline" onClick={onBack}>
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back

@@ -106,7 +106,7 @@ export default function ContractStep({ contractAccepted, onUpdate, onNext, onBac
         </CardContent>
       </Card>
 
-      <div className="flex justify-between pt-4">
+      <div className="flex justify-between pt-4 pb-6 md:pb-4">
         <Button variant="outline" onClick={onBack}>
           Back
         </Button>

@@ -142,7 +142,7 @@ export default function InsuranceStep({ insurance, onUpdate, onNext, onBack }: I
         </ul>
       </div>
 
-      <div className="flex justify-between pt-4">
+      <div className="flex justify-between pt-4 pb-6 md:pb-4">
         <Button variant="outline" onClick={onBack}>
           Back
         </Button>

@@ -310,7 +310,7 @@ export default function DeliveryStep({ delivery, onUpdate, onNext, onBack }: Del
         </div>
       </div>
 
-      <div className="flex justify-between pt-4">
+      <div className="flex justify-between pt-4 pb-6 md:pb-4">
         <Button variant="outline" onClick={onBack}>
           Back
         </Button>
