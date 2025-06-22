@@ -74,31 +74,31 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 async function getAddressCoordinates(address: string): Promise<{ lat: number; lng: number } | null> {
   try {
     // Don't attempt geocoding for very short or incomplete addresses
-    if (!address || address.length < 10 || !address.includes(',')) {
-      console.log('Address too short or incomplete for geocoding:', address);
+    if (!address || address.length < 10) {
       return null;
     }
 
-    // Use the Google Maps Geocoding service
+    // Use the Google Maps Geocoding service with broader bounds
     const geocoder = new google.maps.Geocoder();
     
     return new Promise((resolve, reject) => {
       geocoder.geocode({ 
         address,
         region: 'us', // Restrict to US addresses
-        bounds: new google.maps.LatLngBounds(
-          new google.maps.LatLng(36.5, -114.5), // Southwest Utah
-          new google.maps.LatLng(42.5, -108.5)  // Northeast Utah
-        )
+        // Remove restrictive bounds to allow more addresses to be geocoded
+        // bounds: new google.maps.LatLngBounds(
+        //   new google.maps.LatLng(36.5, -114.5), // Southwest Utah
+        //   new google.maps.LatLng(42.5, -108.5)  // Northeast Utah
+        // )
       }, (results, status) => {
         if (status === 'OK' && results && results[0]) {
           const location = results[0].geometry.location;
-          resolve({
+          const coords = {
             lat: location.lat(),
             lng: location.lng()
-          });
+          };
+          resolve(coords);
         } else if (status === 'ZERO_RESULTS') {
-          console.log('No geocoding results found for address:', address);
           resolve(null);
         } else {
           console.error('Geocoding failed:', status, 'for address:', address);
@@ -115,108 +115,102 @@ async function getAddressCoordinates(address: string): Promise<{ lat: number; ln
 // Validate if an address is within service areas
 export async function validateDeliveryAddress(address: string): Promise<AddressValidationResult> {
   try {
-    console.log('🔍 Validating delivery address:', address);
-    
     // Get radius values from admin_info table
     const { serviceRadius, surroundingRadius, phone } = await getRadiusValues();
-    console.log(`📏 Using radius values - Service: ${serviceRadius}mi, Surrounding: ${surroundingRadius}mi`);
     
-    // First try quick city validation for immediate feedback
-    const quickResult = quickCityValidation(address, phone);
-    if (!quickResult.isValid) {
-      return quickResult;
-    }
-    
-    // Get coordinates for the delivery address
+    // Get coordinates for the delivery address first
     const coordinates = await getAddressCoordinates(address);
-    if (!coordinates) {
+    
+    if (coordinates) {
+      // Get all service areas from database
+      const { data: serviceAreas, error } = await supabase
+        .from('service_areas')
+        .select('id, name, latitude, longitude, local_tax_rate')
+        .not('latitude', 'is', null)
+        .not('longitude', 'is', null);
+      
+      if (error || !serviceAreas || serviceAreas.length === 0) {
+        console.error('Error fetching service areas:', error);
+        return {
+          isValid: false,
+          message: `Unable to validate service areas. Please call us at ${phone} for assistance.`,
+          isWithinServiceArea: false,
+          isWithinSurroundingArea: false
+        };
+      }
+      
+      // Check distance to each service area
+      let closestServiceArea: ServiceArea | null = null;
+      let closestDistance = Infinity;
+      let isWithinServiceArea = false;
+      let isWithinSurroundingArea = false;
+      
+      for (const area of serviceAreas) {
+        const distance = calculateDistance(
+          coordinates.lat,
+          coordinates.lng,
+          area.latitude,
+          area.longitude
+        );
+        
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestServiceArea = area;
+        }
+        
+        if (distance <= serviceRadius) {
+          isWithinServiceArea = true;
+        }
+        
+        if (distance <= surroundingRadius) {
+          isWithinSurroundingArea = true;
+        }
+      }
+      
+      // Determine validation result
+      let isValid = false;
+      let message = '';
+      
+      if (isWithinServiceArea) {
+        isValid = true;
+        message = `✅ Address is within our service area (${closestServiceArea?.name}). Distance: ${closestDistance.toFixed(1)} miles.`;
+      } else if (isWithinSurroundingArea) {
+        isValid = true;
+        message = `⚠️ Address is in a surrounding area (${closestServiceArea?.name}). Distance: ${closestDistance.toFixed(1)} miles. Additional delivery fees may apply.`;
+      } else {
+        isValid = false;
+        message = `❌ Address is outside our service area. Closest service area: ${closestServiceArea?.name} (${closestDistance.toFixed(1)} miles away). Please call us at ${phone} for availability.`;
+      }
+      
+      const result: AddressValidationResult = {
+        isValid,
+        serviceArea: closestServiceArea || undefined,
+        distance: closestDistance,
+        message,
+        isWithinServiceArea,
+        isWithinSurroundingArea
+      };
+      
+      return result;
+    } else {
       // If geocoding fails, fall back to quick validation
-      console.log('Geocoding failed, using quick validation fallback');
-      return quickResult;
-    }
-    
-    console.log('📍 Delivery address coordinates:', coordinates);
-    
-    // Get all service areas from database
-    const { data: serviceAreas, error } = await supabase
-      .from('service_areas')
-      .select('id, name, latitude, longitude, local_tax_rate')
-      .not('latitude', 'is', null)
-      .not('longitude', 'is', null);
-    
-    if (error || !serviceAreas || serviceAreas.length === 0) {
-      console.error('Error fetching service areas:', error);
+      const quickResult = quickCityValidation(address, phone);
       return {
-        isValid: false,
-        message: `Unable to validate service areas. Please call us at ${phone} for assistance.`,
-        isWithinServiceArea: false,
-        isWithinSurroundingArea: false
+        ...quickResult,
+        distance: quickResult.distance,
+        message: quickResult.message
       };
     }
-    
-    console.log('📋 Available service areas:', serviceAreas.length);
-    
-    // Check distance to each service area
-    let closestServiceArea: ServiceArea | null = null;
-    let closestDistance = Infinity;
-    let isWithinServiceArea = false;
-    let isWithinSurroundingArea = false;
-    
-    for (const area of serviceAreas) {
-      const distance = calculateDistance(
-        coordinates.lat,
-        coordinates.lng,
-        area.latitude,
-        area.longitude
-      );
-      
-      console.log(`📏 Distance to ${area.name}: ${distance.toFixed(2)} miles`);
-      
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestServiceArea = area;
-      }
-      
-      if (distance <= serviceRadius) {
-        isWithinServiceArea = true;
-      }
-      
-      if (distance <= surroundingRadius) {
-        isWithinSurroundingArea = true;
-      }
-    }
-    
-    // Determine validation result
-    let isValid = false;
-    let message = '';
-    
-    if (isWithinServiceArea) {
-      isValid = true;
-      message = `✅ Address is within our service area (${closestServiceArea?.name}). Distance: ${closestDistance.toFixed(1)} miles.`;
-    } else if (isWithinSurroundingArea) {
-      isValid = true;
-      message = `⚠️ Address is in a surrounding area (${closestServiceArea?.name}). Distance: ${closestDistance.toFixed(1)} miles. Additional delivery fees may apply.`;
-    } else {
-      isValid = false;
-      message = `❌ Address is outside our service area. Closest service area: ${closestServiceArea?.name} (${closestDistance.toFixed(1)} miles away). Please call us at ${phone} for availability.`;
-    }
-    
-    const result: AddressValidationResult = {
-      isValid,
-      serviceArea: closestServiceArea || undefined,
-      distance: closestDistance,
-      message,
-      isWithinServiceArea,
-      isWithinSurroundingArea
-    };
-    
-    console.log('🎯 Validation result:', result);
-    return result;
     
   } catch (error) {
     console.error('Error validating delivery address:', error);
     // Fall back to quick validation
-    return quickCityValidation(address);
+    const quickResult = quickCityValidation(address);
+    return {
+      ...quickResult,
+      distance: quickResult.distance,
+      message: quickResult.message
+    };
   }
 }
 
@@ -224,7 +218,7 @@ export async function validateDeliveryAddress(address: string): Promise<AddressV
 export function quickCityValidation(address: string, phone: string = '(801) 555-0123'): AddressValidationResult {
   const addressLower = address.toLowerCase();
   
-  // List of serviceable cities
+  // List of serviceable cities - expanded to include more areas
   const serviceableCities = [
     'salt lake city', 'slc', 'west valley city', 'west valley', 'wvc',
     'south jordan', 'west jordan', 'sandy', 'murray', 'draper',
@@ -236,7 +230,12 @@ export function quickCityValidation(address: string, phone: string = '(801) 555-
     'lake shore', 'palmyra', 'fairfield', 'cedar fort',
     'layton', 'ogden', 'clearfield', 'syracuse', 'kaysville',
     'farmington', 'centerville', 'bountiful', 'north salt lake',
-    'woods cross', 'west bountiful', 'south weber', 'uintah'
+    'woods cross', 'west bountiful', 'south weber', 'uintah',
+    'park city', 'heber', 'midway', 'kamas', 'coalville',
+    'eagle mountain', 'cedar hills', 'alpine', 'highland',
+    'lone peak', 'timpanogos', 'pleasant grove', 'orem',
+    'provo canyon', 'sundance', 'deer valley', 'canyons',
+    'brighton', 'solitude', 'alta', 'snowbird'
   ];
   
   // Check if address contains any serviceable city
