@@ -160,13 +160,36 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
       const result = await saveCheckoutToDatabase(checkoutDataWithBilling, taxInfo.total, customerAddress);
 
       if (result) {
-        // TODO: Generate stripe checkout URL with the saved order ID
-        // For now, simulate the process
-        setTimeout(() => {
-          alert(`Order saved! Rental ID: ${result.rental_id}\nTotal with tax: $${taxInfo.total.toFixed(2)}\nRedirecting to payment...`);
-          window.open('https://www.stripe.com', '_blank');
-          setIsProcessing(false);
-        }, 2000);
+        // Create Stripe checkout session
+        const response = await fetch('/api/stripe/create-checkout-session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            rentalId: result.rental_id,
+            amount: taxInfo.total,
+            customerEmail: checkoutData.customer.email,
+            customerName: checkoutData.customer.business 
+              ? checkoutData.customer.first_name 
+              : `${checkoutData.customer.first_name} ${checkoutData.customer.last_name}`,
+            deliveryAddress: checkoutData.delivery.delivery_address,
+            deliveryDate: checkoutData.delivery.delivery_date,
+          }),
+        });
+
+        const { url, error } = await response.json();
+
+        if (error) {
+          throw new Error(error);
+        }
+
+        if (url) {
+          // Redirect to Stripe checkout
+          window.location.href = url;
+        } else {
+          throw new Error('No checkout URL received');
+        }
       } else {
         throw new Error('Failed to save order to database');
       }
