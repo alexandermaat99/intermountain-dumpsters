@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +9,8 @@ import { CheckoutData, CartItem } from '@/lib/types';
 import { CartState } from '@/lib/contexts/CartContext';
 import { CreditCard, ArrowLeft, CheckCircle, User, MapPin } from 'lucide-react';
 import { useContactInfo } from '@/lib/hooks/useContactInfo';
+import { saveCheckoutToDatabase } from '@/lib/checkout';
+import { calculateTaxFromServiceArea, TaxInfo, formatTaxDisplay } from '@/lib/tax-calculator-db';
 
 interface PaymentStepProps {
   checkoutData: CheckoutData;
@@ -21,8 +23,35 @@ interface PaymentStepProps {
 export default function PaymentStep({ checkoutData, cart, insuranceTotal, total, onBack }: PaymentStepProps) {
   const { contactInfo } = useContactInfo();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [showBillingAddress, setShowBillingAddress] = useState(false);
+  const [showBillingAddress, setShowBillingAddress] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'check'>('card');
+  const [taxInfo, setTaxInfo] = useState<TaxInfo | null>(null);
+  const [taxLoading, setTaxLoading] = useState(true);
+
+  // Calculate tax based on delivery address using service areas
+  useMemo(async () => {
+    setTaxLoading(true);
+    try {
+      const calculatedTax = await calculateTaxFromServiceArea(total, checkoutData.delivery.delivery_address);
+      setTaxInfo(calculatedTax);
+    } catch (error) {
+      console.error('Error calculating tax:', error);
+      // Fallback to default calculation
+      const fallbackTax = {
+        subtotal: total,
+        taxAmount: total * 0.065, // 6.5% default
+        total: total * 1.065,
+        taxRate: 0.065,
+        taxBreakdown: {
+          state: total * 0.0485,
+          local: total * 0.0165
+        }
+      };
+      setTaxInfo(fallbackTax);
+    } finally {
+      setTaxLoading(false);
+    }
+  }, [total, checkoutData.delivery.delivery_address]);
 
   // Format insurance prices for display
   const formatDrivewayInsurancePrice = () => {
@@ -41,24 +70,50 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
   };
 
   const handleProceedToPayment = async () => {
+    if (!taxInfo) {
+      alert('Please wait for tax calculation to complete.');
+      return;
+    }
+
     setIsProcessing(true);
     
     try {
-      // TODO: Save order to database
-      // TODO: Generate stripe checkout URL
-      // TODO: Redirect to stripe
+      // 1. Save order to database first (with tax-inclusive total)
+      const savedOrder = await saveCheckoutToDatabase(checkoutData, taxInfo.total);
+      
+      if (!savedOrder) {
+        throw new Error('Failed to save order to database');
+      }
+
+      console.log('Order saved successfully:', savedOrder);
+      
+      // 2. TODO: Generate stripe checkout URL with the saved order ID
+      // TODO: Redirect to stripe with tax-inclusive total
       
       // For now, simulate the process
       setTimeout(() => {
         // This would be replaced with actual Stripe integration
+        alert(`Order saved! Rental ID: ${savedOrder.rental_id}\nTotal with tax: $${taxInfo.total.toFixed(2)}\nRedirecting to payment...`);
         window.open('https://www.stripe.com', '_blank');
         setIsProcessing(false);
       }, 2000);
     } catch (error) {
       console.error('Error processing payment:', error);
+      alert('Error saving order. Please try again.');
       setIsProcessing(false);
     }
   };
+
+  if (taxLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Calculating tax based on delivery location...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -112,11 +167,40 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
               </div>
             )}
 
+            {/* Tax Breakdown */}
+            {taxInfo && (
+              <div className="border-t pt-3">
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Subtotal</span>
+                    <span>${taxInfo.subtotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <div>
+                      <div>Sales Tax</div>
+                      <div className="text-xs text-muted-foreground">
+                        {formatTaxDisplay(taxInfo)}
+                      </div>
+                    </div>
+                    <span>${taxInfo.taxAmount.toFixed(2)}</span>
+                  </div>
+                  {taxInfo.serviceArea && (
+                    <div className="text-xs text-muted-foreground ml-4">
+                      Based on {taxInfo.serviceArea.name} service area
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="border-t pt-3">
               <div className="flex justify-between items-center text-lg font-semibold">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>${taxInfo?.total.toFixed(2) || total.toFixed(2)}</span>
               </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Tax calculated based on delivery address
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -227,9 +311,9 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <CheckCircle className="w-4 h-4 text-green-600" />
               <span>SSL Encrypted</span>
-              <span>•</span>
+              <CheckCircle className="w-4 h-4 text-green-600" />
               <span>PCI Compliant</span>
-              <span>•</span>
+              <CheckCircle className="w-4 h-4 text-green-600" />
               <span>Secure Checkout</span>
             </div>
           </div>
@@ -244,7 +328,7 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
         <Button 
           onClick={handleProceedToPayment} 
           className="min-w-[200px]"
-          disabled={isProcessing}
+          disabled={isProcessing || !taxInfo}
         >
           {isProcessing ? (
             <>
