@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient';
-import { CheckoutData } from './types';
+import { CheckoutData, CustomerInfo } from './types';
 import { calculateTaxFromServiceArea } from './tax-calculator-db';
 
 export interface SavedOrder {
@@ -10,24 +10,31 @@ export interface SavedOrder {
   subtotal_amount: number;
 }
 
-export async function saveCheckoutToDatabase(checkoutData: CheckoutData, totalAmount: number): Promise<SavedOrder | null> {
+export async function saveCheckoutToDatabase(
+  checkoutData: CheckoutData, 
+  totalAmount: number,
+  resolvedCustomerAddress?: CustomerInfo
+): Promise<SavedOrder | null> {
   try {
     // Calculate tax information using service areas
     const taxInfo = await calculateTaxFromServiceArea(totalAmount, checkoutData.delivery.delivery_address);
+    
+    // Use resolved customer address if provided, otherwise use checkoutData.customer
+    const customerToSave = resolvedCustomerAddress || checkoutData.customer;
     
     // 1. Save customer to customers table
     const { data: customerData, error: customerError } = await supabase
       .from('customers')
       .insert({
-        first_name: checkoutData.customer.first_name,
-        last_name: checkoutData.customer.last_name,
-        phone_number: checkoutData.customer.phone_number,
-        address_line_1: checkoutData.customer.address_line_1,
-        address_line_2: checkoutData.customer.address_line_2,
-        city: checkoutData.customer.city,
-        state: checkoutData.customer.state,
-        zip: checkoutData.customer.zip,
-        business: checkoutData.customer.business
+        first_name: customerToSave.first_name,
+        last_name: customerToSave.last_name,
+        phone_number: customerToSave.phone_number,
+        address_line_1: customerToSave.address_line_1,
+        address_line_2: customerToSave.address_line_2,
+        city: customerToSave.city,
+        state: customerToSave.state,
+        zip: customerToSave.zip,
+        business: customerToSave.business
       })
       .select()
       .single();

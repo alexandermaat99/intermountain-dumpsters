@@ -46,6 +46,13 @@ export type CheckoutData = {
   delivery: DeliveryDetails;
   insurance: InsuranceOptions;
   contract_accepted: boolean;
+  billing?: {
+    address_line_1: string;
+    address_line_2?: string;
+    city: string;
+    state: string;
+    zip: string;
+  };
 };
 
 export type CheckoutStep = 'customer' | 'delivery' | 'insurance' | 'contract' | 'payment'; 

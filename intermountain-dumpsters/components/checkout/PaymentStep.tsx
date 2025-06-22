@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,51 +24,99 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
   const { contactInfo } = useContactInfo();
   const [isProcessing, setIsProcessing] = useState(false);
   const [showBillingAddress, setShowBillingAddress] = useState(true);
+  const [billingAddress, setBillingAddress] = useState({
+    address_line_1: '',
+    address_line_2: '',
+    city: '',
+    state: '',
+    zip: ''
+  });
+  const [billingErrors, setBillingErrors] = useState<{[key: string]: string}>({});
   const [taxInfo, setTaxInfo] = useState<TaxInfo | null>(null);
-  const [taxLoading, setTaxLoading] = useState(true);
 
-  // Calculate tax based on delivery address using service areas
-  useMemo(async () => {
-    setTaxLoading(true);
-    try {
-      const calculatedTax = await calculateTaxFromServiceArea(total, checkoutData.delivery.delivery_address);
-      setTaxInfo(calculatedTax);
-    } catch (error) {
-      console.error('Error calculating tax:', error);
-      // Fallback to default calculation
-      const fallbackTax = {
-        subtotal: total,
-        taxAmount: total * 0.065, // 6.5% default
-        total: total * 1.065,
-        taxRate: 0.065,
-        taxBreakdown: {
-          state: total * 0.0485,
-          local: total * 0.0165
-        }
-      };
-      setTaxInfo(fallbackTax);
-    } finally {
-      setTaxLoading(false);
+  // Initialize billing address from checkoutData if it exists
+  useEffect(() => {
+    if (checkoutData.billing) {
+      setBillingAddress({
+        address_line_1: checkoutData.billing.address_line_1,
+        address_line_2: checkoutData.billing.address_line_2 || '',
+        city: checkoutData.billing.city,
+        state: checkoutData.billing.state,
+        zip: checkoutData.billing.zip
+      });
+      setShowBillingAddress(true);
     }
-  }, [total, checkoutData.delivery.delivery_address]);
+  }, [checkoutData.billing]);
 
-  // Format insurance prices for display
+  // Calculate tax based on delivery address
+  useEffect(() => {
+    const calculateTax = async () => {
+      if (!checkoutData.delivery.delivery_address) {
+        setTaxInfo(null);
+        return;
+      }
+      
+      try {
+        const calculatedTax = await calculateTaxFromServiceArea(
+          cart.total + insuranceTotal,
+          checkoutData.delivery.delivery_address
+        );
+        setTaxInfo(calculatedTax);
+      } catch (error) {
+        console.error('Error calculating tax:', error);
+        setTaxInfo(null);
+      }
+    };
+
+    calculateTax();
+  }, [cart.total, insuranceTotal, checkoutData.delivery.delivery_address]);
+
   const formatDrivewayInsurancePrice = () => {
-    const price = contactInfo?.driveway_insurance || 40;
-    return `$${price.toFixed(2)}`;
+    return `$${contactInfo?.driveway_insurance || 40}`;
   };
 
   const formatCancellationInsurancePrice = () => {
-    const price = contactInfo?.cancelation_insurance || 40;
-    return `$${price.toFixed(2)}`;
+    return `$${contactInfo?.cancelation_insurance || 40}`;
   };
 
   const formatRushDeliveryPrice = () => {
-    const price = contactInfo?.rush_fee || 60;
-    return `$${price.toFixed(2)}`;
+    return `$${contactInfo?.rush_fee || 60}`;
+  };
+
+  const validateBillingAddress = () => {
+    const errors: {[key: string]: string} = {};
+    
+    if (showBillingAddress) {
+      if (!billingAddress.address_line_1.trim()) {
+        errors.address_line_1 = 'Billing address is required';
+      }
+      if (!billingAddress.city.trim()) {
+        errors.city = 'City is required';
+      }
+      if (!billingAddress.state.trim()) {
+        errors.state = 'State is required';
+      }
+      if (!billingAddress.zip.trim()) {
+        errors.zip = 'ZIP code is required';
+      }
+    }
+    
+    setBillingErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleBillingAddressChange = (field: string, value: string) => {
+    setBillingAddress(prev => ({ ...prev, [field]: value }));
+    if (billingErrors[field]) {
+      setBillingErrors(prev => ({ ...prev, [field]: '' }));
+    }
   };
 
   const handleProceedToPayment = async () => {
+    if (!validateBillingAddress()) {
+      return;
+    }
+
     if (!taxInfo) {
       alert('Please wait for tax calculation to complete.');
       return;
@@ -77,33 +125,59 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
     setIsProcessing(true);
     
     try {
-      // 1. Save order to database first (with tax-inclusive total)
-      const savedOrder = await saveCheckoutToDatabase(checkoutData, taxInfo.total);
+      // Determine the address to use for customer table
+      let customerAddress = checkoutData.customer;
       
-      if (!savedOrder) {
-        throw new Error('Failed to save order to database');
+      if (!showBillingAddress) {
+        // Use delivery address for billing (same as delivery)
+        // Parse delivery address to extract components
+        const deliveryParts = checkoutData.delivery.delivery_address.split(',').map(part => part.trim());
+        customerAddress = {
+          ...customerAddress,
+          address_line_1: deliveryParts[0] || '',
+          city: deliveryParts[1] || '',
+          state: deliveryParts[2] || '',
+          zip: deliveryParts[3] || ''
+        };
+      } else {
+        // Use billing address
+        customerAddress = {
+          ...customerAddress,
+          address_line_1: billingAddress.address_line_1,
+          address_line_2: billingAddress.address_line_2,
+          city: billingAddress.city,
+          state: billingAddress.state,
+          zip: billingAddress.zip
+        };
       }
 
-      console.log('Order saved successfully:', savedOrder);
-      
-      // 2. TODO: Generate stripe checkout URL with the saved order ID
-      // TODO: Redirect to stripe with tax-inclusive total
-      
-      // For now, simulate the process
-      setTimeout(() => {
-        // This would be replaced with actual Stripe integration
-        alert(`Order saved! Rental ID: ${savedOrder.rental_id}\nTotal with tax: $${taxInfo.total.toFixed(2)}\nRedirecting to payment...`);
-        window.open('https://www.stripe.com', '_blank');
-        setIsProcessing(false);
-      }, 2000);
+      // Save checkout data with billing address
+      const checkoutDataWithBilling = {
+        ...checkoutData,
+        billing: showBillingAddress ? billingAddress : undefined
+      };
+
+      const result = await saveCheckoutToDatabase(checkoutDataWithBilling, taxInfo.total, customerAddress);
+
+      if (result) {
+        // TODO: Generate stripe checkout URL with the saved order ID
+        // For now, simulate the process
+        setTimeout(() => {
+          alert(`Order saved! Rental ID: ${result.rental_id}\nTotal with tax: $${taxInfo.total.toFixed(2)}\nRedirecting to payment...`);
+          window.open('https://www.stripe.com', '_blank');
+          setIsProcessing(false);
+        }, 2000);
+      } else {
+        throw new Error('Failed to save order to database');
+      }
     } catch (error) {
-      console.error('Error processing payment:', error);
-      alert('Error saving order. Please try again.');
+      console.error('Error processing checkout:', error);
+      alert('An error occurred while processing your checkout. Please try again.');
       setIsProcessing(false);
     }
   };
 
-  if (taxLoading) {
+  if (!taxInfo) {
     return (
       <div className="space-y-6">
         <div className="text-center py-8">
@@ -264,12 +338,27 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
 
           {showBillingAddress && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
-              <div>
+              <div className="md:col-span-2">
                 <Label htmlFor="billing_address">Billing Address *</Label>
                 <Input
                   id="billing_address"
                   placeholder="Enter billing address"
+                  className={`mt-1 ${billingErrors.address_line_1 ? 'border-destructive' : ''}`}
+                  value={billingAddress.address_line_1}
+                  onChange={(e) => handleBillingAddressChange('address_line_1', e.target.value)}
+                />
+                {billingErrors.address_line_1 && (
+                  <p className="text-sm text-destructive mt-1">{billingErrors.address_line_1}</p>
+                )}
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="billing_address_2">Address Line 2 (Optional)</Label>
+                <Input
+                  id="billing_address_2"
+                  placeholder="Apartment, suite, etc."
                   className="mt-1"
+                  value={billingAddress.address_line_2}
+                  onChange={(e) => handleBillingAddressChange('address_line_2', e.target.value)}
                 />
               </div>
               <div>
@@ -277,24 +366,39 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
                 <Input
                   id="billing_city"
                   placeholder="City"
-                  className="mt-1"
+                  className={`mt-1 ${billingErrors.city ? 'border-destructive' : ''}`}
+                  value={billingAddress.city}
+                  onChange={(e) => handleBillingAddressChange('city', e.target.value)}
                 />
+                {billingErrors.city && (
+                  <p className="text-sm text-destructive mt-1">{billingErrors.city}</p>
+                )}
               </div>
               <div>
                 <Label htmlFor="billing_state">State *</Label>
                 <Input
                   id="billing_state"
                   placeholder="State"
-                  className="mt-1"
+                  className={`mt-1 ${billingErrors.state ? 'border-destructive' : ''}`}
+                  value={billingAddress.state}
+                  onChange={(e) => handleBillingAddressChange('state', e.target.value)}
                 />
+                {billingErrors.state && (
+                  <p className="text-sm text-destructive mt-1">{billingErrors.state}</p>
+                )}
               </div>
               <div>
                 <Label htmlFor="billing_zip">ZIP Code *</Label>
                 <Input
                   id="billing_zip"
                   placeholder="ZIP Code"
-                  className="mt-1"
+                  className={`mt-1 ${billingErrors.zip ? 'border-destructive' : ''}`}
+                  value={billingAddress.zip}
+                  onChange={(e) => handleBillingAddressChange('zip', e.target.value)}
                 />
+                {billingErrors.zip && (
+                  <p className="text-sm text-destructive mt-1">{billingErrors.zip}</p>
+                )}
               </div>
             </div>
           )}
