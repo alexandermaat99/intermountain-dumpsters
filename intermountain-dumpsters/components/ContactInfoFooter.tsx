@@ -27,7 +27,10 @@ export default function ContactInfoFooter() {
     <div className="space-y-2 text-sm text-white/80">
       <p>{contactInfo.address}</p>
       <p>
-        <span className="font-semibold text-white">Phone:</span> {contactInfo.phone}
+        <span className="font-semibold text-white">Phone:</span>{" "}
+        <a href={`tel:${contactInfo.phone}`} className="hover:underline">
+          {contactInfo.phone}
+        </a>
       </p>
       <div className="text-sm">
         <span className="font-semibold text-white">Hours:</span>
