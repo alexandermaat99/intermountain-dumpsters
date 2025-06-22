@@ -111,7 +111,7 @@ export default function DeliveryStep({ delivery, onUpdate, onNext, onBack }: Del
                 
                 {/* Suggestions dropdown */}
                 {suggestions.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+                  <div className="absolute z-10 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-auto">
                     {loading && (
                       <div className="p-3 text-sm text-muted-foreground">
                         Loading...
@@ -119,16 +119,16 @@ export default function DeliveryStep({ delivery, onUpdate, onNext, onBack }: Del
                     )}
                     {suggestions.map((suggestion, index) => {
                       const style = {
-                        backgroundColor: suggestion.active ? '#f3f4f6' : '#ffffff',
+                        backgroundColor: suggestion.active ? 'hsl(var(--accent))' : 'transparent',
                         cursor: 'pointer',
                       };
                       return (
                         <div
                           {...getSuggestionItemProps(suggestion, { style })}
-                          key={suggestion.placeId || index}
-                          className="p-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                          key={`${suggestion.placeId || 'no-id'}-${index}`}
+                          className="p-3 hover:bg-accent border-b border-border last:border-b-0"
                         >
-                          <div className="text-sm font-medium">{suggestion.formattedSuggestion.mainText}</div>
+                          <div className="text-sm font-medium text-popover-foreground">{suggestion.formattedSuggestion.mainText}</div>
                           <div className="text-xs text-muted-foreground">{suggestion.formattedSuggestion.secondaryText}</div>
                         </div>
                       );
