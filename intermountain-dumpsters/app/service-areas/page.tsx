@@ -47,7 +47,7 @@ export default function ServiceAreasPage() {
   }, []);
 
   return (
-    <div className="w-full flex flex-col gap-5 md:gap-10">
+    <div className="w-full flex flex-col gap-2 md:gap-4">
       {/* Navigation */}
       <Navigation currentPage="service-areas" />
 

@@ -14,7 +14,7 @@ interface NavigationProps {
 export default function Navigation({ currentPage }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   // useEffect only runs on the client, so now we can safely show the UI
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function Navigation({ currentPage }: NavigationProps) {
   ];
 
   // Determine which logo to use based on theme
-  const logoSrc = mounted && theme === 'dark' 
+  const logoSrc = mounted && resolvedTheme === 'dark' 
     ? "/WhiteHorizontalLogo.svg" 
     : "/GreenHorizontalLogo.svg";
 

@@ -3,7 +3,7 @@ import Navigation from "@/components/Navigation";
 
 export default function ContactPage() {
   return (
-    <div className="w-full flex flex-col gap-5 md:gap-10 items-center">
+    <div className="w-full flex flex-col gap-2 md:gap-4 items-center">
       {/* Navigation */}
       <Navigation currentPage="contact" />
 

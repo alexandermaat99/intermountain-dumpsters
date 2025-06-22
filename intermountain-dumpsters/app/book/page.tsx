@@ -123,7 +123,7 @@ export default function BookPage() {
 
   return (
     <div className="w-full flex flex-col items-center">
-      <div className="w-full flex flex-col gap-5 md:gap-10 items-center">
+      <div className="w-full flex flex-col gap-2 md:gap-4 items-center">
         {/* Navigation */}
         <Navigation currentPage="book" />
 
@@ -163,7 +163,7 @@ export default function BookPage() {
                 const isAvailable = dumpsterType.quantity > 0;
                 
                 return (
-                  <Card key={dumpsterType.id} className={`flex flex-col hover:shadow-lg transition-shadow ${!isAvailable ? 'opacity-50' : ''}`}>
+                  <Card key={dumpsterType.id} className={`flex flex-col hover:shadow-lg transition-shadow dark:border dark:border-white/10 ${!isAvailable ? 'opacity-50' : ''}`}>
                     <CardHeader>
                       <CardTitle>{dumpsterType.name}</CardTitle>
                       <CardDescription>{dumpsterType.descriptor}</CardDescription>
