@@ -24,16 +24,22 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 mt-6 md:mt-8">
             <Link 
-              href="/service-areas" 
-              className="border border-white/50 bg-transparent px-6 py-3 sm:px-8 rounded-lg font-semibold hover:bg-white/10 transition-colors text-center"
-            >
-              View Service Areas
-            </Link>
-            <Link 
               href="/book" 
-              className="bg-brand-orange text-white px-6 py-3 sm:px-8 rounded-lg font-semibold hover:bg-brand-orange/90 transition-colors text-center"
+              className="bg-[#2C6B9E] text-white px-6 py-3 sm:px-8 rounded-lg font-semibold hover:bg-[#2C6B9E]/80 transition-colors text-center shadow-lg"
             >
-              Book Your Dumpster
+              Book Online
+            </Link>
+            <a 
+              href="tel:+1234567890" 
+              className="bg-[#2C6B9E] text-white px-6 py-3 sm:px-8 rounded-lg font-semibold hover:bg-[#2C6B9E]/80 transition-colors text-center shadow-lg"
+            >
+              Call to Book
+            </a>
+            <Link 
+              href="/service-areas" 
+              className="bg-[#2C6B9E] text-white px-6 py-3 sm:px-8 rounded-lg font-semibold hover:bg-[#2C6B9E]/80 transition-colors text-center shadow-lg"
+            >
+              Service Areas
             </Link>
           </div>
         </div>

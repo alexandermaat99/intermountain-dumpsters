@@ -25,37 +25,58 @@ export async function saveCheckoutToDatabase(
     // Log the customer data being sent to Supabase
     console.log('Attempting to save customer:', JSON.stringify(customerToSave, null, 2));
 
-    // 1. Save customer to customers table
-    const { data: customerData, error: customerError } = await supabase
+    // 1. Check for existing customer by email
+    let customerData = null;
+    
+    const { data: existingCustomer, error: customerLookupError } = await supabase
       .from('customers')
-      .insert({
-        first_name: customerToSave.first_name,
-        last_name: customerToSave.last_name,
-        email: customerToSave.email,
-        phone_number: customerToSave.phone_number,
-        address_line_1: customerToSave.address_line_1,
-        address_line_2: customerToSave.address_line_2,
-        city: customerToSave.city,
-        state: customerToSave.state,
-        zip: customerToSave.zip,
-        business: customerToSave.business
-      })
-      .select()
+      .select('*')
+      .ilike('email', customerToSave.email.trim())
       .single();
 
-    if (customerError) {
-      console.error('Error saving customer:', JSON.stringify(customerError, null, 2));
-      return null;
+    if (customerLookupError && customerLookupError.code !== 'PGRST116') { // PGRST116 = no rows returned
+      console.error('Error checking for existing customer:', customerLookupError);
+    } else if (existingCustomer) {
+      customerData = existingCustomer;
+      console.log('Found existing customer by email:', customerData.id);
     }
 
-    // 2. Get dumpster_type_id from the cart (assuming first item for now)
+    // 2. If no existing customer found, create a new one
+    if (!customerData) {
+      const { data: newCustomerData, error: customerError } = await supabase
+        .from('customers')
+        .insert({
+          first_name: customerToSave.first_name,
+          last_name: customerToSave.last_name,
+          email: customerToSave.email.toLowerCase().trim(),
+          phone_number: customerToSave.phone_number,
+          address_line_1: customerToSave.address_line_1,
+          address_line_2: customerToSave.address_line_2,
+          city: customerToSave.city,
+          state: customerToSave.state,
+          zip: customerToSave.zip,
+          business: customerToSave.business
+        })
+        .select()
+        .single();
+
+      if (customerError) {
+        console.error('Error saving new customer:', JSON.stringify(customerError, null, 2));
+        return null;
+      }
+
+      customerData = newCustomerData;
+      console.log('Created new customer:', customerData.id);
+    }
+
+    // 3. Get dumpster_type_id from the cart (assuming first item for now)
     // TODO: This should come from the actual cart items
     const dumpsterTypeId = 1; // Default, should be dynamic based on cart
 
     // Extract ZIP code for database storage
     const zipCode = checkoutData.delivery.delivery_address.match(/\b\d{5}\b/)?.[0] || '';
 
-    // 3. Save rental to rentals table with tax information
+    // 4. Save rental to rentals table with tax information
     const { data: rentalData, error: rentalError } = await supabase
       .from('rentals')
       .insert({
