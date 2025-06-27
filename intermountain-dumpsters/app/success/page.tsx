@@ -1,5 +1,3 @@
-'use client';
-
 import { Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -7,8 +5,30 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Home, Phone } from 'lucide-react';
 import Link from 'next/link';
 import { useCartContext } from '@/lib/contexts/CartContext';
+import { getContactInfo } from '@/lib/contact-info';
 
-function SuccessContent() {
+// Server component to fetch phone and pass to client
+export default async function SuccessPage() {
+  const contactInfo = await getContactInfo();
+  const phone = contactInfo.phone || '(801) 555-0123';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || '/';
+
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading your order details...</p>
+        </div>
+      </div>
+    }>
+      <SuccessContent phone={phone} baseUrl={baseUrl} />
+    </Suspense>
+  );
+}
+
+// Client component
+function SuccessContent({ phone, baseUrl }: { phone: string, baseUrl: string }) {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const { clearCart } = useCartContext();
@@ -55,14 +75,13 @@ function SuccessContent() {
           </div>
 
           <div className="space-y-3">
-            <Link href="/">
+            <a href={baseUrl}>
               <Button className="w-full">
                 <Home className="w-4 h-4 mr-2" />
                 Return to Home
               </Button>
-            </Link>
-            
-            <a href="tel:+1234567890" className="block">
+            </a>
+            <a href={`tel:${phone.replace(/[^\d+]/g, '')}`} className="block">
               <Button variant="outline" className="w-full">
                 <Phone className="w-4 h-4 mr-2" />
                 Call Us
@@ -72,20 +91,5 @@ function SuccessContent() {
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-export default function SuccessPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading your order details...</p>
-        </div>
-      </div>
-    }>
-      <SuccessContent />
-    </Suspense>
   );
 } 
