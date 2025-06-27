@@ -91,13 +91,13 @@ export default function Home() {
           </h2>
           <div className="max-w-4xl mx-auto space-y-6 text-lg text-muted-foreground leading-relaxed">
             <p>
-              At Intermountain Dumpsters, we're proud to be a locally owned and operated business serving our community with dedication and integrity. As your neighbors, we understand the unique needs of our region and are committed to providing exceptional service that reflects our local values.
+              At Intermountain Dumpsters, we&apos;re proud to be a locally owned and operated business serving our community with dedication and integrity. As your neighbors, we understand the unique needs of our region and are committed to providing exceptional service that reflects our local values.
             </p>
             <p>
-              Our team brings years of experience in waste management and construction services, ensuring that every project—whether it's a home renovation, construction site, or commercial cleanup—receives the attention to detail and professional care it deserves. We believe in building lasting relationships with our customers through reliable service, transparent pricing, and unwavering commitment to quality.
+              Our team brings years of experience in waste management and construction services, ensuring that every project—whether it&apos;s a home renovation, construction site, or commercial cleanup—receives the attention to detail and professional care it deserves. We believe in building lasting relationships with our customers through reliable service, transparent pricing, and unwavering commitment to quality.
             </p>
             <p>
-              When you choose Intermountain Dumpsters, you're not just getting a dumpster—you're partnering with a local business that cares about your project's success and our community's well-being. From our family to yours, we're here to make your waste management needs simple, efficient, and stress-free.
+              When you choose Intermountain Dumpsters, you&apos;re not just getting a dumpster—you&apos;re partnering with a local business that cares about your project&apos;s success and our community&apos;s well-being. From our family to yours, we&apos;re here to make your waste management needs simple, efficient, and stress-free.
             </p>
           </div>
         </div>
