@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import HeroCallButton from "@/components/HeroCallButton";
-import { Phone, MapPin, Calendar } from "lucide-react";
+import { MapPin, Calendar } from "lucide-react";
 
 export default function Home() {
   return (
