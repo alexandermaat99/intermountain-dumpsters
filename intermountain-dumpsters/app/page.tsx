@@ -44,40 +44,60 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Features Section - This will have its own width constraint */}
+      {/* Values Section */}
       <div className="max-w-6xl w-full mx-auto p-5 py-20">
         <div className="grid md:grid-cols-3 gap-8">
           <div className="text-center space-y-4">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-              <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <div className="w-16 h-16 bg-[#2C6B9E]/10 rounded-full flex items-center justify-center mx-auto">
+              <svg className="w-8 h-8 text-[#2C6B9E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold">Fast Delivery</h3>
+            <h3 className="text-xl font-semibold">Locally Owned</h3>
             <p className="text-muted-foreground">
-              Same-day or next-day delivery available for residential and commercial projects
+              Family-owned business serving our community with dedication and integrity
             </p>
           </div>
           <div className="text-center space-y-4">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-              <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+            <div className="w-16 h-16 bg-[#2C6B9E]/10 rounded-full flex items-center justify-center mx-auto">
+              <svg className="w-8 h-8 text-[#2C6B9E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold">Competitive Pricing</h3>
+            <h3 className="text-xl font-semibold">Customer Service</h3>
             <p className="text-muted-foreground">
-              Transparent pricing for both residential and commercial customers with no hidden fees
+              Building lasting relationships through reliable service and personal attention
             </p>
           </div>
           <div className="text-center space-y-4">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-              <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 109.75 9.75A9.75 9.75 0 0012 2.25z" />
+            <div className="w-16 h-16 bg-[#2C6B9E]/10 rounded-full flex items-center justify-center mx-auto">
+              <svg className="w-8 h-8 text-[#2C6B9E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold">Flexible Rentals</h3>
+            <h3 className="text-xl font-semibold">Professional</h3>
             <p className="text-muted-foreground">
-              Rent by the day or week for any project size with easy pickup and delivery scheduling
+              Years of experience with unwavering commitment to quality and excellence
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* About Section */}
+      <div className="max-w-6xl w-full mx-auto p-5 py-20">
+        <div className="text-center space-y-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+            Locally Owned & Operated
+          </h2>
+          <div className="max-w-4xl mx-auto space-y-6 text-lg text-muted-foreground leading-relaxed">
+            <p>
+              At Intermountain Dumpsters, we're proud to be a locally owned and operated business serving our community with dedication and integrity. As your neighbors, we understand the unique needs of our region and are committed to providing exceptional service that reflects our local values.
+            </p>
+            <p>
+              Our team brings years of experience in waste management and construction services, ensuring that every project—whether it's a home renovation, construction site, or commercial cleanup—receives the attention to detail and professional care it deserves. We believe in building lasting relationships with our customers through reliable service, transparent pricing, and unwavering commitment to quality.
+            </p>
+            <p>
+              When you choose Intermountain Dumpsters, you're not just getting a dumpster—you're partnering with a local business that cares about your project's success and our community's well-being. From our family to yours, we're here to make your waste management needs simple, efficient, and stress-free.
             </p>
           </div>
         </div>
