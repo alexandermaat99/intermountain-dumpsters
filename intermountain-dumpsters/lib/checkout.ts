@@ -22,7 +22,7 @@ export interface PendingOrder {
     cancelation_insurance: boolean;
     emergency_delivery: boolean;
   };
-  cart_info: any; // You can type this more specifically
+  cart_info: Record<string, unknown>; // Replace any with a more specific type
   total_amount: number;
   tax_amount: number;
   subtotal_amount: number;
@@ -233,11 +233,7 @@ export async function confirmPendingOrder(pendingOrderId: number, stripeSessionI
 }
 
 // Keep the old function for backward compatibility but mark as deprecated
-export async function saveCheckoutToDatabase(
-  checkoutData: CheckoutData, 
-  totalAmount: number,
-  resolvedCustomerAddress?: CustomerInfo
-): Promise<SavedOrder | null> {
+export async function saveCheckoutToDatabase(): Promise<SavedOrder | null> {
   console.warn('saveCheckoutToDatabase is deprecated. Use createPendingOrder instead.');
   return null;
 }

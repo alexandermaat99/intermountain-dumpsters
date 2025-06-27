@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { updateRentalWithPayment } from '@/lib/checkout';
 
 export async function POST(request: NextRequest) {
   try {
