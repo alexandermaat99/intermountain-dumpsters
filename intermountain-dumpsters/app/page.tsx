@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
-import CallButton from "@/components/CallButton";
+import HeroCallButton from "@/components/HeroCallButton";
 import { Phone, MapPin, Calendar } from "lucide-react";
 
 export default function Home() {
@@ -32,13 +32,7 @@ export default function Home() {
               <Calendar className="w-5 h-5 mr-1 opacity-80" />
               Book Online
             </Link>
-            <a
-              href="tel:+18015550123"
-              className="w-full sm:min-w-[210px] flex items-center justify-center gap-2 bg-white text-[#2C6B9E] px-6 py-3 rounded-lg font-medium text-base shadow-md border border-[#2C6B9E] hover:bg-[#f3f8fc] active:bg-[#e6f0fa] transition-all focus:outline-none focus:ring-2 focus:ring-[#2C6B9E]/40 whitespace-nowrap"
-            >
-              <Phone className="w-5 h-5 mr-1 opacity-80" />
-              Call to Book
-            </a>
+            <HeroCallButton />
             <Link 
               href="/service-areas" 
               className="w-full sm:min-w-[210px] flex items-center justify-center gap-2 bg-white text-[#2C6B9E] px-6 py-3 rounded-lg font-medium text-base shadow-md border border-[#2C6B9E] hover:bg-[#f3f8fc] active:bg-[#e6f0fa] transition-all focus:outline-none focus:ring-2 focus:ring-[#2C6B9E]/40 whitespace-nowrap"

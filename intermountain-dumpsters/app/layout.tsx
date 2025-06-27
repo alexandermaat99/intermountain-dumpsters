@@ -5,6 +5,7 @@ import { CartProvider } from "@/lib/contexts/CartContext";
 import Footer from "@/components/Footer";
 import "./globals.css";
 import Script from "next/script";
+import { Suspense } from "react";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -48,7 +49,18 @@ export default function RootLayout({
               <main className="flex-1">
                 {children}
               </main>
-              <Footer />
+              <Suspense fallback={
+                <footer className="w-full border-t border-transparent bg-brand-green-dark text-white">
+                  <div className="max-w-7xl mx-auto px-5 py-12">
+                    <div className="animate-pulse">
+                      <div className="h-4 bg-white/20 rounded w-1/4 mb-4"></div>
+                      <div className="h-4 bg-white/20 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                </footer>
+              }>
+                <Footer />
+              </Suspense>
             </div>
           </CartProvider>
         </ThemeProvider>
