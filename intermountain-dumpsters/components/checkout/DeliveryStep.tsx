@@ -250,6 +250,13 @@ export default function DeliveryStep({ delivery, onUpdate, onNext, onBack }: Del
             searchOptions={{
               componentRestrictions: { country: 'us' }
             }}
+            onError={(status, clearSuggestions) => {
+              // Suppress ZERO_RESULTS errors as they're normal when typing
+              if (status !== 'ZERO_RESULTS') {
+                console.error('Places Autocomplete error:', status);
+              }
+              clearSuggestions();
+            }}
           >
             {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
               <div className="relative">

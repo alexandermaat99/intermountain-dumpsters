@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
+import CallButton from "@/components/CallButton";
 
 export default function Home() {
   return (
@@ -29,12 +30,7 @@ export default function Home() {
             >
               Book Online
             </Link>
-            <a 
-              href="tel:+1234567890" 
-              className="bg-[#2C6B9E] text-white px-6 py-3 sm:px-8 rounded-lg font-semibold hover:bg-[#2C6B9E]/80 transition-colors text-center shadow-lg"
-            >
-              Call to Book
-            </a>
+            <CallButton />
             <Link 
               href="/service-areas" 
               className="bg-[#2C6B9E] text-white px-6 py-3 sm:px-8 rounded-lg font-semibold hover:bg-[#2C6B9E]/80 transition-colors text-center shadow-lg"

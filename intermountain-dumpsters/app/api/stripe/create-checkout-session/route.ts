@@ -9,9 +9,9 @@ export async function POST(request: NextRequest) {
     });
 
     const body = await request.json();
-    const { rentalId, amount, customerEmail, customerName, deliveryAddress, deliveryDate } = body;
+    const { pendingOrderId, amount, customerEmail, customerName, deliveryAddress, deliveryDate } = body;
 
-    if (!rentalId || !amount || !customerEmail) {
+    if (!pendingOrderId || !amount || !customerEmail) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -39,15 +39,12 @@ export async function POST(request: NextRequest) {
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cart`,
       customer_email: customerEmail,
       metadata: {
-        rentalId: rentalId.toString(),
+        pendingOrderId: pendingOrderId.toString(),
         customerName,
         deliveryAddress,
         deliveryDate,
       },
     });
-
-    // Update rental with Stripe session ID
-    await updateRentalWithPayment(rentalId, 'pending', session.id);
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error) {

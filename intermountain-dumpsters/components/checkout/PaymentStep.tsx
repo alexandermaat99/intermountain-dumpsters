@@ -9,7 +9,7 @@ import { CheckoutData, CartItem } from '@/lib/types';
 import { CartState } from '@/lib/contexts/CartContext';
 import { CreditCard, ArrowLeft, CheckCircle, User, MapPin } from 'lucide-react';
 import { useContactInfo } from '@/lib/hooks/useContactInfo';
-import { saveCheckoutToDatabase } from '@/lib/checkout';
+import { createPendingOrder } from '@/lib/checkout';
 import { calculateTaxFromServiceArea, TaxInfo, formatTaxDisplay } from '@/lib/tax-calculator-db';
 
 interface PaymentStepProps {
@@ -157,41 +157,13 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
         billing: showBillingAddress ? billingAddress : undefined
       };
 
-      const result = await saveCheckoutToDatabase(checkoutDataWithBilling, taxInfo.total, customerAddress);
+      const result = await createPendingOrder(checkoutDataWithBilling, taxInfo.total, customerAddress);
 
       if (result) {
-        // Create Stripe checkout session
-        const response = await fetch('/api/stripe/create-checkout-session', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            rentalId: result.rental_id,
-            amount: taxInfo.total,
-            customerEmail: checkoutData.customer.email,
-            customerName: checkoutData.customer.business 
-              ? checkoutData.customer.first_name 
-              : `${checkoutData.customer.first_name} ${checkoutData.customer.last_name}`,
-            deliveryAddress: checkoutData.delivery.delivery_address,
-            deliveryDate: checkoutData.delivery.delivery_date,
-          }),
-        });
-
-        const { url, error } = await response.json();
-
-        if (error) {
-          throw new Error(error);
-        }
-
-        if (url) {
-          // Redirect to Stripe checkout
-          window.location.href = url;
-        } else {
-          throw new Error('No checkout URL received');
-        }
+        // Redirect to Stripe checkout
+        window.location.href = result.checkoutUrl;
       } else {
-        throw new Error('Failed to save order to database');
+        throw new Error('Failed to create pending order');
       }
     } catch (error) {
       console.error('Error processing checkout:', error);
