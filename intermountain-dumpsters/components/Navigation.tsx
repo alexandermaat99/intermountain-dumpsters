@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Home as HomeIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import CartIcon from "./CartIcon";
 import Image from "next/image";
@@ -59,7 +59,7 @@ export default function Navigation({ currentPage }: NavigationProps) {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-4">
-          {navItems.slice(1).map((item) => (
+          {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
