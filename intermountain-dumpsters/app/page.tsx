@@ -83,6 +83,113 @@ export default function Home() {
         </div>
       </div>
 
+      {/* How It Works Section */}
+      <div className="w-full bg-[#2C6B9E] text-white py-20">
+        <div className="max-w-6xl w-full mx-auto p-5">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              How It Works
+            </h2>
+            <p className="text-lg text-white/90 max-w-2xl mx-auto">
+              Getting a dumpster for your project is simple and straightforward. Here&apos;s how our process works:
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-4 gap-8">
+            {/* Step 1 */}
+            <div className="relative group">
+              <div className="text-center space-y-4">
+                <div className="relative">
+                  <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto text-[#2C6B9E] shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-10 h-10 text-[#2C6B9E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-[#2C6B9E] font-bold text-sm">1</span>
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-white">Book Online</h3>
+                <p className="text-white/80 text-sm leading-relaxed">
+                  Choose your dumpster size and rental period through our easy online booking system
+                </p>
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="relative group">
+              <div className="text-center space-y-4">
+                <div className="relative">
+                  <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto text-[#2C6B9E] shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-10 h-10 text-[#2C6B9E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-[#2C6B9E] font-bold text-sm">2</span>
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-white">Fast Delivery</h3>
+                <p className="text-white/80 text-sm leading-relaxed">
+                  We&apos;ll deliver your dumpster to your location on your scheduled date
+                </p>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="relative group">
+              <div className="text-center space-y-4">
+                <div className="relative">
+                  <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto text-[#2C6B9E] shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-10 h-10 text-[#2C6B9E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-[#2C6B9E] font-bold text-sm">3</span>
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-white">Fill & Use</h3>
+                <p className="text-white/80 text-sm leading-relaxed">
+                  Load your waste into the dumpster at your own pace during your rental period
+                </p>
+              </div>
+            </div>
+
+            {/* Step 4 */}
+            <div className="relative group">
+              <div className="text-center space-y-4">
+                <div className="relative">
+                  <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto text-[#2C6B9E] shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-10 h-10 text-[#2C6B9E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-[#2C6B9E] font-bold text-sm">4</span>
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-white">Easy Pickup</h3>
+                <p className="text-white/80 text-sm leading-relaxed">
+                  We&apos;ll pick up the dumpster and handle all waste disposal when you&apos;re done
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA Button */}
+          <div className="text-center mt-16">
+            <Link 
+              href="/book" 
+              className="inline-flex items-center gap-3 bg-white text-[#2C6B9E] px-10 py-4 rounded-lg font-semibold text-lg shadow-xl hover:bg-gray-50 active:bg-gray-100 transition-all border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/30 hover:scale-105 transform duration-200"
+            >
+              <Calendar className="w-6 h-6" />
+              Get Started Today
+            </Link>
+          </div>
+        </div>
+      </div>
+
       {/* About Section */}
       <div className="max-w-6xl w-full mx-auto p-5 py-20">
         <div className="text-center space-y-6">
@@ -102,6 +209,8 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Features Section - This will have its own width constraint */}
     </div>
   );
 }
