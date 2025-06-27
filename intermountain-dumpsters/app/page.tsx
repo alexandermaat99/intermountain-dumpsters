@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import CallButton from "@/components/CallButton";
+import { Phone, MapPin, Calendar } from "lucide-react";
 
 export default function Home() {
   return (
@@ -13,28 +14,36 @@ export default function Home() {
         className="w-full h-[70vh] md:h-[60vh] bg-cover bg-center bg-no-repeat relative"
         style={{ backgroundImage: "url('/hero_image.png')" }}
       >
-        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 bg-black/20" />
         <div className="relative z-10 flex flex-col items-start justify-center h-full text-white text-left max-w-6xl w-full mx-auto p-5 md:p-10">
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight [text-shadow:_0_2px_4px_rgb(0_0_0_/_40%)]">
             Residential & Commercial Dumpster Rentals
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-white/80 max-w-3xl mt-4 md:mt-6 font-semibold">
+          <p className="text-base sm:text-lg md:text-xl text-white max-w-3xl mt-4 md:mt-6 font-semibold">
             Reliable dumpster rental services for residential and commercial projects. 
             From home renovations to large construction sites, we provide fast delivery, 
             competitive pricing, and exceptional customer service.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 mt-6 md:mt-8">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 md:mt-8 w-full max-w-xl justify-center items-center">
             <Link 
               href="/book" 
-              className="bg-[#2C6B9E] text-white px-6 py-3 sm:px-8 rounded-lg font-semibold hover:bg-[#2C6B9E]/80 transition-colors text-center shadow-lg"
+              className="w-full sm:min-w-[210px] flex items-center justify-center gap-2 bg-[#2C6B9E] text-white px-6 py-3 rounded-lg font-medium text-base shadow-md hover:bg-[#22527a] active:bg-[#17405a] transition-all border border-[#2C6B9E] focus:outline-none focus:ring-2 focus:ring-[#2C6B9E]/40 whitespace-nowrap"
             >
+              <Calendar className="w-5 h-5 mr-1 opacity-80" />
               Book Online
             </Link>
-            <CallButton />
+            <a
+              href="tel:+18015550123"
+              className="w-full sm:min-w-[210px] flex items-center justify-center gap-2 bg-white text-[#2C6B9E] px-6 py-3 rounded-lg font-medium text-base shadow-md border border-[#2C6B9E] hover:bg-[#f3f8fc] active:bg-[#e6f0fa] transition-all focus:outline-none focus:ring-2 focus:ring-[#2C6B9E]/40 whitespace-nowrap"
+            >
+              <Phone className="w-5 h-5 mr-1 opacity-80" />
+              Call to Book
+            </a>
             <Link 
               href="/service-areas" 
-              className="bg-[#2C6B9E] text-white px-6 py-3 sm:px-8 rounded-lg font-semibold hover:bg-[#2C6B9E]/80 transition-colors text-center shadow-lg"
+              className="w-full sm:min-w-[210px] flex items-center justify-center gap-2 bg-white text-[#2C6B9E] px-6 py-3 rounded-lg font-medium text-base shadow-md border border-[#2C6B9E] hover:bg-[#f3f8fc] active:bg-[#e6f0fa] transition-all focus:outline-none focus:ring-2 focus:ring-[#2C6B9E]/40 whitespace-nowrap"
             >
+              <MapPin className="w-5 h-5 mr-1 opacity-80" />
               Service Areas
             </Link>
           </div>
