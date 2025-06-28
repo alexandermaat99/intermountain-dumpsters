@@ -16,6 +16,11 @@ export const metadata: Metadata = {
   title: "Intermountain Dumpsters - Residential & Commercial Dumpster Rental Services",
   description: "Reliable residential and commercial dumpster rental services for construction, renovation, and cleanup projects. Fast delivery, competitive pricing, and exceptional customer service.",
   keywords: "dumpster rental, residential dumpster, commercial dumpster, construction waste, renovation cleanup, waste disposal, Intermountain Dumpsters",
+  icons: {
+    icon: '/WhiteLogoNoText.svg',
+    shortcut: '/WhiteLogoNoText.svg',
+    apple: '/WhiteLogoNoText.svg',
+  },
 };
 
 const geistSans = Geist({

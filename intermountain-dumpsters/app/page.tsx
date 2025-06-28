@@ -1,9 +1,48 @@
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import HeroCallButton from "@/components/HeroCallButton";
+import AllowedItemsSection from "@/components/AllowedItemsSection";
 import { MapPin, Calendar } from "lucide-react";
 
 export default function Home() {
+  const allowedItems = [
+    {
+      title: "General Household Items",
+      description: "Examples include furniture, toys, clothing, and other non-hazardous items typically found in your home."
+    },
+    {
+      title: "Household Chemicals and Pesticides",
+      description: "Accepted materials in this category may include common cleaning products and garden chemicals that are properly sealed and labeled."
+    },
+    {
+      title: "Home Electronics and Appliances",
+      description: "Old or unused electronics such as TVs, computers, and kitchen appliances can be placed in the dumpster for proper disposal."
+    },
+    {
+      title: "Paint and Chemicals",
+      description: "Latex and water-based paints, as well as certain homeowner-specific chemicals, are often accepted if they are dried out or solidified."
+    }
+  ];
+
+  const notAllowedItems = [
+    {
+      title: "Batteries",
+      description: "Due to their hazardous components, batteries of any kind should not be put in the dumpster and require special disposal methods."
+    },
+    {
+      title: "Biohazardous Materials",
+      description: "Items like medical waste or other materials that pose a biological risk are strictly prohibited from dumpster disposal."
+    },
+    {
+      title: "Food Waste",
+      description: "Organic waste can create health hazards and attract pests, so it is not allowed in our rental dumpsters."
+    },
+    {
+      title: "Weapons",
+      description: "Firearms, ammunition, and explosive materials are dangerous and cannot be disposed of in a standard dumpster."
+    }
+  ];
+
   return (
     <div className="w-full flex flex-col">
       {/* Navigation */}
@@ -209,6 +248,9 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Allowed Items Section */}
+      <AllowedItemsSection allowedItems={allowedItems} notAllowedItems={notAllowedItems} />
 
       {/* Features Section - This will have its own width constraint */}
     </div>
