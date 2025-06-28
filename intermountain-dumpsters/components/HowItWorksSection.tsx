@@ -58,20 +58,20 @@ const numberVariants = {
 const defaultSteps: Step[] = [
   {
     number: 1,
-    title: "Book Online",
-    description: "Choose your dumpster size and rental period through our easy online booking system",
+    title: "Book Online or Call",
+    description: "Choose your dumpster size and drop off date",
     icon: <Plus className="w-10 h-10" />
   },
   {
     number: 2,
     title: "Fast Delivery",
-    description: "We'll deliver your dumpster to your location on your scheduled date",
+    description: "We'll deliver your dumpster to your location on your scheduled date or same day",
     icon: <Zap className="w-10 h-10" />
   },
   {
     number: 3,
     title: "Fill & Use",
-    description: "Load your waste into the dumpster at your own pace during your rental period",
+    description: "Load your waste into the dumpster at your own pace for as long as you need",
     icon: <Package className="w-10 h-10" />
   },
   {
