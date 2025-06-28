@@ -8,7 +8,7 @@ import CartIcon from "./CartIcon";
 import Image from "next/image";
 
 interface NavigationProps {
-  currentPage: 'home' | 'book' | 'service-areas' | 'contact' | 'cart';
+  currentPage: 'home' | 'book' | 'service-areas' | 'contact' | 'cart' | 'admin';
 }
 
 export default function Navigation({ currentPage }: NavigationProps) {
