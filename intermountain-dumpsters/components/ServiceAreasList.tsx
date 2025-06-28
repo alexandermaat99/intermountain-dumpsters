@@ -1,6 +1,8 @@
 'use client';
 
-import { MapPin } from 'lucide-react';
+import { MapPin, Calendar } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 interface ServiceArea {
   id: number;
@@ -76,6 +78,21 @@ export default function ServiceAreasList({ onAreaSelect, selectedArea, serviceAr
           <p className="text-muted-foreground text-center">No service areas found</p>
         </div>
       )}
+      
+      {/* Book Now Button */}
+      <div className="pt-4 border-t border-muted">
+        <div className="text-center space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Ready to book your dumpster?
+          </p>
+          <Link href="/book">
+            <Button className="w-full bg-[#2C6B9E] hover:bg-[#22527a] text-white">
+              <Calendar className="w-4 h-4 mr-2" />
+              Book Now
+            </Button>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 } 
