@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { DumpsterType } from '@/lib/types';
 import HowItWorksSection from "@/components/HowItWorksSection";
 import AllowedItemsSection from "@/components/AllowedItemsSection";
-import { getContactInfo } from "@/lib/contact-info";
+import { getContactInfo, ContactInfo } from "@/lib/contact-info";
 
 type DumpsterTypeWithCount = Omit<DumpsterType, 'quantity'> & {
   dumpsters: [{ count: number }];
@@ -76,7 +76,7 @@ export default function BookPage() {
   const [dumpsterTypes, setDumpsterTypes] = useState<DumpsterType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [contactInfo, setContactInfo] = useState<any>(null);
+  const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const { addToCart, isInCart } = useCartContext();
   const router = useRouter();
   const [addingId, setAddingId] = useState<number | null>(null);
