@@ -5,11 +5,13 @@ import { motion } from "framer-motion";
 interface AllowedItem {
   title: string;
   description: string;
+  emoji: string;
 }
 
 interface NotAllowedItem {
   title: string;
   description: string;
+  emoji: string;
 }
 
 interface AllowedItemsSectionProps {
@@ -29,7 +31,7 @@ export default function AllowedItemsSection({
   phoneNumber
 }: AllowedItemsSectionProps) {
   return (
-    <div className="w-full bg-gray-50 py-20">
+    <div className="w-full bg-gray-50 dark:bg-gray-900 py-20">
       <div className="max-w-6xl w-full mx-auto p-5">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -45,7 +47,7 @@ export default function AllowedItemsSection({
           {/* Allowed Items */}
           <div className="space-y-6">
             <div className="text-center">
-              <h3 className="text-2xl font-bold text-green-700 mb-2">
+              <h3 className="text-2xl font-bold text-green-700 dark:text-green-400 mb-2">
                 Allowed Items
               </h3>
               <p className="text-muted-foreground">
@@ -56,19 +58,20 @@ export default function AllowedItemsSection({
               {allowedItems.map((item, index) => (
                 <motion.div
                   key={index}
-                  className="bg-white rounded-lg p-6 shadow-sm border border-green-100 hover:shadow-md transition-shadow flex items-start gap-4"
+                  className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border-2 border-green-300 dark:border-green-600 hover:shadow-md transition-shadow flex items-start gap-4"
                   variants={itemVariants}
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, amount: 0.3 }}
                 >
-                  <CheckCircle className="w-6 h-6 text-green-600 mt-1 flex-shrink-0" />
+                  <span className="text-3xl flex-shrink-0">{item.emoji}</span>
                   <div>
-                    <h4 className="font-semibold text-green-800 mb-2">
+                    <h4 className="font-semibold text-green-800 dark:text-green-300 mb-2">
                       {item.title}
                     </h4>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      {item.description}
+                    <p className="text-muted-foreground text-sm leading-relaxed flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                      <span>{item.description}</span>
                     </p>
                   </div>
                 </motion.div>
@@ -79,7 +82,7 @@ export default function AllowedItemsSection({
           {/* Not Allowed Items */}
           <div className="space-y-6">
             <div className="text-center">
-              <h3 className="text-2xl font-bold text-red-700 mb-2">
+              <h3 className="text-2xl font-bold text-red-700 dark:text-red-400 mb-2">
                 Not Allowed Items
               </h3>
               <p className="text-muted-foreground">
@@ -90,19 +93,20 @@ export default function AllowedItemsSection({
               {notAllowedItems.map((item, index) => (
                 <motion.div
                   key={index}
-                  className="bg-white rounded-lg p-6 shadow-sm border border-red-100 hover:shadow-md transition-shadow flex items-start gap-4"
+                  className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border-2 border-red-300 dark:border-red-600 hover:shadow-md transition-shadow flex items-start gap-4"
                   variants={itemVariants}
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, amount: 0.3 }}
                 >
-                  <XCircle className="w-6 h-6 text-red-600 mt-1 flex-shrink-0" />
+                  <span className="text-3xl flex-shrink-0">{item.emoji}</span>
                   <div>
-                    <h4 className="font-semibold text-red-800 mb-2">
+                    <h4 className="font-semibold text-red-800 dark:text-red-300 mb-2">
                       {item.title}
                     </h4>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      {item.description}
+                    <p className="text-muted-foreground text-sm leading-relaxed flex items-start gap-2">
+                      <XCircle className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+                      <span>{item.description}</span>
                     </p>
                   </div>
                 </motion.div>
@@ -113,11 +117,11 @@ export default function AllowedItemsSection({
 
         {/* Additional Information */}
         <div className="mt-16 text-center">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-3xl mx-auto">
-            <h4 className="font-semibold text-blue-800 mb-2">
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-6 max-w-3xl mx-auto">
+            <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">
               Need Help with Special Disposal?
             </h4>
-            <p className="text-blue-700 text-sm mb-4">
+            <p className="text-blue-700 dark:text-blue-300 text-sm mb-4">
               If you have questions about specific items or need guidance on proper disposal methods, 
               don&apos;t hesitate to contact us. We&apos;re here to help ensure safe and compliant waste management.
             </p>
