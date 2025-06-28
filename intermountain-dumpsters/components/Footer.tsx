@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ThemeSwitcher } from "@/components/theme-switcher";
 import { getContactInfo } from "@/lib/contact-info";
+import { FooterThemeSwitcher } from "./FooterThemeSwitcher";
 
 export default async function Footer() {
   const contactInfo = await getContactInfo();
@@ -67,7 +67,7 @@ export default async function Footer() {
               Privacy Policy
             </Link>
           </div>
-          <ThemeSwitcher iconClassName="text-white" />
+          <FooterThemeSwitcher />
         </div>
       </div>
     </footer>

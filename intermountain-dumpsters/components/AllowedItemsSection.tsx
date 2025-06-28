@@ -1,5 +1,5 @@
 "use client";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Phone } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface AllowedItem {
@@ -15,6 +15,7 @@ interface NotAllowedItem {
 interface AllowedItemsSectionProps {
   allowedItems: AllowedItem[];
   notAllowedItems: NotAllowedItem[];
+  phoneNumber?: string;
 }
 
 const itemVariants = {
@@ -24,7 +25,8 @@ const itemVariants = {
 
 export default function AllowedItemsSection({ 
   allowedItems, 
-  notAllowedItems 
+  notAllowedItems,
+  phoneNumber
 }: AllowedItemsSectionProps) {
   return (
     <div className="w-full bg-gray-50 py-20">
@@ -115,10 +117,26 @@ export default function AllowedItemsSection({
             <h4 className="font-semibold text-blue-800 mb-2">
               Need Help with Special Disposal?
             </h4>
-            <p className="text-blue-700 text-sm">
+            <p className="text-blue-700 text-sm mb-4">
               If you have questions about specific items or need guidance on proper disposal methods, 
               don&apos;t hesitate to contact us. We&apos;re here to help ensure safe and compliant waste management.
             </p>
+            {phoneNumber && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <a
+                  href={`tel:${phoneNumber.replace(/[^\d+]/g, "")}`}
+                  className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium text-sm shadow-md hover:bg-blue-700 active:bg-blue-800 transition-all border border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/40"
+                >
+                  <Phone className="w-4 h-4" />
+                  Call Us: {phoneNumber}
+                </a>
+              </motion.div>
+            )}
           </div>
         </div>
       </div>
