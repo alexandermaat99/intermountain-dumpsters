@@ -7,6 +7,10 @@ import "./globals.css";
 import Script from "next/script";
 import { Suspense } from "react";
 
+// Force dynamic rendering to prevent caching issues
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";

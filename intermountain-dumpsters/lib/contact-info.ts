@@ -49,6 +49,8 @@ export const defaultContactInfo: ContactInfo = {
 
 export async function getContactInfo(): Promise<ContactInfo> {
   try {
+    // Add cache busting parameter to prevent caching issues
+    const timestamp = new Date().getTime();
     const { data, error } = await supabase
       .from('admin_info')
       .select('*')
