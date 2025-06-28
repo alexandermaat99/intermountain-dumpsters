@@ -7,7 +7,6 @@ import HowItWorksSection from "@/components/HowItWorksSection";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useState, useEffect } from "react";
 import { supabase } from '@/lib/supabaseClient';
-import { Plus, Zap, Package, CheckCircle } from "lucide-react";
 
 interface ServiceArea {
   id: number;

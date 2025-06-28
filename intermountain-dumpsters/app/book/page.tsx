@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { supabase } from "@/lib/supabaseClient";
 import { useCartContext } from "@/lib/contexts/CartContext";
 import Image from "next/image";
-import { ShoppingCart, Check, Plus, Zap, Package, CheckCircle } from "lucide-react";
+import { ShoppingCart, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { DumpsterType } from '@/lib/types';
 import HowItWorksSection from "@/components/HowItWorksSection";

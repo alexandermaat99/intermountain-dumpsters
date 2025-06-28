@@ -3,13 +3,15 @@
 import Link from "next/link";
 import { Calendar, Plus, Zap, Package, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { ReactNode } from "react";
 
-interface Step {
+// Define a type for steps
+export type Step = {
   number: number;
   title: string;
   description: string;
-  icon: React.ReactNode;
-}
+  icon: ReactNode;
+};
 
 interface HowItWorksSectionProps {
   title?: string;
@@ -17,7 +19,7 @@ interface HowItWorksSectionProps {
   steps: Step[];
   ctaText?: string;
   ctaHref?: string;
-  ctaIcon?: React.ReactNode;
+  ctaIcon?: ReactNode;
   backgroundColor?: string;
   textColor?: string;
 }
@@ -64,7 +66,7 @@ const numberVariants = {
   }
 };
 
-const defaultSteps = [
+const defaultSteps: Step[] = [
   {
     number: 1,
     title: "Book Online",
@@ -100,7 +102,16 @@ export default function HowItWorksSection({
   ctaIcon = <Calendar className="w-6 h-6" />,
   backgroundColor = "#2C6B9E",
   textColor = "white"
-}: any) {
+}: {
+  steps?: Step[];
+  title?: string;
+  description?: string;
+  ctaText?: string;
+  ctaHref?: string;
+  ctaIcon?: ReactNode;
+  backgroundColor?: string;
+  textColor?: string;
+}) {
   return (
     <div 
       className="w-full py-20"
@@ -135,7 +146,7 @@ export default function HowItWorksSection({
         </motion.div>
         
         <div className="grid md:grid-cols-4 gap-8">
-          {steps.map((step: any, index: any) => (
+          {steps.map((step, index) => (
             <motion.div
               key={step.number}
               className="relative group cursor-pointer"
