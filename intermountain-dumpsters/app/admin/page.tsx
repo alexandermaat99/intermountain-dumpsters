@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getContactInfo, updateContactInfo, ContactInfo } from '@/lib/contact-info';
-import { Loader2, Eye, EyeOff, Settings, Phone, Mail, MapPin, Clock } from 'lucide-react';
+import { Loader2, Eye, EyeOff, Settings, Phone, Mail, MapPin } from 'lucide-react';
 
 export default function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -57,8 +57,8 @@ export default function AdminPage() {
     try {
       const info = await getContactInfo();
       setContactInfo(info);
-    } catch (error) {
-      console.error('Error loading contact info:', error);
+    } catch {
+      // error intentionally ignored
     }
   };
 
@@ -77,7 +77,7 @@ export default function AdminPage() {
       if (error) {
         setError(error.message);
       }
-    } catch (error) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setAuthLoading(false);
@@ -106,7 +106,7 @@ export default function AdminPage() {
         setSuccess('Password reset email sent! Check your inbox.');
         setShowForgotPassword(false);
       }
-    } catch (error) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setResetLoading(false);

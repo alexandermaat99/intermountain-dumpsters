@@ -50,6 +50,7 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess('');
 
     // Validate passwords
     if (password.length < 6) {
@@ -77,7 +78,7 @@ export default function ResetPasswordPage() {
           router.push('/admin');
         }, 2000);
       }
-    } catch (error) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
