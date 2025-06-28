@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Calendar } from "lucide-react";
+import { Calendar, Plus, Zap, Package, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface Step {
@@ -64,16 +64,43 @@ const numberVariants = {
   }
 };
 
+const defaultSteps = [
+  {
+    number: 1,
+    title: "Book Online",
+    description: "Choose your dumpster size and rental period through our easy online booking system",
+    icon: <Plus className="w-10 h-10" />
+  },
+  {
+    number: 2,
+    title: "Fast Delivery",
+    description: "We'll deliver your dumpster to your location on your scheduled date",
+    icon: <Zap className="w-10 h-10" />
+  },
+  {
+    number: 3,
+    title: "Fill & Use",
+    description: "Load your waste into the dumpster at your own pace during your rental period",
+    icon: <Package className="w-10 h-10" />
+  },
+  {
+    number: 4,
+    title: "Easy Pickup",
+    description: "We'll pick up the dumpster and handle all waste disposal when you're done",
+    icon: <CheckCircle className="w-10 h-10" />
+  }
+];
+
 export default function HowItWorksSection({
+  steps = defaultSteps,
   title = "How It Works",
   description = "Getting started is simple and straightforward. Here's how our process works:",
-  steps,
   ctaText = "Get Started Today",
   ctaHref = "/book",
   ctaIcon = <Calendar className="w-6 h-6" />,
   backgroundColor = "#2C6B9E",
   textColor = "white"
-}: HowItWorksSectionProps) {
+}: any) {
   return (
     <div 
       className="w-full py-20"
@@ -108,7 +135,7 @@ export default function HowItWorksSection({
         </motion.div>
         
         <div className="grid md:grid-cols-4 gap-8">
-          {steps.map((step, index) => (
+          {steps.map((step: any, index: any) => (
             <motion.div
               key={step.number}
               className="relative group cursor-pointer"

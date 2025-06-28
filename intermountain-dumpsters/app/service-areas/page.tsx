@@ -23,33 +23,6 @@ export default function ServiceAreasPage() {
   const [serviceAreas, setServiceAreas] = useState<ServiceArea[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const howItWorksSteps = [
-    {
-      number: 1,
-      title: "Book Online",
-      description: "Choose your dumpster size and rental period through our easy online booking system",
-      icon: <Plus className="w-10 h-10" />
-    },
-    {
-      number: 2,
-      title: "Fast Delivery",
-      description: "We'll deliver your dumpster to your location on your scheduled date",
-      icon: <Zap className="w-10 h-10" />
-    },
-    {
-      number: 3,
-      title: "Fill & Use",
-      description: "Load your waste into the dumpster at your own pace during your rental period",
-      icon: <Package className="w-10 h-10" />
-    },
-    {
-      number: 4,
-      title: "Easy Pickup",
-      description: "We'll pick up the dumpster and handle all waste disposal when you're done",
-      icon: <CheckCircle className="w-10 h-10" />
-    }
-  ];
-
   useEffect(() => {
     async function fetchServiceAreas() {
       try {
@@ -134,7 +107,7 @@ export default function ServiceAreasPage() {
       </div>
 
       {/* How It Works Section */}
-      <HowItWorksSection steps={howItWorksSteps} />
+      <HowItWorksSection />
     </div>
   );
 }

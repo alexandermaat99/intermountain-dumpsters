@@ -4,84 +4,11 @@ import HeroCallButton from "@/components/HeroCallButton";
 import AllowedItemsSection from "@/components/AllowedItemsSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import { getContactInfo } from "@/lib/contact-info";
-import { MapPin, Calendar, Plus, Zap, Package, Check } from "lucide-react";
+import { MapPin, Calendar } from "lucide-react";
 
 export default async function Home() {
   const contactInfo = await getContactInfo();
   
-  const allowedItems = [
-    {
-      title: "General Household Items",
-      description: "Examples include furniture, toys, clothing, and other non-hazardous items typically found in your home.",
-      emoji: "🏠"
-    },
-    {
-      title: "Household Chemicals and Pesticides",
-      description: "Accepted materials in this category may include common cleaning products and garden chemicals that are properly sealed and labeled.",
-      emoji: "🧪"
-    },
-    {
-      title: "Home Electronics and Appliances",
-      description: "Old or unused electronics such as TVs, computers, and kitchen appliances can be placed in the dumpster for proper disposal.",
-      emoji: "📺"
-    },
-    {
-      title: "Paint and Chemicals",
-      description: "Latex and water-based paints, as well as certain homeowner-specific chemicals, are often accepted if they are dried out or solidified.",
-      emoji: "🎨"
-    }
-  ];
-
-  const notAllowedItems = [
-    {
-      title: "Batteries",
-      description: "Due to their hazardous components, batteries of any kind should not be put in the dumpster and require special disposal methods.",
-      emoji: "🔋"
-    },
-    {
-      title: "Biohazardous Materials",
-      description: "Items like medical waste or other materials that pose a biological risk are strictly prohibited from dumpster disposal.",
-      emoji: "☣️"
-    },
-    {
-      title: "Food Waste",
-      description: "Organic waste can create health hazards and attract pests, so it is not allowed in our rental dumpsters.",
-      emoji: "🍎"
-    },
-    {
-      title: "Weapons",
-      description: "Firearms, ammunition, and explosive materials are dangerous and cannot be disposed of in a standard dumpster.",
-      emoji: "🔫"
-    }
-  ];
-
-  const howItWorksSteps = [
-    {
-      number: 1,
-      title: "Book Online",
-      description: "Choose your dumpster size and rental period through our easy online booking system",
-      icon: <Plus className="w-10 h-10" />
-    },
-    {
-      number: 2,
-      title: "Fast Delivery",
-      description: "We'll deliver your dumpster to your location on your scheduled date",
-      icon: <Zap className="w-10 h-10" />
-    },
-    {
-      number: 3,
-      title: "Fill & Use",
-      description: "Load your waste into the dumpster at your own pace during your rental period",
-      icon: <Package className="w-10 h-10" />
-    },
-    {
-      number: 4,
-      title: "Easy Pickup",
-      description: "We'll pick up the dumpster and handle all waste disposal when you're done",
-      icon: <Check className="w-10 h-10" />
-    }
-  ];
-
   return (
     <div className="w-full flex flex-col">
       {/* Navigation */}
@@ -162,7 +89,7 @@ export default async function Home() {
       </div>
 
       {/* How It Works Section */}
-      <HowItWorksSection steps={howItWorksSteps} />
+      <HowItWorksSection />
 
       {/* About Section */}
       <div className="max-w-6xl w-full mx-auto p-5 py-20">
@@ -185,11 +112,7 @@ export default async function Home() {
       </div>
 
       {/* Allowed Items Section */}
-      <AllowedItemsSection 
-        allowedItems={allowedItems} 
-        notAllowedItems={notAllowedItems} 
-        phoneNumber={contactInfo.phone}
-      />
+      <AllowedItemsSection phoneNumber={contactInfo.phone} />
 
       {/* Features Section - This will have its own width constraint */}
     </div>
