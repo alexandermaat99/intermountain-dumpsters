@@ -13,17 +13,6 @@ export type Step = {
   icon: ReactNode;
 };
 
-interface HowItWorksSectionProps {
-  title?: string;
-  description?: string;
-  steps: Step[];
-  ctaText?: string;
-  ctaHref?: string;
-  ctaIcon?: ReactNode;
-  backgroundColor?: string;
-  textColor?: string;
-}
-
 const stepVariants = {
   hidden: { opacity: 0, y: 60, scale: 0.8 },
   visible: { 
