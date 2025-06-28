@@ -50,7 +50,7 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setSuccess('');
+    setSuccess(false);
 
     // Validate passwords
     if (password.length < 6) {
