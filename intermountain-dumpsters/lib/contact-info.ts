@@ -68,12 +68,22 @@ export async function getContactInfo(): Promise<ContactInfo> {
 
 export async function updateContactInfo(contactInfo: Partial<ContactInfo>): Promise<ContactInfo | null> {
   try {
+    // Ensure we have an ID to update
+    if (!contactInfo.id) {
+      console.error('Error updating contact info: No ID provided');
+      return null;
+    }
+
+    // Prepare the update data, excluding the id field
+    const { id, ...updateData } = contactInfo;
+    
     const { data, error } = await supabase
       .from('admin_info')
-      .upsert({
-        ...contactInfo,
+      .update({
+        ...updateData,
         updated_at: new Date().toISOString()
       })
+      .eq('id', id)
       .select()
       .single();
 
