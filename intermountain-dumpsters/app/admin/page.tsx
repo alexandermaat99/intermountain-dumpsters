@@ -30,7 +30,7 @@ export default function AdminPage() {
         const { data: { session } } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
         setLoading(false);
-      } catch (error) {
+      } catch {
         setLoading(false);
       }
     };

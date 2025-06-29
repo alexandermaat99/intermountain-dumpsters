@@ -61,7 +61,7 @@ export default function RentalsPage() {
         const { data: { session } } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
         setLoading(false);
-      } catch (error) {
+      } catch {
         setLoading(false);
       }
     };

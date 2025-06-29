@@ -22,7 +22,7 @@ export default function AdminDashPage() {
     try {
       const info = await getContactInfoClient();
       setContactInfo(info);
-    } catch (error) {
+    } catch {
       // Silently handle error, use default values
     }
   }, []);
@@ -34,7 +34,7 @@ export default function AdminDashPage() {
         const { data: { session } } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
         setLoading(false);
-      } catch (error) {
+      } catch {
         setLoading(false);
       }
     };
