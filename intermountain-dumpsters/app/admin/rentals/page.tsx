@@ -6,7 +6,7 @@ import { User } from '@supabase/supabase-js';
 import AdminSidebar from '@/components/AdminSidebar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Calendar, User as UserIcon, Package, DollarSign, Truck } from 'lucide-react';
+import { Loader2, User as UserIcon, Package, DollarSign, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
