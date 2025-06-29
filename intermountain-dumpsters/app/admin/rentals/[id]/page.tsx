@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Loader2, Pencil, Check, X, ArrowLeft, Truck, Info, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { Loader2, Pencil, ArrowLeft } from 'lucide-react';
 
 export default function RentalDetailPage() {
   const { id } = useParams();
@@ -14,9 +14,7 @@ export default function RentalDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [rental, setRental] = useState<any>(null);
-  const [editField, setEditField] = useState<string | null>(null);
-  const [fieldValue, setFieldValue] = useState<any>(null);
+  const [rental, setRental] = useState<Record<string, any> | null>(null);
   const [saving, setSaving] = useState(false);
 
   // Driver update state

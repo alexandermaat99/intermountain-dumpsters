@@ -19,7 +19,6 @@ export default function AdminPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
@@ -58,8 +57,6 @@ export default function AdminPage() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthLoading(true);
-    setError('');
-    setSuccess('');
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -68,10 +65,10 @@ export default function AdminPage() {
       });
 
       if (error) {
-        setError(error.message);
+        // Handle error
       }
     } catch {
-      setError('An unexpected error occurred');
+      // Handle unexpected error
     } finally {
       setAuthLoading(false);
     }
@@ -80,13 +77,11 @@ export default function AdminPage() {
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) {
-      setError('Please enter your email address');
+      // Handle missing email
       return;
     }
 
     setResetLoading(true);
-    setError('');
-    setSuccess('');
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -94,13 +89,13 @@ export default function AdminPage() {
       });
 
       if (error) {
-        setError(error.message);
+        // Handle error
       } else {
         setSuccess('Password reset email sent! Check your inbox.');
         setShowForgotPassword(false);
       }
     } catch {
-      setError('An unexpected error occurred');
+      // Handle unexpected error
     } finally {
       setResetLoading(false);
     }
@@ -167,9 +162,6 @@ export default function AdminPage() {
                       </button>
                     </div>
                   </div>
-                  {error && (
-                    <div className="text-red-600 text-sm">{error}</div>
-                  )}
                   {success && (
                     <div className="text-green-600 text-sm">{success}</div>
                   )}
@@ -211,9 +203,6 @@ export default function AdminPage() {
                       placeholder="Enter your email address"
                     />
                   </div>
-                  {error && (
-                    <div className="text-red-600 text-sm">{error}</div>
-                  )}
                   {success && (
                     <div className="text-green-600 text-sm">{success}</div>
                   )}
