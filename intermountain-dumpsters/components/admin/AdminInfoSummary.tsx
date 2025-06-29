@@ -37,6 +37,8 @@ export default function AdminInfoSummary({ contactInfo, onEdit }: AdminInfoSumma
         <div><strong>Cancellation Insurance ($):</strong> {contactInfo.cancelation_insurance ?? 0}</div>
         <div><strong>Driveway Insurance ($):</strong> {contactInfo.driveway_insurance ?? 0}</div>
         <div><strong>Rush Fee ($):</strong> {contactInfo.rush_fee ?? 0}</div>
+        <div><strong>Service Radius:</strong> {contactInfo.service_radius ?? 0} miles</div>
+        <div><strong>Surrounding Area Radius:</strong> {contactInfo.surrounding_area_radius ?? 0} miles</div>
       </div>
     </>
   );

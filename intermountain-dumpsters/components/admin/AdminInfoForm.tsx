@@ -230,6 +230,38 @@ export default function AdminInfoForm({ contactInfo, onUpdate, onCancel }: Admin
           })}
         />
       </div>
+
+      {/* Service Area fields */}
+      <div className="grid grid-cols-2 gap-4 pt-4">
+        <div className="space-y-2">
+          <Label htmlFor="service_radius">Service Radius (miles)</Label>
+          <Input
+            id="service_radius"
+            type="number"
+            step="1"
+            min="0"
+            value={formData.service_radius || 0}
+            onChange={(e) => setFormData({
+              ...formData, 
+              service_radius: parseInt(e.target.value)
+            })}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="surrounding_area_radius">Surrounding Area Radius (miles)</Label>
+          <Input
+            id="surrounding_area_radius"
+            type="number"
+            step="1"
+            min="0"
+            value={formData.surrounding_area_radius || 0}
+            onChange={(e) => setFormData({
+              ...formData, 
+              surrounding_area_radius: parseInt(e.target.value)
+            })}
+          />
+        </div>
+      </div>
       
       {/* Error and Success Messages */}
       {error && (

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Settings, Truck, ClipboardList, Menu, X } from 'lucide-react';
+import { Settings, Truck, ClipboardList, Menu, X, MapPin } from 'lucide-react';
 import { User } from '@supabase/supabase-js';
 import { useState } from 'react';
 
@@ -20,6 +20,11 @@ const navItems = [
     label: 'Manage Admin',
     href: '/admin/dash',
     icon: <Settings className="h-5 w-5 mr-2" />,
+  },
+  {
+    label: 'Service Areas',
+    href: '/admin/service-areas',
+    icon: <MapPin className="h-5 w-5 mr-2" />,
   },
   {
     label: 'Dumpsters',

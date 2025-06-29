@@ -21,6 +21,8 @@ export interface ContactInfo {
   cancelation_insurance?: number;
   driveway_insurance?: number;
   rush_fee?: number;
+  service_radius?: number;
+  surrounding_area_radius?: number;
 }
 
 // Default contact information as fallback
@@ -44,7 +46,9 @@ export const defaultContactInfo: ContactInfo = {
   day_rate: 20,
   cancelation_insurance: 40,
   driveway_insurance: 40,
-  rush_fee: 60
+  rush_fee: 60,
+  service_radius: 50,
+  surrounding_area_radius: 100
 };
 
 export async function getContactInfo(): Promise<ContactInfo> {
