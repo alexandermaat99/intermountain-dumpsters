@@ -1,5 +1,6 @@
 'use client';
 
+import { Metadata } from "next";
 import ServiceAreaMap from "@/components/ServiceAreaMap";
 import ServiceAreasList from "../../components/ServiceAreasList";
 import Navigation from "@/components/Navigation";
@@ -7,6 +8,22 @@ import HowItWorksSection from "@/components/HowItWorksSection";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useState, useEffect } from "react";
 import { supabase } from '@/lib/supabaseClient';
+
+export const metadata: Metadata = {
+  title: "Service Areas",
+  description: "View our service areas for dumpster rental throughout the Intermountain region. Check if we serve your location and see our coverage map.",
+  keywords: [
+    "dumpster rental service areas",
+    "Intermountain dumpster rental",
+    "local dumpster rental",
+    "dumpster delivery areas",
+    "construction dumpster service areas"
+  ],
+  openGraph: {
+    title: "Service Areas | Intermountain Dumpsters",
+    description: "View our service areas for dumpster rental throughout the Intermountain region. Check if we serve your location and see our coverage map.",
+  },
+};
 
 interface ServiceArea {
   id: number;

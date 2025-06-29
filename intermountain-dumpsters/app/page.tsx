@@ -5,12 +5,75 @@ import AllowedItemsSection from "@/components/AllowedItemsSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import { getContactInfo } from "@/lib/contact-info";
 import { MapPin, Calendar } from "lucide-react";
+import Script from "next/script";
 
 export default async function Home() {
   const contactInfo = await getContactInfo();
   
+  // Structured data for SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Intermountain Dumpsters",
+    "description": "Reliable residential and commercial dumpster rental services for construction, renovation, and cleanup projects. Fast delivery, competitive pricing, and exceptional customer service.",
+    "url": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000",
+    "telephone": contactInfo.phone,
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": contactInfo.address
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": "40.7608",
+      "longitude": "-111.8910"
+    },
+    "openingHours": [
+      `Mo-Fr ${contactInfo.business_hours.monday_friday}`,
+      `Sa ${contactInfo.business_hours.saturday}`,
+      `Su ${contactInfo.business_hours.sunday}`
+    ],
+    "priceRange": "$$",
+    "serviceType": [
+      "Dumpster Rental",
+      "Residential Dumpster Rental",
+      "Commercial Dumpster Rental",
+      "Construction Waste Disposal",
+      "Renovation Cleanup"
+    ],
+    "areaServed": "Intermountain Region",
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Dumpster Rental Services",
+      "itemListElement": [
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Residential Dumpster Rental"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Commercial Dumpster Rental"
+          }
+        }
+      ]
+    }
+  };
+  
   return (
     <div className="w-full flex flex-col">
+      {/* Structured Data for SEO */}
+      <Script
+        id="structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
+
       {/* Navigation */}
       <Navigation currentPage="home" />
 

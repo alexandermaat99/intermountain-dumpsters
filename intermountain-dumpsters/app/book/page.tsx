@@ -13,6 +13,26 @@ import { DumpsterType } from '@/lib/types';
 import HowItWorksSection from "@/components/HowItWorksSection";
 import AllowedItemsSection from "@/components/AllowedItemsSection";
 import { getContactInfo, ContactInfo } from "@/lib/contact-info";
+import { Metadata } from "next";
+import { Trash2, Calendar, MapPin, Phone, Loader2 } from "lucide-react";
+import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Book Your Dumpster",
+  description: "Browse and book residential and commercial dumpsters for your construction, renovation, or cleanup project. Fast delivery and competitive pricing.",
+  keywords: [
+    "book dumpster",
+    "dumpster rental booking",
+    "residential dumpster booking",
+    "commercial dumpster booking",
+    "construction dumpster rental",
+    "renovation dumpster rental"
+  ],
+  openGraph: {
+    title: "Book Your Dumpster | Intermountain Dumpsters",
+    description: "Browse and book residential and commercial dumpsters for your construction, renovation, or cleanup project. Fast delivery and competitive pricing.",
+  },
+};
 
 type DumpsterTypeWithCount = Omit<DumpsterType, 'quantity'> & {
   dumpsters: [{ count: number }];
