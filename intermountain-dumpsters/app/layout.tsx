@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import { ThemeProvider } from "next-themes";
+import AdminThemeProvider from "@/components/AdminThemeProvider";
 import { CartProvider } from "@/lib/contexts/CartContext";
 import ConditionalFooter from "@/components/ConditionalFooter";
 import "./globals.css";
@@ -46,12 +46,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${geistSans.className} antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <AdminThemeProvider>
           <CartProvider>
             <div className="min-h-screen flex flex-col">
               <main className="flex-1">
@@ -60,7 +55,7 @@ export default function RootLayout({
               <ConditionalFooter />
             </div>
           </CartProvider>
-        </ThemeProvider>
+        </AdminThemeProvider>
       </body>
     </html>
   );
