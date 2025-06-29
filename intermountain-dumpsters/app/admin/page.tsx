@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { User } from '@supabase/supabase-js';
 import AdminSidebar from '@/components/AdminSidebar';
@@ -8,13 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { getContactInfoClient, ContactInfo } from '@/lib/contact-info';
-import { Loader2, Eye, EyeOff, Settings } from 'lucide-react';
-import AdminInfoForm from '@/components/admin/AdminInfoForm';
-import AdminInfoSummary from '@/components/admin/AdminInfoSummary';
-import AdminAccountsCard from '@/components/admin/AdminAccountsCard';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 
 export default function AdminPage() {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [authLoading, setAuthLoading] = useState(false);
@@ -23,20 +21,8 @@ export default function AdminPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
-  const [editingContact, setEditingContact] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
-
-  const loadContactInfo = useCallback(async () => {
-    try {
-      const info = await getContactInfoClient();
-      setContactInfo(info);
-    } catch (error) {
-      console.error('Error loading contact info:', error);
-      // Don't set error state here, just log it
-    }
-  }, []);
 
   useEffect(() => {
     // Check for existing session
@@ -46,7 +32,6 @@ export default function AdminPage() {
         setUser(session?.user ?? null);
         setLoading(false);
       } catch (error) {
-        console.error('Error checking session:', error);
         setLoading(false);
       }
     };
@@ -57,21 +42,18 @@ export default function AdminPage() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setUser(session?.user ?? null);
-        if (session?.user) {
-          await loadContactInfo();
-        }
       }
     );
 
     return () => subscription.unsubscribe();
-  }, [loadContactInfo]);
+  }, []);
 
-  // Fetch contact info only after user is authenticated
+  // Redirect to rentals page if user is authenticated and on main admin page
   useEffect(() => {
-    if (user) {
-      loadContactInfo();
+    if (user && !loading) {
+      router.push('/admin/rentals');
     }
-  }, [user, loadContactInfo]);
+  }, [user, loading, router]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,19 +105,6 @@ export default function AdminPage() {
       setResetLoading(false);
     }
   };
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-  };
-
-  const handleContactInfoUpdate = useCallback((updatedInfo: ContactInfo) => {
-    setContactInfo(updatedInfo);
-    setEditingContact(false);
-  }, []);
-
-  const handleEditCancel = useCallback(() => {
-    setEditingContact(false);
-  }, []);
 
   if (loading) {
     return (
@@ -281,78 +250,6 @@ export default function AdminPage() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <AdminSidebar user={user} />
-      <main className="flex-1 p-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-gray-600">Welcome back, {user.email}</p>
-            </div>
-            <Button onClick={handleSignOut} variant="outline">
-              Sign Out
-            </Button>
-          </div>
-          
-          {/* Debug info */}
-          <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded">
-            <p className="text-sm text-blue-800">
-              <strong>Debug Info:</strong> User authenticated: {user ? 'Yes' : 'No'}, 
-              Contact info loaded: {contactInfo ? 'Yes' : 'No'}
-            </p>
-          </div>
-          
-          <div className="grid gap-6 md:grid-cols-1">
-            {/* Contact Information Management */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="h-5 w-5" />
-                  Admin Info
-                </CardTitle>
-                <CardDescription>
-                  Manage your business contact information
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* Show loading spinner in card if contactInfo is not loaded yet */}
-                {!contactInfo ? (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="text-center">
-                      <Loader2 className="h-6 w-6 animate-spin text-gray-400 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500">Loading contact information...</p>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    {/* Show summary when not editing */}
-                    {!editingContact && (
-                      <AdminInfoSummary 
-                        contactInfo={contactInfo}
-                        onEdit={() => setEditingContact(true)}
-                      />
-                    )}
-
-                    {/* Form only when editing */}
-                    {editingContact && (
-                      <AdminInfoForm
-                        contactInfo={contactInfo}
-                        onUpdate={handleContactInfoUpdate}
-                        onCancel={handleEditCancel}
-                      />
-                    )}
-                  </>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Admin Accounts Management */}
-            <AdminAccountsCard />
-          </div>
-        </div>
-      </main>
-    </div>
-  );
+  // This should not render if user is authenticated due to redirect
+  return null;
 } 
