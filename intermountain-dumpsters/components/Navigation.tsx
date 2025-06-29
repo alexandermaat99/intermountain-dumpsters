@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { useTheme } from "next-themes";
 import CartIcon from "./CartIcon";
+import AdminLink from "./AdminLink";
 import Image from "next/image";
 
 interface NavigationProps {
@@ -70,6 +71,7 @@ export default function Navigation({ currentPage }: NavigationProps) {
               {item.label}
             </Link>
           ))}
+          <AdminLink />
           <CartIcon />
         </div>
 
@@ -145,6 +147,10 @@ export default function Navigation({ currentPage }: NavigationProps) {
                 {item.label}
               </Link>
             ))}
+            {/* Admin Link for Mobile */}
+            <div className="py-3 px-4">
+              <AdminLink />
+            </div>
           </div>
         </div>
       </div>

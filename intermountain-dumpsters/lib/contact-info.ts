@@ -66,6 +66,26 @@ export async function getContactInfo(): Promise<ContactInfo> {
   }
 }
 
+// Client-side version of getContactInfo
+export async function getContactInfoClient(): Promise<ContactInfo> {
+  try {
+    const { data, error } = await supabase
+      .from('admin_info')
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('Error fetching contact info:', error);
+      return defaultContactInfo;
+    }
+
+    return data || defaultContactInfo;
+  } catch (error) {
+    console.error('Error fetching contact info:', error);
+    return defaultContactInfo;
+  }
+}
+
 export async function updateContactInfo(contactInfo: Partial<ContactInfo>): Promise<ContactInfo | null> {
   try {
     // Ensure we have an ID to update
