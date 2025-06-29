@@ -148,6 +148,16 @@ export default function RentalsPage() {
     }
   };
 
+  const getDaysUntil = (dateString: string) => {
+    const today = new Date();
+    const delivery = new Date(dateString);
+    // Zero out the time for both dates
+    today.setHours(0,0,0,0);
+    delivery.setHours(0,0,0,0);
+    const diff = Math.ceil((delivery.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    return diff;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -214,9 +224,10 @@ export default function RentalsPage() {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Delivery Date</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Days Until</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Delivery Address</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Customer</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Delivery</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Dumpster</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Payment</th>
                       </tr>
@@ -224,11 +235,23 @@ export default function RentalsPage() {
                     <tbody className="divide-y divide-gray-100">
                       {rentals.length === 0 ? (
                         <tr>
-                          <td colSpan={5} className="text-center py-8 text-gray-500">No rentals found</td>
+                          <td colSpan={6} className="text-center py-8 text-gray-500">No rentals found</td>
                         </tr>
                       ) : (
                         rentals.map((rental) => (
                           <tr key={rental.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => router.push(`/admin/rentals/${rental.id}`)} tabIndex={0} role="button" aria-label={`View rental #${rental.id}`}>
+                            {/* Delivery Date */}
+                            <td className="px-4 py-4 align-top text-sm font-semibold text-blue-900">{formatDate(rental.delivery_date_requested)}</td>
+                            {/* Days Until */}
+                            <td className="px-4 py-4 align-top text-sm font-semibold text-green-700">{getDaysUntil(rental.delivery_date_requested)}</td>
+                            {/* Delivery Address */}
+                            <td className="px-4 py-4 align-top text-sm">
+                              <div className="font-medium text-gray-900">{rental.delivery_address}</div>
+                              <div className="text-gray-500">{rental.delivery_zip_code}</div>
+                              {rental.emergency_delivery && (
+                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 mt-1">Emergency</span>
+                              )}
+                            </td>
                             {/* Customer */}
                             <td className="px-4 py-4 align-top text-sm">
                               <div className="font-medium text-gray-900">{rental.customer?.first_name} {rental.customer?.last_name}</div>
@@ -238,27 +261,8 @@ export default function RentalsPage() {
                                 <span className="ml-1 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Business</span>
                               )}
                             </td>
-                            {/* Delivery */}
-                            <td className="px-4 py-4 align-top text-sm">
-                              <div className="font-medium">{formatDate(rental.delivery_date_requested)}</div>
-                              <div className="text-gray-500">{rental.delivery_address}</div>
-                              <div className="text-gray-500">{rental.delivery_zip_code}</div>
-                              {rental.emergency_delivery && (
-                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 mt-1">Emergency</span>
-                              )}
-                            </td>
-                            {/* Dumpster */}
-                            <td className="px-4 py-4 align-top text-sm">
-                              <div className="font-medium">{rental.dumpster_type?.name}</div>
-                              <div className="text-gray-500">{rental.dumpster_type?.descriptor}</div>
-                              {rental.dumpster_id && (
-                                <div className="text-gray-500">ID: {rental.dumpster_id}</div>
-                              )}
-                            </td>
                             {/* Status */}
-                            <td className="px-4 py-4 align-top text-sm">
-                              {getStatusBadge(rental)}
-                            </td>
+                            <td className="px-4 py-4 align-top text-sm">{getStatusBadge(rental)}</td>
                             {/* Payment */}
                             <td className="px-4 py-4 align-top text-sm">
                               <div className="font-medium">{formatCurrency(rental.total_amount)}</div>
@@ -299,10 +303,16 @@ export default function RentalsPage() {
                           <div className="flex flex-col gap-2 mb-4">
                             <div>
                               <h3 className="text-lg font-semibold text-gray-900">
-                                Rental #{rental.id}
+                                {formatDate(rental.delivery_date_requested)}
                               </h3>
+                              <span className="inline-block text-xs font-semibold text-green-700 bg-green-50 rounded px-2 py-0.5 mt-1 mb-1">
+                                {getDaysUntil(rental.delivery_date_requested)} days until
+                              </span>
+                              <p className="text-xs text-blue-900 font-medium">
+                                {rental.delivery_address}
+                              </p>
                               <p className="text-xs text-gray-500">
-                                Created {formatDate(rental.created_at)}
+                                {rental.delivery_zip_code}
                               </p>
                             </div>
                             <div className="flex gap-2 mt-2">
@@ -326,37 +336,6 @@ export default function RentalsPage() {
                                 </p>
                                 <p className="text-gray-500">{rental.customer?.phone_number}</p>
                                 <p className="text-gray-500">{rental.customer?.email}</p>
-                              </div>
-                            </div>
-                            {/* Delivery Info */}
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2 text-xs text-gray-600">
-                                <Calendar className="h-4 w-4" />
-                                <span className="font-medium">Delivery</span>
-                              </div>
-                              <div className="text-xs">
-                                <p className="font-medium">{formatDate(rental.delivery_date_requested)}</p>
-                                <p className="text-gray-500">{rental.delivery_address}</p>
-                                <p className="text-gray-500">{rental.delivery_zip_code}</p>
-                                {rental.emergency_delivery && (
-                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                    Emergency Delivery
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            {/* Dumpster Info */}
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2 text-xs text-gray-600">
-                                <Package className="h-4 w-4" />
-                                <span className="font-medium">Dumpster</span>
-                              </div>
-                              <div className="text-xs">
-                                <p className="font-medium">{rental.dumpster_type?.name}</p>
-                                <p className="text-gray-500">{rental.dumpster_type?.descriptor}</p>
-                                {rental.dumpster_id && (
-                                  <p className="text-gray-500">ID: {rental.dumpster_id}</p>
-                                )}
                               </div>
                             </div>
                             {/* Financial Info */}
