@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Loader2, Pencil, ArrowLeft } from 'lucide-react';
+import { Loader2, Pencil, ArrowLeft, ShieldCheck, AlertTriangle } from 'lucide-react';
 
 export default function RentalDetailPage() {
   const { id } = useParams();
@@ -14,7 +14,7 @@ export default function RentalDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [rental, setRental] = useState<Record<string, any> | null>(null);
+  const [rental, setRental] = useState<Record<string, unknown> | null>(null);
   const [saving, setSaving] = useState(false);
 
   // Driver update state
@@ -114,10 +114,10 @@ export default function RentalDetailPage() {
   const handleOtherInfoCancel = () => {
     setOtherInfoEdit(false);
     setOtherInfoFields({
-      delivery_date_requested: rental.delivery_date_requested ? rental.delivery_date_requested.split('T')[0] : '',
-      cancelation_insurance: !!rental.cancelation_insurance,
-      driveway_insurance: !!rental.driveway_insurance,
-      emergency_delivery: !!rental.emergency_delivery,
+      delivery_date_requested: (rental?.delivery_date_requested as string)?.split('T')[0] || '',
+      cancelation_insurance: !!rental?.cancelation_insurance,
+      driveway_insurance: !!rental?.driveway_insurance,
+      emergency_delivery: !!rental?.emergency_delivery,
     });
   };
   const handleOtherInfoSave = async () => {
@@ -164,11 +164,11 @@ export default function RentalDetailPage() {
           <Button variant="ghost" size="icon" onClick={() => router.back()} className="mr-2">
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <span className="font-semibold text-xl tracking-tight">Rental #{rental.id}</span>
+          <span className="font-semibold text-xl tracking-tight">Rental #{rental && (rental.id as React.ReactNode)}</span>
         </div>
         <Card className="shadow-xl rounded-2xl border border-gray-100">
           <CardHeader className="pb-2">
-            <div className="text-base text-gray-500 font-medium truncate">{rental.delivery_address}</div>
+            <div className="text-base text-gray-500 font-medium truncate">{rental && (rental.delivery_address as React.ReactNode)}</div>
           </CardHeader>
           <CardContent className="space-y-10 p-6">
             {/* DRIVER UPDATE SECTION */}
