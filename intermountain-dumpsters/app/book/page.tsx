@@ -20,4 +20,4 @@ export const metadata: Metadata = {
 
 export default function BookPage() {
   return <BookPageClient />;
-} // Force redeploy
+}
