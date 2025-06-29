@@ -153,16 +153,6 @@ export default function AdminAccountsCard() {
     });
   };
 
-  const getStatusBadge = (user: AdminUser) => {
-    if (!user.email_confirmed_at) {
-      return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>;
-    }
-    if (user.last_sign_in_at) {
-      return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>;
-    }
-    return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Inactive</span>;
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -296,7 +286,6 @@ export default function AdminAccountsCard() {
                               </div>
                             </div>
                           </div>
-                          {getStatusBadge(user)}
                         </div>
                       </div>
                     </div>
