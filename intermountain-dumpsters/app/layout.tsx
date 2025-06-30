@@ -102,10 +102,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Favicons for Google and browsers */}
+        {/* Favicons for Google, Android, and browsers */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" type="image/svg+xml" href="/WhiteLogoNoText.svg" />
-        <link rel="apple-touch-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/GrenLogoIcon192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/GrenLogoIcon512.png" />
+        <link rel="apple-touch-icon" href="/GrenLogoIcon192.png" />
         {/* Google Tag Manager */}
         {process.env.NEXT_PUBLIC_GTM_ID && (
           <Script
