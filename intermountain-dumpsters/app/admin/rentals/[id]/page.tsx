@@ -24,6 +24,7 @@ export default function RentalDetailPage() {
     drop_weight: '',
     days_dropped: '',
   });
+  const [daysAutoCalculated, setDaysAutoCalculated] = useState(false);
 
   // Other Info section state
   const [otherInfoEdit, setOtherInfoEdit] = useState(false);
@@ -64,6 +65,8 @@ export default function RentalDetailPage() {
         driveway_insurance: !!data.driveway_insurance,
         emergency_delivery: !!data.emergency_delivery,
       });
+      // Reset auto-calculated flag when loading data
+      setDaysAutoCalculated(false);
     }
     setLoading(false);
   };
@@ -71,7 +74,41 @@ export default function RentalDetailPage() {
   // Driver update handler
   const handleDriverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setDriverFields((prev) => ({ ...prev, [name]: value }));
+    setDriverFields((prev) => {
+      const updatedFields = { ...prev, [name]: value };
+      
+      // Auto-calculate days dropped when pickup date is set
+      if (name === 'date_picked_up') {
+        if (value) {
+          const deliveryDate = rental?.delivery_date_requested as string;
+          if (deliveryDate) {
+            // Create dates and set to midnight UTC to avoid timezone issues
+            const delivery = new Date(deliveryDate + 'T00:00:00.000Z');
+            const pickup = new Date(value + 'T00:00:00.000Z');
+            
+            // Calculate difference in days
+            const timeDiff = pickup.getTime() - delivery.getTime();
+            const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            
+            // Only auto-fill if the calculation is valid (positive number)
+            if (daysDiff >= 0) {
+              updatedFields.days_dropped = daysDiff.toString();
+              setDaysAutoCalculated(true);
+            }
+          }
+        } else {
+          // Clear auto-calculated flag if pickup date is cleared
+          setDaysAutoCalculated(false);
+        }
+      }
+      
+      // Reset auto-calculated flag if days_dropped is manually edited
+      if (name === 'days_dropped') {
+        setDaysAutoCalculated(false);
+      }
+      
+      return updatedFields;
+    });
   };
 
   const handleDriverSave = async (e: React.FormEvent) => {
@@ -93,6 +130,7 @@ export default function RentalDetailPage() {
       setError('Failed to update.');
     } else {
       setSuccess('Updated!');
+      setDaysAutoCalculated(false);
       fetchRental();
     }
     setSaving(false);
@@ -217,6 +255,11 @@ export default function RentalDetailPage() {
                     min={0}
                     step={1}
                   />
+                  {daysAutoCalculated && (
+                    <p className="text-xs text-blue-600 mt-1">
+                      ✓ Auto-calculated from pickup date
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex gap-2 mt-2">
