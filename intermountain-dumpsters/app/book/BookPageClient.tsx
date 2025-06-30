@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { supabase } from "@/lib/supabaseClient";
 import { useCartContext } from "@/lib/contexts/CartContext";
 import Image from "next/image";
@@ -71,6 +71,12 @@ function EmptyState() {
     </div>
   );
 }
+
+const getImageUrl = (image_path: string | undefined) => {
+  if (!image_path) return "/placeholder.png";
+  if (image_path.startsWith("http")) return image_path;
+  return "https://acsxwvvvlfajjizqwcia.supabase.co/storage/v1/object/public/dumpster-images/" + image_path;
+};
 
 export default function BookPageClient() {
   const [dumpsterTypes, setDumpsterTypes] = useState<DumpsterType[]>([]);
@@ -185,7 +191,7 @@ export default function BookPageClient() {
                     <CardContent className="flex-grow space-y-4">
                       <div className="relative w-full h-48">
                         <Image
-                          src={dumpsterType.image_path}
+                          src={getImageUrl(dumpsterType.image_path)}
                           alt={`Image of ${dumpsterType.name}`}
                           fill
                           style={{ objectFit: "cover" }}

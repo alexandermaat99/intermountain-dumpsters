@@ -63,8 +63,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Intermountain Dumpsters - Residential & Commercial Dumpster Rental Services",
-    description: "Reliable residential and commercial dumpster rental services for construction, renovation, and cleanup projects. Fast delivery, competitive pricing, and exceptional customer service.",
+  title: "Intermountain Dumpsters - Residential & Commercial Dumpster Rental Services",
+  description: "Reliable residential and commercial dumpster rental services for construction, renovation, and cleanup projects. Fast delivery, competitive pricing, and exceptional customer service.",
     images: ["/twitter-image.png"],
     creator: "@intermountaindumpsters",
   },
