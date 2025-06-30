@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -30,7 +30,7 @@ export default function AdminAccountsCard() {
   const [success, setSuccess] = useState('');
   const router = useRouter();
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -73,7 +73,7 @@ export default function AdminAccountsCard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [session?.access_token]);
 
   const inviteUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,7 +139,7 @@ export default function AdminAccountsCard() {
       setLoading(false);
       setError('Please log in to view admin accounts.');
     }
-  }, [currentUser, session?.access_token]);
+  }, [currentUser, session?.access_token, fetchUsers]);
 
   const handleRefresh = async () => {
     console.log('Refresh button clicked');

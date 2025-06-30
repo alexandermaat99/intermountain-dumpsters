@@ -45,6 +45,7 @@ export default function AdminPage() {
         setError(error.message);
       }
     } catch (err) {
+      console.error('Sign in error:', err);
       setError('An unexpected error occurred during sign in');
     } finally {
       setAuthLoading(false);
@@ -73,6 +74,7 @@ export default function AdminPage() {
         setShowForgotPassword(false);
       }
     } catch (err) {
+      console.error('Password reset error:', err);
       setError('An unexpected error occurred');
     } finally {
       setResetLoading(false);
