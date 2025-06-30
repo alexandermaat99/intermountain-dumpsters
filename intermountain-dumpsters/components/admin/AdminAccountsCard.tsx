@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Users, UserPlus, Mail, Calendar, Clock } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
+import { useRouter } from 'next/navigation';
 
 interface AdminUser {
   id: string;
@@ -26,6 +27,7 @@ export default function AdminAccountsCard() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const router = useRouter();
 
   const fetchUsers = async () => {
     try {
@@ -257,7 +259,7 @@ export default function AdminAccountsCard() {
                     <p className="text-sm">Please log in to view and manage admin accounts.</p>
                   </div>
                   <Button 
-                    onClick={() => window.location.href = '/admin'}
+                    onClick={() => router.push('/admin')}
                     className="flex items-center gap-2"
                   >
                     Go to Admin Login
