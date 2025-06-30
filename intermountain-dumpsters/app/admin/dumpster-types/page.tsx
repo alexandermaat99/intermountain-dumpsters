@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Plus, Pencil, Trash } from "lucide-react";
 import { Dialog } from '@headlessui/react';
+import Image from "next/image";
 
 interface DumpsterType {
   id: number;
@@ -99,6 +100,12 @@ export default function AdminDumpsterTypesPage() {
     setForm({ name: '', descriptor: '', length: '', width: '', height: '', uses: '', price: '', long_description: '', description: '', image: null });
     setFormLoading(false);
     fetchTypes();
+  };
+
+  const getImageUrl = (image_path: string | undefined) => {
+    if (!image_path) return "/placeholder.png";
+    if (image_path.startsWith("http")) return image_path;
+    return SUPABASE_IMAGE_URL + image_path;
   };
 
   return (
@@ -224,10 +231,13 @@ export default function AdminDumpsterTypesPage() {
           <div className="grid gap-4">
             {types.map((type) => (
               <Card key={type.id} className="flex flex-row items-center gap-4 p-4">
-                <img
-                  src={type.image_path ? SUPABASE_IMAGE_URL + type.image_path : "/placeholder.png"}
+                <Image
+                  src={getImageUrl(type.image_path)}
                   alt={`Image of ${type.name}`}
+                  width={96}
+                  height={96}
                   className="w-24 h-24 object-cover rounded border"
+                  unoptimized={getImageUrl(type.image_path).startsWith("http") ? false : undefined}
                 />
                 <div className="flex-1">
                   <div className="font-bold text-lg text-gray-900">{type.name}</div>
