@@ -65,7 +65,7 @@ export default function AdminDashPage() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.push('/');
+    window.location.href = '/'; // Force full reload to clear session on live
   };
 
   const handleContactInfoUpdate = useCallback((updatedInfo: ContactInfo) => {
