@@ -1,0 +1,20 @@
+{
+  "name": "Intermountain Dumpsters",
+  "short_name": "Intermountain Dumpsters",
+  "description": "Reliable residential and commercial dumpster rental services",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2C6B9E",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/WhiteLogoNoText.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "utilities"],
+  "lang": "en-US"
+} 

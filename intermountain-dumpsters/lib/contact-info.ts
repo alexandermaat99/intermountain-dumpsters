@@ -21,6 +21,8 @@ export interface ContactInfo {
   cancelation_insurance?: number;
   driveway_insurance?: number;
   rush_fee?: number;
+  service_radius?: number;
+  surrounding_area_radius?: number;
 }
 
 // Default contact information as fallback
@@ -44,7 +46,9 @@ export const defaultContactInfo: ContactInfo = {
   day_rate: 20,
   cancelation_insurance: 40,
   driveway_insurance: 40,
-  rush_fee: 60
+  rush_fee: 60,
+  service_radius: 50,
+  surrounding_area_radius: 100
 };
 
 export async function getContactInfo(): Promise<ContactInfo> {
@@ -66,14 +70,44 @@ export async function getContactInfo(): Promise<ContactInfo> {
   }
 }
 
-export async function updateContactInfo(contactInfo: Partial<ContactInfo>): Promise<ContactInfo | null> {
+// Client-side version of getContactInfo
+export async function getContactInfoClient(): Promise<ContactInfo> {
   try {
     const { data, error } = await supabase
       .from('admin_info')
-      .upsert({
-        ...contactInfo,
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('Error fetching contact info:', error);
+      return defaultContactInfo;
+    }
+
+    return data || defaultContactInfo;
+  } catch (error) {
+    console.error('Error fetching contact info:', error);
+    return defaultContactInfo;
+  }
+}
+
+export async function updateContactInfo(contactInfo: Partial<ContactInfo>): Promise<ContactInfo | null> {
+  try {
+    // Ensure we have an ID to update
+    if (!contactInfo.id) {
+      console.error('Error updating contact info: No ID provided');
+      return null;
+    }
+
+    // Prepare the update data, excluding the id field
+    const { id, ...updateData } = contactInfo;
+    
+    const { data, error } = await supabase
+      .from('admin_info')
+      .update({
+        ...updateData,
         updated_at: new Date().toISOString()
       })
+      .eq('id', id)
       .select()
       .single();
 
