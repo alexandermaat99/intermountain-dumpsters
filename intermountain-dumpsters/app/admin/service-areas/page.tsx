@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabaseClient';
-import { User } from '@supabase/supabase-js';
+import { useAuth } from '@/lib/contexts/AuthContext';
 import AdminSidebar from '@/components/AdminSidebar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,8 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export default function ServiceAreasPage() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading } = useAuth();
   const [serviceAreas, setServiceAreas] = useState<ServiceArea[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [creating, setCreating] = useState(false);
@@ -29,30 +27,6 @@ export default function ServiceAreasPage() {
     local_tax_rate: 0,
   });
 
-  useEffect(() => {
-    // Check for existing session
-    const checkUser = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setUser(session?.user ?? null);
-        setLoading(false);
-      } catch {
-        setLoading(false);
-      }
-    };
-
-    checkUser();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
-
   // Load service areas when user is authenticated
   useEffect(() => {
     if (user) {
@@ -64,8 +38,9 @@ export default function ServiceAreasPage() {
     try {
       const areas = await getServiceAreas();
       setServiceAreas(areas);
-    } catch {
-      // Silently handle error
+    } catch (error) {
+      console.error('Error loading service areas:', error);
+      setError('Failed to load service areas');
     }
   };
 

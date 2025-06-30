@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Settings, Truck, ClipboardList, Menu, X, MapPin } from 'lucide-react';
+import { Settings, Truck, ClipboardList, Menu, X, MapPin, LogOut } from 'lucide-react';
 import { User } from '@supabase/supabase-js';
 import { useState } from 'react';
+import { useAuth } from '@/lib/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
 
 interface AdminSidebarProps {
   user?: User | null;
@@ -41,11 +43,20 @@ const navItems = [
 export default function AdminSidebar({ user }: AdminSidebarProps) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { signOut } = useAuth();
 
   // Don't render sidebar if user is not authenticated
   if (!user) {
     return null;
   }
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Signout error:', error);
+    }
+  };
 
   // Hamburger for mobile
   const Hamburger = (
@@ -80,7 +91,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
             <X className="h-5 w-5" />
           </button>
         </div>
-        <nav className="flex flex-col gap-2">
+        <nav className="flex flex-col gap-2 flex-1">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -97,6 +108,17 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
             );
           })}
         </nav>
+        {/* Sign out button at bottom */}
+        <div className="mt-auto pt-4 border-t">
+          <Button
+            onClick={handleSignOut}
+            variant="outline"
+            className="w-full flex items-center justify-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            <LogOut className="h-4 w-4" />
+            Sign Out
+          </Button>
+        </div>
       </aside>
     </div>
   );
@@ -104,7 +126,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
   // Sidebar for desktop
   const DesktopSidebar = (
     <aside className="hidden md:flex w-56 min-h-full bg-white border-r flex-col py-8 px-4 shadow-sm">
-      <nav className="flex flex-col gap-2">
+      <nav className="flex flex-col gap-2 flex-1">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -120,6 +142,17 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           );
         })}
       </nav>
+      {/* Sign out button at bottom */}
+      <div className="mt-auto pt-4 border-t">
+        <Button
+          onClick={handleSignOut}
+          variant="outline"
+          className="w-full flex items-center justify-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+        >
+          <LogOut className="h-4 w-4" />
+          Sign Out
+        </Button>
+      </div>
     </aside>
   );
 

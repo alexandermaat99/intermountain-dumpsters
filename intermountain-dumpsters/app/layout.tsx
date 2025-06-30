@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import AdminThemeProvider from "@/components/AdminThemeProvider";
 import { CartProvider } from "@/lib/contexts/CartContext";
+import { AuthProvider } from "@/lib/contexts/AuthContext";
 import ConditionalFooter from "@/components/ConditionalFooter";
 import "./globals.css";
 import Script from "next/script";
@@ -142,6 +143,7 @@ export default function RootLayout({
         <Script
           src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
           strategy="beforeInteractive"
+          async
         />
       </head>
       <body className={`${geistSans.className} antialiased`}>
@@ -158,14 +160,16 @@ export default function RootLayout({
         )}
 
         <AdminThemeProvider>
-          <CartProvider>
-            <div className="min-h-screen flex flex-col">
-              <main className="flex-1">
-                {children}
-              </main>
-              <ConditionalFooter />
-            </div>
-          </CartProvider>
+          <AuthProvider>
+            <CartProvider>
+              <div className="min-h-screen flex flex-col">
+                <main className="flex-1">
+                  {children}
+                </main>
+                <ConditionalFooter />
+              </div>
+            </CartProvider>
+          </AuthProvider>
         </AdminThemeProvider>
       </body>
     </html>

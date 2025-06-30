@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import { User } from '@supabase/supabase-js';
+import { useAuth } from '@/lib/contexts/AuthContext';
 import AdminSidebar from '@/components/AdminSidebar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -61,35 +61,10 @@ function getMostRecentSunday(date = new Date()) {
 }
 
 export default function RentalsPage() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading } = useAuth();
   const [rentals, setRentals] = useState<Rental[]>([]);
   const [rentalsLoading, setRentalsLoading] = useState(true);
   const router = useRouter();
-
-  useEffect(() => {
-    // Check for existing session
-    const checkUser = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setUser(session?.user ?? null);
-        setLoading(false);
-      } catch {
-        setLoading(false);
-      }
-    };
-
-    checkUser();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   useEffect(() => {
     if (user) {

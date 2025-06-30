@@ -8,7 +8,7 @@ import { Loader2, Plus, Pencil, Trash } from "lucide-react";
 import { Dialog } from '@headlessui/react';
 import Image from "next/image";
 import AdminSidebar from "@/components/AdminSidebar";
-import { User } from '@supabase/supabase-js';
+import { useAuth } from "@/lib/contexts/AuthContext";
 
 interface DumpsterType {
   id: number;
@@ -22,9 +22,8 @@ interface DumpsterType {
 const SUPABASE_IMAGE_URL = "https://acsxwvvvlfajjizqwcia.supabase.co/storage/v1/object/public/dumpster-images/";
 
 export default function AdminDumpsterTypesPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, loading } = useAuth();
   const [types, setTypes] = useState<DumpsterType[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({
@@ -43,34 +42,12 @@ export default function AdminDumpsterTypesPage() {
   const [formLoading, setFormLoading] = useState(false);
 
   useEffect(() => {
-    // Check for existing session
-    const checkUser = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setUser(session?.user ?? null);
-        setLoading(false);
-      } catch {
-        setLoading(false);
-      }
-    };
-    checkUser();
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
-    return () => subscription.unsubscribe();
-  }, []);
-
-  useEffect(() => {
     if (user) {
       fetchTypes();
     }
   }, [user]);
 
   const fetchTypes = async () => {
-    setLoading(true);
     setError("");
     const { data, error } = await supabase.from("dumpster_types").select("*").order("id");
     if (error) {
@@ -78,7 +55,6 @@ export default function AdminDumpsterTypesPage() {
     } else {
       setTypes(data || []);
     }
-    setLoading(false);
   };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

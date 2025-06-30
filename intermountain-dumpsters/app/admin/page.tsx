@@ -2,19 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabaseClient';
-import { User } from '@supabase/supabase-js';
+import { useAuth } from '@/lib/contexts/AuthContext';
 import AdminSidebar from '@/components/AdminSidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function AdminPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading } = useAuth();
   const [authLoading, setAuthLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,30 +21,7 @@ export default function AdminPage() {
   const [success, setSuccess] = useState('');
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
-
-  useEffect(() => {
-    // Check for existing session
-    const checkUser = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setUser(session?.user ?? null);
-        setLoading(false);
-      } catch {
-        setLoading(false);
-      }
-    };
-
-    checkUser();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
+  const [error, setError] = useState('');
 
   // Redirect to rentals page if user is authenticated and on main admin page
   useEffect(() => {
@@ -57,6 +33,7 @@ export default function AdminPage() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthLoading(true);
+    setError('');
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -65,10 +42,10 @@ export default function AdminPage() {
       });
 
       if (error) {
-        // Handle error
+        setError(error.message);
       }
-    } catch {
-      // Handle unexpected error
+    } catch (err) {
+      setError('An unexpected error occurred during sign in');
     } finally {
       setAuthLoading(false);
     }
@@ -77,11 +54,12 @@ export default function AdminPage() {
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) {
-      // Handle missing email
+      setError('Please enter an email address');
       return;
     }
 
     setResetLoading(true);
+    setError('');
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -89,13 +67,13 @@ export default function AdminPage() {
       });
 
       if (error) {
-        // Handle error
+        setError(error.message);
       } else {
         setSuccess('Password reset email sent! Check your inbox.');
         setShowForgotPassword(false);
       }
-    } catch {
-      // Handle unexpected error
+    } catch (err) {
+      setError('An unexpected error occurred');
     } finally {
       setResetLoading(false);
     }
@@ -162,8 +140,15 @@ export default function AdminPage() {
                       </button>
                     </div>
                   </div>
+                  {error && (
+                    <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md border border-red-200">
+                      {error}
+                    </div>
+                  )}
                   {success && (
-                    <div className="text-green-600 text-sm">{success}</div>
+                    <div className="text-green-600 text-sm bg-green-50 p-3 rounded-md border border-green-200">
+                      {success}
+                    </div>
                   )}
                   <Button
                     type="submit"
@@ -203,8 +188,15 @@ export default function AdminPage() {
                       placeholder="Enter your email address"
                     />
                   </div>
+                  {error && (
+                    <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md border border-red-200">
+                      {error}
+                    </div>
+                  )}
                   {success && (
-                    <div className="text-green-600 text-sm">{success}</div>
+                    <div className="text-green-600 text-sm bg-green-50 p-3 rounded-md border border-green-200">
+                      {success}
+                    </div>
                   )}
                   <Button
                     type="submit"

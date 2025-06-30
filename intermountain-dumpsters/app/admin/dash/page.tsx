@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabaseClient';
-import { User } from '@supabase/supabase-js';
+import { useAuth } from '@/lib/contexts/AuthContext';
 import AdminSidebar from '@/components/AdminSidebar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,8 +12,7 @@ import AdminInfoSummary from '@/components/admin/AdminInfoSummary';
 import AdminAccountsCard from '@/components/admin/AdminAccountsCard';
 
 export default function AdminDashPage() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading } = useAuth();
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [editingContact, setEditingContact] = useState(false);
 
@@ -27,44 +25,12 @@ export default function AdminDashPage() {
     }
   }, []);
 
-  useEffect(() => {
-    // Check for existing session
-    const checkUser = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setUser(session?.user ?? null);
-        setLoading(false);
-      } catch {
-        setLoading(false);
-      }
-    };
-
-    checkUser();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          await loadContactInfo();
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, [loadContactInfo]);
-
   // Fetch contact info only after user is authenticated
   useEffect(() => {
     if (user) {
       loadContactInfo();
     }
   }, [user, loadContactInfo]);
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    window.location.href = '/'; // Force full reload to clear session on live
-  };
 
   const handleContactInfoUpdate = useCallback((updatedInfo: ContactInfo) => {
     setContactInfo(updatedInfo);
@@ -161,13 +127,6 @@ export default function AdminDashPage() {
 
             {/* Admin Accounts Management */}
             <AdminAccountsCard />
-
-            {/* Sign Out Button */}
-            <div className="pt-2 flex justify-center">
-              <Button onClick={handleSignOut} variant="outline" className="max-w-xs w-full sm:w-auto">
-                Sign Out
-              </Button>
-            </div>
           </div>
         </div>
       </main>
