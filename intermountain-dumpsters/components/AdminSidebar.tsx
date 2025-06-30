@@ -27,6 +27,11 @@ const navItems = [
     icon: <MapPin className="h-5 w-5 mr-2" />,
   },
   {
+    label: 'Dumpster Types',
+    href: '/admin/dumpster-types',
+    icon: <ClipboardList className="h-5 w-5 mr-2" />,
+  },
+  {
     label: 'Dumpsters',
     href: '/admin/dumpsters',
     icon: <Truck className="h-5 w-5 mr-2" />,
