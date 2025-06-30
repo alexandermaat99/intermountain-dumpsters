@@ -280,7 +280,6 @@ export default function AdminDumpsterTypesPage() {
                     width={160}
                     height={160}
                     className="w-40 h-40 object-cover rounded border"
-                    unoptimized={getImageUrl(type.image_path).startsWith("http") ? false : undefined}
                   />
                   <div className="flex-1">
                     <div className="font-bold text-lg text-gray-900">{type.name}</div>

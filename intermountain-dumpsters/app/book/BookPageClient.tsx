@@ -195,8 +195,8 @@ export default function BookPageClient() {
                         <Image
                           src={getImageUrl(dumpsterType.image_path)}
                           alt={`Image of ${dumpsterType.name}`}
-                          fill
-                          style={{ objectFit: "cover" }}
+                          width={300}
+                          height={200}
                           className="rounded-md"
                         />
                       </div>
