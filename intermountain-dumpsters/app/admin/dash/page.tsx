@@ -11,12 +11,14 @@ import { Loader2, Settings } from 'lucide-react';
 import AdminInfoForm from '@/components/admin/AdminInfoForm';
 import AdminInfoSummary from '@/components/admin/AdminInfoSummary';
 import AdminAccountsCard from '@/components/admin/AdminAccountsCard';
+import { useRouter } from 'next/navigation';
 
 export default function AdminDashPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [editingContact, setEditingContact] = useState(false);
+  const router = useRouter();
 
   const loadContactInfo = useCallback(async () => {
     try {
@@ -63,6 +65,7 @@ export default function AdminDashPage() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    router.push('/');
   };
 
   const handleContactInfoUpdate = useCallback((updatedInfo: ContactInfo) => {

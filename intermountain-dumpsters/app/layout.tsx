@@ -81,11 +81,6 @@ export const metadata: Metadata = {
   alternates: {
     canonical: defaultUrl,
   },
-  icons: {
-    icon: '/WhiteLogoNoText.svg',
-    shortcut: '/WhiteLogoNoText.svg',
-    apple: '/WhiteLogoNoText.svg',
-  },
 };
 
 const geistSans = Geist({
