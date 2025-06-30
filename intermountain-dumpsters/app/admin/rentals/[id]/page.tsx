@@ -8,6 +8,12 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Loader2, Pencil, ArrowLeft, ShieldCheck, AlertTriangle } from 'lucide-react';
 
+interface Dumpster {
+  id: number;
+  identification: string;
+  dumpster_type_id: number;
+}
+
 export default function RentalDetailPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -16,6 +22,8 @@ export default function RentalDetailPage() {
   const [success, setSuccess] = useState('');
   const [rental, setRental] = useState<Record<string, unknown> | null>(null);
   const [saving, setSaving] = useState(false);
+  const [availableDumpsters, setAvailableDumpsters] = useState<Dumpster[]>([]);
+  const [loadingDumpsters, setLoadingDumpsters] = useState(false);
 
   // Driver update state
   const [driverFields, setDriverFields] = useState({
@@ -67,12 +75,40 @@ export default function RentalDetailPage() {
       });
       // Reset auto-calculated flag when loading data
       setDaysAutoCalculated(false);
+      
+      // Fetch available dumpsters for this rental's dumpster type
+      if (data.dumpster_type_id) {
+        await fetchAvailableDumpsters(data.dumpster_type_id);
+      }
     }
     setLoading(false);
   };
 
+  const fetchAvailableDumpsters = async (dumpsterTypeId: number) => {
+    setLoadingDumpsters(true);
+    try {
+      const { data, error } = await supabase
+        .from('dumpsters')
+        .select('id, identification, dumpster_type_id')
+        .eq('dumpster_type_id', dumpsterTypeId)
+        .order('identification');
+      
+      if (error) {
+        console.error('Error fetching dumpsters:', error);
+        setAvailableDumpsters([]);
+      } else {
+        setAvailableDumpsters(data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching dumpsters:', err);
+      setAvailableDumpsters([]);
+    } finally {
+      setLoadingDumpsters(false);
+    }
+  };
+
   // Driver update handler
-  const handleDriverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDriverChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setDriverFields((prev) => {
       const updatedFields = { ...prev, [name]: value };
@@ -120,7 +156,7 @@ export default function RentalDetailPage() {
     const { error } = await supabase
       .from('rentals')
       .update({
-        dumpster_id,
+        dumpster_id: dumpster_id === '' ? null : Number(dumpster_id),
         date_picked_up: date_picked_up || null,
         drop_weight: drop_weight === '' ? null : Number(drop_weight),
         days_dropped: days_dropped === '' ? null : Number(days_dropped),
@@ -217,13 +253,41 @@ export default function RentalDetailPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-semibold mb-1 text-gray-700">Dumpster ID</label>
-                  <Input
-                    type="text"
-                    name="dumpster_id"
-                    value={driverFields.dumpster_id}
-                    onChange={handleDriverChange}
-                    required
-                  />
+                  {loadingDumpsters ? (
+                    <div className="flex items-center gap-2 p-2 border border-gray-300 rounded-md bg-gray-50">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span className="text-sm text-gray-600">Loading dumpsters...</span>
+                    </div>
+                  ) : availableDumpsters.length > 0 ? (
+                    <select
+                      name="dumpster_id"
+                      value={driverFields.dumpster_id}
+                      onChange={handleDriverChange}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      required
+                    >
+                      <option value="">Select a dumpster...</option>
+                      {availableDumpsters.map((dumpster) => (
+                        <option key={dumpster.id} value={dumpster.id}>
+                          {dumpster.identification}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <Input
+                      type="text"
+                      name="dumpster_id"
+                      value={driverFields.dumpster_id}
+                      onChange={handleDriverChange}
+                      placeholder="No dumpsters available for this type"
+                      required
+                    />
+                  )}
+                  {availableDumpsters.length > 0 && (
+                    <p className="text-xs text-gray-600 mt-1">
+                      {availableDumpsters.length} dumpster{availableDumpsters.length !== 1 ? 's' : ''} available for this type
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-semibold mb-1 text-gray-700">Pickup Date</label>
