@@ -292,31 +292,27 @@ export default function AdminAccountsCard() {
               {users.map((user) => (
                 <div
                   key={user.id}
-                  className="flex items-center justify-between p-3 border rounded-lg bg-white"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border rounded-lg bg-white gap-2 sm:gap-0"
                 >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{user.email}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0">
+                      <span className="font-medium truncate text-sm sm:text-base max-w-full" title={user.email}>{user.email}</span>
                       {user.is_super_admin && (
-                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                          Super Admin
-                        </span>
+                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded mt-1 sm:mt-0 whitespace-nowrap">Super Admin</span>
                       )}
                     </div>
-                    <div className="text-sm text-gray-500 mt-1">
-                      Created: {new Date(user.created_at).toLocaleDateString()}
+                    <div className="flex flex-col sm:flex-row sm:items-center text-xs sm:text-sm text-gray-500 mt-1 gap-1 sm:gap-4">
+                      <span>Created: {new Date(user.created_at).toLocaleDateString()}</span>
                       {user.last_sign_in_at && (
-                        <span className="ml-4">
-                          Last sign in: {new Date(user.last_sign_in_at).toLocaleDateString()}
-                        </span>
+                        <span>Last sign in: {new Date(user.last_sign_in_at).toLocaleDateString()}</span>
                       )}
                     </div>
                   </div>
-                  <div className="text-sm text-gray-500">
+                  <div className="flex items-center gap-1 mt-1 sm:mt-0">
                     {user.email_confirmed_at ? (
-                      <span className="text-green-600">✓ Confirmed</span>
+                      <span className="text-xs sm:text-sm text-green-600 whitespace-nowrap">✓ Confirmed</span>
                     ) : (
-                      <span className="text-yellow-600">⏳ Pending</span>
+                      <span className="text-xs sm:text-sm text-yellow-600 whitespace-nowrap flex items-center gap-1">⏳ Pending</span>
                     )}
                   </div>
                 </div>
