@@ -131,7 +131,8 @@ export default function AdminDumpsterTypesPage() {
   const getImageUrl = (image_path: string | undefined) => {
     if (!image_path) return "/placeholder.png";
     if (image_path.startsWith("http")) return image_path;
-    return SUPABASE_IMAGE_URL + image_path;
+    if (/\.(png|jpe?g|webp|gif|svg)$/i.test(image_path)) return SUPABASE_IMAGE_URL + image_path;
+    return "/" + image_path;
   };
 
   if (loading) {
