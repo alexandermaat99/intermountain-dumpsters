@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Loader2, Pencil, ArrowLeft, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { Loader2, Pencil, ArrowLeft, ShieldCheck, AlertTriangle, Clipboard, Check } from 'lucide-react';
 
 interface Dumpster {
   id: number;
@@ -31,6 +31,7 @@ export default function RentalDetailPage() {
     date_picked_up: '',
     drop_weight: '',
     days_dropped: '',
+    delivered: false,
   });
   const [daysAutoCalculated, setDaysAutoCalculated] = useState(false);
 
@@ -42,6 +43,9 @@ export default function RentalDetailPage() {
     driveway_insurance: false,
     emergency_delivery: false,
   });
+
+  // Add state for copy feedback
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -66,6 +70,7 @@ export default function RentalDetailPage() {
         date_picked_up: data.date_picked_up ? data.date_picked_up.split('T')[0] : '',
         drop_weight: data.drop_weight ?? '',
         days_dropped: data.days_dropped ?? '',
+        delivered: !!data.delivered,
       });
       setOtherInfoFields({
         delivery_date_requested: data.delivery_date_requested ? data.delivery_date_requested.split('T')[0] : '',
@@ -109,9 +114,13 @@ export default function RentalDetailPage() {
 
   // Driver update handler
   const handleDriverChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
+    let fieldValue: string | boolean = value;
+    if (type === 'checkbox' && e.target instanceof HTMLInputElement) {
+      fieldValue = e.target.checked;
+    }
     setDriverFields((prev) => {
-      const updatedFields = { ...prev, [name]: value };
+      const updatedFields = { ...prev, [name]: fieldValue };
       
       // Auto-calculate days dropped when pickup date is set
       if (name === 'date_picked_up') {
@@ -152,7 +161,9 @@ export default function RentalDetailPage() {
     setSaving(true);
     setError('');
     setSuccess('');
-    const { dumpster_id, date_picked_up, drop_weight, days_dropped } = driverFields;
+    const { dumpster_id, date_picked_up, drop_weight, days_dropped, delivered } = driverFields;
+    // Determine picked_up: if drop_weight is entered and not empty/zero, set picked_up true
+    const picked_up = drop_weight && Number(drop_weight) > 0;
     const { error } = await supabase
       .from('rentals')
       .update({
@@ -160,6 +171,8 @@ export default function RentalDetailPage() {
         date_picked_up: date_picked_up || null,
         drop_weight: drop_weight === '' ? null : Number(drop_weight),
         days_dropped: days_dropped === '' ? null : Number(days_dropped),
+        delivered: delivered,
+        picked_up: picked_up,
       })
       .eq('id', id);
     if (error) {
@@ -167,7 +180,10 @@ export default function RentalDetailPage() {
     } else {
       setSuccess('Updated!');
       setDaysAutoCalculated(false);
-      fetchRental();
+      // Redirect back to admin rentals page after successful save
+      setTimeout(() => {
+        router.push('/admin/rentals');
+      }, 1000); // 1 second delay to show success message
     }
     setSaving(false);
   };
@@ -242,7 +258,24 @@ export default function RentalDetailPage() {
         </div>
         <Card className="shadow-xl rounded-2xl border border-gray-100">
           <CardHeader className="pb-2">
-            <div className="text-base text-gray-500 font-medium truncate">{rental && (rental.delivery_address as React.ReactNode)}</div>
+            <div className="flex items-center gap-2 text-base text-gray-500 font-medium truncate">
+              {rental && (rental.delivery_address as React.ReactNode)}
+              <button
+                type="button"
+                onClick={async () => {
+                  if (rental?.delivery_address) {
+                    await navigator.clipboard.writeText(rental.delivery_address as string);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 1200);
+                  }
+                }}
+                className="ml-2 p-1 rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                aria-label="Copy address"
+              >
+                {copied ? <Check className="h-4 w-4 text-green-600" /> : <Clipboard className="h-4 w-4 text-gray-600" />}
+              </button>
+              {copied && <span className="text-xs text-green-600 ml-1">Copied!</span>}
+            </div>
           </CardHeader>
           <CardContent className="space-y-10 p-6">
             {/* DRIVER UPDATE SECTION */}
@@ -251,6 +284,17 @@ export default function RentalDetailPage() {
                 <span className="font-semibold text-blue-900 text-lg">Driver Update</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="flex items-center mt-2">
+                  <input
+                    type="checkbox"
+                    name="delivered"
+                    checked={driverFields.delivered}
+                    onChange={handleDriverChange}
+                    className="h-4 w-4 accent-blue-600 mr-2"
+                    id="delivered-checkbox"
+                  />
+                  <label htmlFor="delivered-checkbox" className="text-sm font-semibold text-gray-700">Dropped Off</label>
+                </div>
                 <div>
                   <label className="block text-sm font-semibold mb-1 text-gray-700">Dumpster ID</label>
                   {loadingDumpsters ? (

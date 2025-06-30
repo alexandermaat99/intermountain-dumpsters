@@ -45,6 +45,19 @@ interface Rental {
     descriptor: string;
     price: number;
   };
+  dumpster?: {
+    identification: string;
+  };
+}
+
+// Helper to get most recent Sunday (start of week)
+function getMostRecentSunday(date = new Date()) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const day = d.getDay();
+  // 0 = Sunday, so if today is Sunday, return today
+  d.setDate(d.getDate() - day);
+  return d;
 }
 
 export default function RentalsPage() {
@@ -93,7 +106,8 @@ export default function RentalsPage() {
         .select(`
           *,
           customer:customers(first_name, last_name, phone_number, email, business),
-          dumpster_type:dumpster_types(name, descriptor, price)
+          dumpster_type:dumpster_types(name, descriptor, price),
+          dumpster:dumpsters(identification)
         `)
         .order('delivery_date_requested', { ascending: true });
 
@@ -126,13 +140,24 @@ export default function RentalsPage() {
   };
 
   const getStatusBadge = (rental: Rental) => {
+    const daysUntil = getDaysUntil(rental.delivery_date_requested);
     if (rental.picked_up) {
-      return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Completed</span>;
+      return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Completed</span>;
     }
     if (rental.delivered) {
-      return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Delivered</span>;
+      return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Active</span>;
     }
-    return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>;
+    if (!rental.delivered && !rental.picked_up) {
+      if (daysUntil > 2) {
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Ordered</span>;
+      } else if (daysUntil >= 0) {
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Needs Drop Off</span>;
+      } else {
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Late</span>;
+      }
+    }
+    // Fallback
+    return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Unknown</span>;
   };
 
   const getPaymentStatusBadge = (status: string) => {
@@ -157,6 +182,21 @@ export default function RentalsPage() {
     const diff = Math.ceil((delivery.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     return diff;
   };
+
+  // Partition rentals into main and archived
+  const mostRecentSunday = getMostRecentSunday();
+  const mainRentals = rentals.filter(rental => {
+    if (!rental.picked_up) return true;
+    if (!rental.date_picked_up) return true;
+    // If picked up, only show if completed after most recent Sunday
+    return new Date(rental.date_picked_up) >= mostRecentSunday;
+  });
+  const archivedRentals = rentals.filter(rental => {
+    if (!rental.picked_up) return false;
+    if (!rental.date_picked_up) return false;
+    // Archived if completed before most recent Sunday
+    return new Date(rental.date_picked_up) < mostRecentSunday;
+  });
 
   if (loading) {
     return (
@@ -226,6 +266,7 @@ export default function RentalsPage() {
                       <tr>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Delivery Date</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Days Until</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Dumpster Info</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Delivery Address</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Customer</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
@@ -233,17 +274,26 @@ export default function RentalsPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                      {rentals.length === 0 ? (
+                      {mainRentals.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="text-center py-8 text-gray-500">No rentals found</td>
+                          <td colSpan={7} className="text-center py-8 text-gray-500">No rentals found</td>
                         </tr>
                       ) : (
-                        rentals.map((rental) => (
+                        mainRentals.map((rental) => (
                           <tr key={rental.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => router.push(`/admin/rentals/${rental.id}`)} tabIndex={0} role="button" aria-label={`View rental #${rental.id}`}>
                             {/* Delivery Date */}
                             <td className="px-4 py-4 align-top text-sm font-semibold text-blue-900">{formatDate(rental.delivery_date_requested)}</td>
                             {/* Days Until */}
                             <td className="px-4 py-4 align-top text-sm font-semibold text-green-700">{getDaysUntil(rental.delivery_date_requested)}</td>
+                            {/* Dumpster Info */}
+                            <td className="px-4 py-4 align-top text-sm">
+                              <div className="font-medium text-gray-900">
+                                {rental.dumpster_type?.name || 'Unknown Type'}
+                              </div>
+                              <div className="text-gray-500">
+                                ID: {rental.dumpster?.identification || 'Not Assigned'}
+                              </div>
+                            </td>
                             {/* Delivery Address */}
                             <td className="px-4 py-4 align-top text-sm">
                               <div className="font-medium text-gray-900">{rental.delivery_address}</div>
@@ -283,9 +333,81 @@ export default function RentalsPage() {
                   </table>
                 </div>
               </div>
+              {/* Archived Orders Table (desktop) */}
+              {archivedRentals.length > 0 && (
+                <div className="hidden md:block mt-10">
+                  <h2 className="text-lg font-bold mb-2 text-gray-700">Archived Orders</h2>
+                  <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Delivery Date</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Days Until</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Dumpster Info</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Delivery Address</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Customer</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Payment</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {archivedRentals.map((rental) => (
+                          <tr key={rental.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => router.push(`/admin/rentals/${rental.id}`)} tabIndex={0} role="button" aria-label={`View rental #${rental.id}`}>
+                            {/* Delivery Date */}
+                            <td className="px-4 py-4 align-top text-sm font-semibold text-blue-900">{formatDate(rental.delivery_date_requested)}</td>
+                            {/* Days Until */}
+                            <td className="px-4 py-4 align-top text-sm font-semibold text-green-700">{getDaysUntil(rental.delivery_date_requested)}</td>
+                            {/* Dumpster Info */}
+                            <td className="px-4 py-4 align-top text-sm">
+                              <div className="font-medium text-gray-900">
+                                {rental.dumpster_type?.name || 'Unknown Type'}
+                              </div>
+                              <div className="text-gray-500">
+                                ID: {rental.dumpster?.identification || 'Not Assigned'}
+                              </div>
+                            </td>
+                            {/* Delivery Address */}
+                            <td className="px-4 py-4 align-top text-sm">
+                              <div className="font-medium text-gray-900">{rental.delivery_address}</div>
+                              <div className="text-gray-500">{rental.delivery_zip_code}</div>
+                              {rental.emergency_delivery && (
+                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 mt-1">Emergency</span>
+                              )}
+                            </td>
+                            {/* Customer */}
+                            <td className="px-4 py-4 align-top text-sm">
+                              <div className="font-medium text-gray-900">{rental.customer?.first_name} {rental.customer?.last_name}</div>
+                              <div className="text-gray-500">{rental.customer?.phone_number}</div>
+                              <div className="text-gray-500">{rental.customer?.email}</div>
+                              {rental.customer?.business && (
+                                <span className="ml-1 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Business</span>
+                              )}
+                            </td>
+                            {/* Status */}
+                            <td className="px-4 py-4 align-top text-sm">{getStatusBadge(rental)}</td>
+                            {/* Payment */}
+                            <td className="px-4 py-4 align-top text-sm">
+                              <div className="font-medium">{formatCurrency(rental.total_amount)}</div>
+                              <div className="mt-1">{getPaymentStatusBadge(rental.payment_status)}</div>
+                              <div className="text-xs text-gray-500">Subtotal: {formatCurrency(rental.subtotal_amount)}</div>
+                              <div className="text-xs text-gray-500">Tax: {formatCurrency(rental.tax_amount)}</div>
+                              {rental.cancelation_insurance && (
+                                <div className="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 mt-1">Cancellation Insurance</div>
+                              )}
+                              {rental.driveway_insurance && (
+                                <div className="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 mt-1">Driveway Insurance</div>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
               {/* Card layout for mobile */}
               <div className="flex flex-col gap-4 md:hidden">
-                {rentals.length === 0 ? (
+                {mainRentals.length === 0 ? (
                   <Card>
                     <CardContent className="py-12">
                       <div className="text-center">
@@ -296,7 +418,7 @@ export default function RentalsPage() {
                     </CardContent>
                   </Card>
                 ) : (
-                  rentals.map((rental) => (
+                  mainRentals.map((rental) => (
                     <Link href={`/admin/rentals/${rental.id}`} key={rental.id} className="hover:shadow-lg transition-shadow w-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded block">
                       <Card className="w-full">
                         <CardContent className="p-4">
@@ -321,6 +443,21 @@ export default function RentalsPage() {
                             </div>
                           </div>
                           <div className="grid grid-cols-1 gap-4">
+                            {/* Dumpster Info */}
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 text-xs text-gray-600">
+                                <Package className="h-4 w-4" />
+                                <span className="font-medium">Dumpster</span>
+                              </div>
+                              <div className="text-xs">
+                                <p className="font-medium text-gray-900">
+                                  {rental.dumpster_type?.name || 'Unknown Type'}
+                                </p>
+                                <p className="text-gray-500">
+                                  ID: {rental.dumpster?.identification || 'Not Assigned'}
+                                </p>
+                              </div>
+                            </div>
                             {/* Customer Info */}
                             <div className="space-y-2">
                               <div className="flex items-center gap-2 text-xs text-gray-600">
@@ -385,6 +522,115 @@ export default function RentalsPage() {
                       </Card>
                     </Link>
                   ))
+                )}
+                {archivedRentals.length > 0 && (
+                  <div className="flex flex-col gap-4 md:hidden mt-10">
+                    <h2 className="text-lg font-bold mb-2 text-gray-700">Archived Orders</h2>
+                    {archivedRentals.map((rental) => (
+                      <Link href={`/admin/rentals/${rental.id}`} key={rental.id} className="hover:shadow-lg transition-shadow w-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded block">
+                        <Card className="w-full">
+                          <CardContent className="p-4">
+                            <div className="flex flex-col gap-2 mb-4">
+                              <div>
+                                <h3 className="text-lg font-semibold text-gray-900">
+                                  {formatDate(rental.delivery_date_requested)}
+                                </h3>
+                                <span className="inline-block text-xs font-semibold text-green-700 bg-green-50 rounded px-2 py-0.5 mt-1 mb-1">
+                                  {getDaysUntil(rental.delivery_date_requested)} days until
+                                </span>
+                                <p className="text-xs text-blue-900 font-medium">
+                                  {rental.delivery_address}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {rental.delivery_zip_code}
+                                </p>
+                              </div>
+                              <div className="flex gap-2 mt-2">
+                                {getStatusBadge(rental)}
+                                {getPaymentStatusBadge(rental.payment_status)}
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                              {/* Dumpster Info */}
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2 text-xs text-gray-600">
+                                  <Package className="h-4 w-4" />
+                                  <span className="font-medium">Dumpster</span>
+                                </div>
+                                <div className="text-xs">
+                                  <p className="font-medium text-gray-900">
+                                    {rental.dumpster_type?.name || 'Unknown Type'}
+                                  </p>
+                                  <p className="text-gray-500">
+                                    ID: {rental.dumpster?.identification || 'Not Assigned'}
+                                  </p>
+                                </div>
+                              </div>
+                              {/* Customer Info */}
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2 text-xs text-gray-600">
+                                  <UserIcon className="h-4 w-4" />
+                                  <span className="font-medium">Customer</span>
+                                </div>
+                                <div className="text-xs">
+                                  <p className="font-medium">
+                                    {rental.customer?.first_name} {rental.customer?.last_name}
+                                    {rental.customer?.business && (
+                                      <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Business</span>
+                                    )}
+                                  </p>
+                                  <p className="text-gray-500">{rental.customer?.phone_number}</p>
+                                  <p className="text-gray-500">{rental.customer?.email}</p>
+                                </div>
+                              </div>
+                              {/* Financial Info */}
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2 text-xs text-gray-600">
+                                  <DollarSign className="h-4 w-4" />
+                                  <span className="font-medium">Financial</span>
+                                </div>
+                                <div className="text-xs">
+                                  <p className="font-medium">{formatCurrency(rental.total_amount)}</p>
+                                  <p className="text-gray-500">Subtotal: {formatCurrency(rental.subtotal_amount)}</p>
+                                  <p className="text-gray-500">Tax: {formatCurrency(rental.tax_amount)}</p>
+                                  {rental.cancelation_insurance && (
+                                    <span className="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                      Cancellation Insurance
+                                    </span>
+                                  )}
+                                  {rental.driveway_insurance && (
+                                    <span className="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                      Driveway Insurance
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            {/* Pickup Info */}
+                            {rental.picked_up && (
+                              <div className="mt-4 pt-4 border-t border-gray-200">
+                                <div className="flex items-center gap-2 text-xs text-gray-600">
+                                  <Truck className="h-4 w-4" />
+                                  <span className="font-medium">Pickup Information</span>
+                                </div>
+                                <div className="text-xs mt-2">
+                                  <p className="text-gray-500">
+                                    Picked up: {rental.date_picked_up ? formatDate(rental.date_picked_up) : 'N/A'}
+                                  </p>
+                                  {rental.drop_weight && (
+                                    <p className="text-gray-500">Weight: {rental.drop_weight} lbs</p>
+                                  )}
+                                  {rental.days_dropped && (
+                                    <p className="text-gray-500">Days: {rental.days_dropped}</p>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    ))}
+                  </div>
                 )}
               </div>
             </>
