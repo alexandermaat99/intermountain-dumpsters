@@ -12,6 +12,8 @@ interface Dumpster {
   id: number;
   identification: string;
   dumpster_type_id: number;
+  is_in_use?: boolean;
+  status?: 'assigned' | 'in_use';
 }
 
 export default function RentalDetailPage() {
@@ -22,7 +24,7 @@ export default function RentalDetailPage() {
   const [success, setSuccess] = useState('');
   const [rental, setRental] = useState<Record<string, unknown> | null>(null);
   const [saving, setSaving] = useState(false);
-  const [availableDumpsters, setAvailableDumpsters] = useState<Dumpster[]>([]);
+  const [availableDumpsters, setAvailableDumpsters] = useState<({ id: number; identification: string; dumpster_type_id: number; status?: 'assigned' | 'in_use' })[]>([]);
   const [loadingDumpsters, setLoadingDumpsters] = useState(false);
 
   // Driver update state
@@ -92,17 +94,35 @@ export default function RentalDetailPage() {
   const fetchAvailableDumpsters = async (dumpsterTypeId: number) => {
     setLoadingDumpsters(true);
     try {
+      // Fetch all dumpsters of this type
       const { data, error } = await supabase
         .from('dumpsters')
         .select('id, identification, dumpster_type_id')
         .eq('dumpster_type_id', dumpsterTypeId)
         .order('identification');
-      
       if (error) {
         console.error('Error fetching dumpsters:', error);
         setAvailableDumpsters([]);
       } else {
-        setAvailableDumpsters(data || []);
+        // Fetch status for these dumpsters
+        const ids = (data || []).map(d => d.id);
+        let statusMap: Record<number, 'assigned' | 'in_use' | undefined> = {};
+        if (ids.length > 0) {
+          const { data: rentals } = await supabase
+            .from('rentals')
+            .select('dumpster_id, delivered, picked_up')
+            .in('dumpster_id', ids);
+          if (rentals) {
+            rentals.forEach(rental => {
+              if (rental.delivered === true && rental.picked_up !== true) {
+                statusMap[rental.dumpster_id] = 'in_use';
+              } else if (rental.delivered === false && rental.picked_up !== true) {
+                statusMap[rental.dumpster_id] = 'assigned';
+              }
+            });
+          }
+        }
+        setAvailableDumpsters((data || []).map(d => ({ ...d, status: statusMap[d.id] })));
       }
     } catch (err) {
       console.error('Error fetching dumpsters:', err);
@@ -162,21 +182,29 @@ export default function RentalDetailPage() {
     setError('');
     setSuccess('');
     const { dumpster_id, date_picked_up, drop_weight, days_dropped, delivered } = driverFields;
-    // Determine picked_up: if drop_weight is entered and not empty/zero, set picked_up true
+    // Ensure booleans are always true/false
+    const deliveredBool = typeof delivered === 'string' ? delivered === 'true' : !!delivered;
     const picked_up = drop_weight && Number(drop_weight) > 0;
+    
+    const updateData = {
+      dumpster_id: dumpster_id === '' ? null : parseInt(dumpster_id, 10),
+      date_picked_up: date_picked_up ? `${date_picked_up}T00:00:00.000Z` : null,
+      drop_weight: drop_weight === '' ? null : Number(drop_weight),
+      days_dropped: days_dropped === '' ? null : Number(days_dropped),
+      delivered: deliveredBool,
+      picked_up: !!picked_up,
+    };
+    
+    console.log('Updating rental with data:', updateData);
+    
     const { error } = await supabase
       .from('rentals')
-      .update({
-        dumpster_id: dumpster_id === '' ? null : Number(dumpster_id),
-        date_picked_up: date_picked_up || null,
-        drop_weight: drop_weight === '' ? null : Number(drop_weight),
-        days_dropped: days_dropped === '' ? null : Number(days_dropped),
-        delivered: delivered,
-        picked_up: picked_up,
-      })
+      .update(updateData)
       .eq('id', id);
+      
     if (error) {
-      setError('Failed to update.');
+      console.error('Update error:', error);
+      setError(`Failed to update: ${error.message}`);
     } else {
       setSuccess('Updated!');
       setDaysAutoCalculated(false);
@@ -215,17 +243,24 @@ export default function RentalDetailPage() {
     setError('');
     setSuccess('');
     const { delivery_date_requested, cancelation_insurance, driveway_insurance, emergency_delivery } = otherInfoFields;
+    
+    const updateData = {
+      delivery_date_requested: delivery_date_requested ? `${delivery_date_requested}T00:00:00.000Z` : null,
+      cancelation_insurance,
+      driveway_insurance,
+      emergency_delivery,
+    };
+    
+    console.log('Updating other info with data:', updateData);
+    
     const { error } = await supabase
       .from('rentals')
-      .update({
-        delivery_date_requested: delivery_date_requested || null,
-        cancelation_insurance,
-        driveway_insurance,
-        emergency_delivery,
-      })
+      .update(updateData)
       .eq('id', id);
+      
     if (error) {
-      setError('Failed to update.');
+      console.error('Update error:', error);
+      setError(`Failed to update: ${error.message}`);
     } else {
       setSuccess('Updated!');
       setOtherInfoEdit(false);
@@ -302,35 +337,21 @@ export default function RentalDetailPage() {
                       <Loader2 className="h-4 w-4 animate-spin" />
                       <span className="text-sm text-gray-600">Loading dumpsters...</span>
                     </div>
-                  ) : availableDumpsters.length > 0 ? (
+                  ) : (
                     <select
                       name="dumpster_id"
                       value={driverFields.dumpster_id}
                       onChange={handleDriverChange}
                       className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
                     >
-                      <option value="">Select a dumpster...</option>
+                      <option value="">Unassigned</option>
                       {availableDumpsters.map((dumpster) => (
-                        <option key={dumpster.id} value={dumpster.id}>
+                        <option key={dumpster.id} value={dumpster.id} disabled={dumpster.status === 'in_use' && String(driverFields.dumpster_id) !== String(dumpster.id)}>
                           {dumpster.identification}
+                          {dumpster.status === 'in_use' ? ' (In Use)' : dumpster.status === 'assigned' ? ' (Assigned)' : ''}
                         </option>
                       ))}
                     </select>
-                  ) : (
-                    <Input
-                      type="text"
-                      name="dumpster_id"
-                      value={driverFields.dumpster_id}
-                      onChange={handleDriverChange}
-                      placeholder="No dumpsters available for this type"
-                      required
-                    />
-                  )}
-                  {availableDumpsters.length > 0 && (
-                    <p className="text-xs text-gray-600 mt-1">
-                      {availableDumpsters.length} dumpster{availableDumpsters.length !== 1 ? 's' : ''} available for this type
-                    </p>
                   )}
                 </div>
                 <div>
