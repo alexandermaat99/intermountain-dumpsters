@@ -161,14 +161,14 @@ export default function RootLayout({
 
         <AdminThemeProvider>
           <AuthProvider>
-            <CartProvider>
-              <div className="min-h-screen flex flex-col">
-                <main className="flex-1">
-                  {children}
-                </main>
-                <ConditionalFooter />
-              </div>
-            </CartProvider>
+          <CartProvider>
+            <div className="min-h-screen flex flex-col">
+              <main className="flex-1">
+                {children}
+              </main>
+              <ConditionalFooter />
+            </div>
+          </CartProvider>
           </AuthProvider>
         </AdminThemeProvider>
       </body>

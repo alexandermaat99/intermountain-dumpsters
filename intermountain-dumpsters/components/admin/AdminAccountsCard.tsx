@@ -134,7 +134,7 @@ export default function AdminAccountsCard() {
   // Load users when component mounts and user is authenticated
   useEffect(() => {
     if (currentUser && session?.access_token) {
-      fetchUsers();
+    fetchUsers();
     } else if (!currentUser) {
       setLoading(false);
       setError('Please log in to view admin accounts.');
@@ -182,13 +182,13 @@ export default function AdminAccountsCard() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Admin Accounts
-            </CardTitle>
-            <CardDescription>
+        <CardTitle className="flex items-center gap-2">
+          <Users className="h-5 w-5" />
+          Admin Accounts
+        </CardTitle>
+        <CardDescription>
               Manage admin user accounts
-            </CardDescription>
+        </CardDescription>
           </div>
           <div className="flex gap-2">
             <Button
@@ -228,68 +228,68 @@ export default function AdminAccountsCard() {
           <div className="mb-6 p-4 border rounded-lg bg-gray-50">
             <h3 className="text-lg font-semibold mb-4">Invite New Admin</h3>
             <form onSubmit={inviteUser} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="invite-email">Email Address</Label>
-                <Input
-                  id="invite-email"
-                  type="email"
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                  placeholder="admin@example.com"
-                  required
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="invite-email">Email Address</Label>
+                        <Input
+                          id="invite-email"
+                          type="email"
+                          value={inviteEmail}
+                          onChange={(e) => setInviteEmail(e.target.value)}
+                          placeholder="admin@example.com"
+                          required
+                        />
+                      </div>
               <div className="flex gap-2">
-                <Button
-                  type="submit"
-                  disabled={inviting}
-                  className="flex items-center gap-2"
-                >
-                  {inviting ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Button 
+                        type="submit" 
+                        disabled={inviting}
+                        className="flex items-center gap-2"
+                      >
+                        {inviting ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
                       Sending Invite...
-                    </>
-                  ) : (
-                    <>
+                          </>
+                        ) : (
+                          <>
                       <Mail className="h-4 w-4" />
-                      Send Invite
-                    </>
-                  )}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setShowInviteForm(false);
-                    setInviteEmail('');
-                    setError('');
-                  }}
+                            Send Invite
+                          </>
+                        )}
+                      </Button>
+                      <Button 
+                        type="button" 
+                        variant="outline"
+                        onClick={() => {
+                          setShowInviteForm(false);
+                          setInviteEmail('');
+                          setError('');
+                        }}
                   disabled={inviting}
-                >
-                  Cancel
-                </Button>
-              </div>
+                      >
+                        Cancel
+                      </Button>
+                    </div>
             </form>
-          </div>
-        )}
+                    </div>
+                  )}
 
-        {/* Users List */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Current Admin Accounts</h3>
+            {/* Users List */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Current Admin Accounts</h3>
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-gray-400 mr-2" />
               <span className="text-gray-600">Loading admin accounts...</span>
-            </div>
-          ) : users.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+                </div>
+              ) : users.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
               <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
               <p>No admin accounts found.</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {users.map((user) => (
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {users.map((user) => (
                 <div
                   key={user.id}
                   className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border rounded-lg bg-white gap-2 sm:gap-0"
@@ -300,26 +300,26 @@ export default function AdminAccountsCard() {
                       {user.is_super_admin && (
                         <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded mt-1 sm:mt-0 whitespace-nowrap">Super Admin</span>
                       )}
-                    </div>
+                              </div>
                     <div className="flex flex-col sm:flex-row sm:items-center text-xs sm:text-sm text-gray-500 mt-1 gap-1 sm:gap-4">
                       <span>Created: {new Date(user.created_at).toLocaleDateString()}</span>
                       {user.last_sign_in_at && (
                         <span>Last sign in: {new Date(user.last_sign_in_at).toLocaleDateString()}</span>
                       )}
-                    </div>
-                  </div>
+                              </div>
+                            </div>
                   <div className="flex items-center gap-1 mt-1 sm:mt-0">
                     {user.email_confirmed_at ? (
                       <span className="text-xs sm:text-sm text-green-600 whitespace-nowrap">✓ Confirmed</span>
                     ) : (
                       <span className="text-xs sm:text-sm text-yellow-600 whitespace-nowrap flex items-center gap-1">⏳ Pending</span>
                     )}
-                  </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
-          )}
-        </div>
       </CardContent>
     </Card>
   );
