@@ -25,9 +25,16 @@ function ResetPasswordPageInner() {
     // Check if we have the necessary tokens in the URL
     const accessToken = searchParams.get('access_token');
     const refreshToken = searchParams.get('refresh_token');
-    
+
     if (!accessToken || !refreshToken) {
-      setError('Invalid reset link. Please request a new password reset.');
+      // Only show error if user is not authenticated
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!session) {
+          setError('Invalid reset link. Please request a new password reset.');
+        } else {
+          setError(''); // Clear error if user is authenticated
+        }
+      });
       return;
     }
 
