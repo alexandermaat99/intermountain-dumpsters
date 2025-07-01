@@ -8,14 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Loader2, Pencil, ArrowLeft, ShieldCheck, AlertTriangle, Clipboard, Check } from 'lucide-react';
 
-interface Dumpster {
-  id: number;
-  identification: string;
-  dumpster_type_id: number;
-  is_in_use?: boolean;
-  status?: 'assigned' | 'in_use';
-}
-
 export default function RentalDetailPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -106,7 +98,7 @@ export default function RentalDetailPage() {
       } else {
         // Fetch status for these dumpsters
         const ids = (data || []).map(d => d.id);
-        let statusMap: Record<number, 'assigned' | 'in_use' | undefined> = {};
+        const statusMap: Record<number, 'assigned' | 'in_use' | undefined> = {};
         if (ids.length > 0) {
           const { data: rentals } = await supabase
             .from('rentals')

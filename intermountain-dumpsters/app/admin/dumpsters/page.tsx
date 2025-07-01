@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -65,7 +65,7 @@ export default function AdminDumpstersPage() {
       }
 
       // Transform the data to include dumpster count
-      const typesWithCount = (typesData || []).map((type: any) => ({
+      const typesWithCount = (typesData || []).map((type: DumpsterType & { dumpsters?: { count: number }[] }) => ({
         ...type,
         dumpster_count: type.dumpsters?.[0]?.count || 0
       }));
@@ -95,7 +95,7 @@ export default function AdminDumpstersPage() {
             .filter(rental => rental.delivered === true && rental.picked_up !== true)
             .map(rental => rental.dumpster_id)
         );
-        const dumpstersWithStatus = (dumpstersData || []).map((dumpster: any) => ({
+        const dumpstersWithStatus = (dumpstersData || []).map((dumpster: Dumpster) => ({
           ...dumpster,
           is_in_use: inUseDumpsterIds.has(dumpster.id)
         }));
