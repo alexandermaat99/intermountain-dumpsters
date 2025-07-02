@@ -7,6 +7,7 @@ import ConditionalFooter from "@/components/ConditionalFooter";
 import "./globals.css";
 import Script from "next/script";
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next"
 
 const defaultUrl = "https://intermountaindumpsters.com";
 
@@ -171,6 +172,7 @@ export default function RootLayout({
           </AuthProvider>
         </AdminThemeProvider>
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
