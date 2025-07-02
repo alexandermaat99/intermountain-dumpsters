@@ -37,7 +37,7 @@ export const defaultContactInfo: ContactInfo = {
   business_hours: {
     monday_friday: "7:00 AM - 6:00 PM",
     saturday: "8:00 AM - 4:00 PM",
-    sunday: "Closed (Emergency service available)"
+    sunday: "Closed (Rush service available)"
   },
   emergency_phone: "(801) 555-9999",
   created_at: new Date().toISOString(),

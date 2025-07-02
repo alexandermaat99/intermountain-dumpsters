@@ -87,7 +87,7 @@ The `contact_info` table contains:
 - `state`: State
 - `zip_code`: ZIP code
 - `business_hours`: JSON object with hours for each day
-- `emergency_phone`: Emergency contact number
+- `emergency_phone`: Rush contact number
 - `created_at`: Creation timestamp
 - `updated_at`: Last update timestamp
 

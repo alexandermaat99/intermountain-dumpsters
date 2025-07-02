@@ -30,6 +30,9 @@ export default async function Footer() {
               <Link href="/service-areas" className="block text-sm text-white/80 hover:text-white transition-colors">
                 View Service Areas
               </Link>
+              <Link href="/about" className="block text-sm text-white/80 hover:text-white transition-colors">
+                About
+              </Link>
               <Link href="/contact" className="block text-sm text-white/80 hover:text-white transition-colors">
                 Contact Us
               </Link>

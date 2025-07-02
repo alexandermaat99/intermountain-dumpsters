@@ -9,7 +9,7 @@ import AdminLink from "./AdminLink";
 import Image from "next/image";
 
 interface NavigationProps {
-  currentPage: 'home' | 'book' | 'service-areas' | 'contact' | 'cart' | 'admin';
+  currentPage: 'home' | 'book' | 'service-areas' | 'contact' | 'cart' | 'admin' | 'about';
 }
 
 export default function Navigation({ currentPage }: NavigationProps) {
@@ -34,7 +34,8 @@ export default function Navigation({ currentPage }: NavigationProps) {
     { href: "/", label: "Home", page: 'home' as const },
     { href: "/book", label: "Book Now", page: 'book' as const },
     { href: "/service-areas", label: "Service Areas", page: 'service-areas' as const },
-    { href: "/contact", label: "Contact", page: 'contact' as const },
+    { href: "/about", label: "About", page: 'about' as const },
+    { href: "/contact", label: "Contact Us", page: 'contact' as const },
   ];
 
   // Determine which logo to use based on theme

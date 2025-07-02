@@ -23,7 +23,7 @@ export default function AdminInfoSummary({ contactInfo, onEdit }: AdminInfoSumma
         <div><strong>Phone:</strong> {contactInfo.phone}</div>
         <div><strong>Email:</strong> {contactInfo.email}</div>
         <div><strong>Address:</strong> {contactInfo.address}, {contactInfo.city}, {contactInfo.state} {contactInfo.zip_code}</div>
-        <div><strong>Emergency Phone:</strong> {contactInfo.emergency_phone}</div>
+                        <div><strong>Rush Phone:</strong> {contactInfo.emergency_phone}</div>
         <div>
           <strong>Business Hours:</strong>
           <ul className="ml-4 list-disc">

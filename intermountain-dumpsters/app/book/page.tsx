@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import BookPageClient from "./BookPageClient";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Book Your Dumpster",
@@ -19,5 +20,37 @@ export const metadata: Metadata = {
 };
 
 export default function BookPage() {
-  return <BookPageClient />;
+  // Breadcrumb structured data
+  const breadcrumbData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Book Your Dumpster",
+        "item": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/book` : "http://localhost:3000/book"
+      }
+    ]
+  };
+
+  return (
+    <>
+      {/* Breadcrumb Structured Data */}
+      <Script
+        id="book-breadcrumb-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbData),
+        }}
+      />
+      <BookPageClient />
+    </>
+  );
 }

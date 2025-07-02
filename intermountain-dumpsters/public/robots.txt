@@ -1,18 +1,37 @@
 User-agent: *
 Allow: /
 
-# Disallow admin pages
+# Disallow admin pages and sensitive areas
 Disallow: /admin/
 Disallow: /api/admin/
+Disallow: /api/stripe/
+Disallow: /test-validation/
 
-# Allow important pages
+# Allow important pages explicitly
 Allow: /book
 Allow: /service-areas
+Allow: /about
 Allow: /contact
 Allow: /privacy-policy
+Allow: /cart
+Allow: /success
 
-# Sitemap location (replace YOUR_DOMAIN with your actual domain)
+# Sitemap location
 Sitemap: https://www.intermountaindumpsters.com/sitemap.xml
 
-# Crawl delay (optional)
-Crawl-delay: 1 
+# Crawl delay for better server performance
+Crawl-delay: 1
+
+# Additional directives for better SEO
+# Allow Google to index images
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.gif$
+Allow: /*.svg$
+
+# Block access to temporary and cache files
+Disallow: /*.tmp$
+Disallow: /*.cache$
+Disallow: /_next/
+Disallow: /api/webhook/ 

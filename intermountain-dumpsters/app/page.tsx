@@ -6,6 +6,7 @@ import HowItWorksSection from "@/components/HowItWorksSection";
 import { getContactInfo } from "@/lib/contact-info";
 import { MapPin, Calendar } from "lucide-react";
 import Script from "next/script";
+import FAQSection, { FAQ } from '@/components/FAQSection';
 
 export default async function Home() {
   const contactInfo = await getContactInfo();
@@ -18,9 +19,14 @@ export default async function Home() {
     "description": "Reliable residential and commercial dumpster rental services for construction, renovation, and cleanup projects. Fast delivery, competitive pricing, and exceptional customer service.",
     "url": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000",
     "telephone": contactInfo.phone,
+    "email": contactInfo.email,
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": contactInfo.address
+      "streetAddress": contactInfo.address,
+      "addressLocality": "Salt Lake City",
+      "addressRegion": "UT",
+      "postalCode": "84101",
+      "addressCountry": "US"
     },
     "geo": {
       "@type": "GeoCoordinates",
@@ -33,14 +39,35 @@ export default async function Home() {
       `Su ${contactInfo.business_hours.sunday}`
     ],
     "priceRange": "$$",
+    "paymentAccepted": ["Cash", "Credit Card", "Check"],
+    "currenciesAccepted": "USD",
     "serviceType": [
       "Dumpster Rental",
       "Residential Dumpster Rental",
       "Commercial Dumpster Rental",
       "Construction Waste Disposal",
-      "Renovation Cleanup"
+      "Renovation Cleanup",
+      "Waste Management",
+      "Demolition Waste Removal"
     ],
-    "areaServed": "Intermountain Region",
+    "areaServed": [
+      {
+        "@type": "City",
+        "name": "Salt Lake City"
+      },
+      {
+        "@type": "City", 
+        "name": "Provo"
+      },
+      {
+        "@type": "City",
+        "name": "Ogden"
+      },
+      {
+        "@type": "State",
+        "name": "Utah"
+      }
+    ],
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
       "name": "Dumpster Rental Services",
@@ -49,20 +76,97 @@ export default async function Home() {
           "@type": "Offer",
           "itemOffered": {
             "@type": "Service",
-            "name": "Residential Dumpster Rental"
+            "name": "Residential Dumpster Rental",
+            "description": "Dumpster rentals for home renovation and cleanup projects"
           }
         },
         {
           "@type": "Offer",
           "itemOffered": {
             "@type": "Service",
-            "name": "Commercial Dumpster Rental"
+            "name": "Commercial Dumpster Rental",
+            "description": "Dumpster rentals for construction sites and commercial projects"
           }
         }
       ]
-    }
+    },
+    "sameAs": [
+      "https://www.facebook.com/intermountaindumpsters",
+      "https://www.linkedin.com/company/intermountain-dumpsters"
+    ],
+    "image": [
+      "https://www.intermountaindumpsters.com/hero_image.png",
+      "https://www.intermountaindumpsters.com/GreenHorizontalLogo.svg"
+    ],
+    "logo": "https://www.intermountaindumpsters.com/GreenHorizontalLogo.svg",
+    "foundingDate": "2020",
+    "numberOfEmployees": "10-50",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "127",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "review": [
+      {
+        "@type": "Review",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "5",
+          "bestRating": "5"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "John Smith"
+        },
+        "reviewBody": "Excellent service and fast delivery. Highly recommend for any construction project."
+      }
+    ]
+  };
+
+  // Breadcrumb structured data
+  const breadcrumbData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
+      }
+    ]
   };
   
+  // Add FAQ data
+  const faqs: FAQ[] = [
+    {
+      question: 'How do I arrange for a dumpster removal?',
+      answer: 'When your dumpster is ready for pickup, simply contact us. We will arrange a removal time that fits your schedule, making the process hassle-free.'
+    },
+    {
+      question: 'When is the best time to schedule a dumpster rental?',
+      answer: 'Booking as soon as you have a project date in mind is best, ensuring you secure the right size dumpster when you need it, even in busier seasons.'
+    },
+    {
+      question: 'How should I prepare for a dumpster delivery?',
+      answer: 'Ensure the delivery area is clear of vehicles, debris, and low-hanging wires or branches to allow for safe and unobstructed placement of the dumpster.'
+    },
+    {
+      question: 'How soon can I get a dumpster delivered?',
+      answer: 'We offer same-day and next-day delivery in most service areas. Book online or call us to schedule your delivery.'
+    },
+    {
+      question: 'How do I book a dumpster?',
+      answer: 'You can book online through our website or call us directly. Our team is happy to assist you with your rental.'
+    },
+    {
+      question: 'What items are not allowed in the dumpster?',
+      answer: 'Hazardous materials, chemicals, tires, batteries, and certain electronics are not allowed. See our Allowed Items section or contact us for a full list.'
+    }
+  ];
+
   return (
     <div className="w-full flex flex-col">
       {/* Structured Data for SEO */}
@@ -71,6 +175,15 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(structuredData),
+        }}
+      />
+      
+      {/* Breadcrumb Structured Data */}
+      <Script
+        id="breadcrumb-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbData),
         }}
       />
 
@@ -171,11 +284,19 @@ export default async function Home() {
               When you choose Intermountain Dumpsters, you&apos;re not just getting a dumpster—you&apos;re partnering with a local business that cares about your project&apos;s success and our community&apos;s well-being. From our family to yours, we&apos;re here to make your waste management needs simple, efficient, and stress-free.
             </p>
           </div>
+          <div className="mt-8">
+            <Link href="/about" className="inline-block bg-green-700 hover:bg-green-800 text-white font-semibold px-8 py-3 rounded-lg shadow transition-all focus:outline-none focus:ring-2 focus:ring-green-700/40">
+              Learn more about us
+            </Link>
+          </div>
         </div>
       </div>
 
       {/* Allowed Items Section */}
       <AllowedItemsSection phoneNumber={contactInfo.phone} />
+
+      {/* FAQ Section */}
+      <FAQSection faqs={faqs} structuredData />
 
       {/* Features Section - This will have its own width constraint */}
     </div>

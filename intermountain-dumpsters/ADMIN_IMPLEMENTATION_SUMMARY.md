@@ -25,7 +25,7 @@ The admin authentication system has been successfully implemented using Supabase
 - **Contact Information Management**: Update business details
 - **Pricing Configuration**: Set rates and fees
 - **Business Hours**: Edit operating hours
-- **Emergency Contacts**: Manage emergency phone numbers
+- **Rush Contacts**: Manage rush phone numbers
 
 #### 🛡️ Security Features
 - **Secure Authentication**: Uses Supabase's built-in security

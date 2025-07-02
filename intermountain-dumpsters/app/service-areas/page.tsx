@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import ServiceAreasPageClient from "./ServiceAreasPageClient";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Service Areas",
@@ -18,5 +19,37 @@ export const metadata: Metadata = {
 };
 
 export default function ServiceAreasPage() {
-  return <ServiceAreasPageClient />;
+  // Breadcrumb structured data
+  const breadcrumbData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Service Areas",
+        "item": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/service-areas` : "http://localhost:3000/service-areas"
+      }
+    ]
+  };
+
+  return (
+    <>
+      {/* Breadcrumb Structured Data */}
+      <Script
+        id="service-areas-breadcrumb-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbData),
+        }}
+      />
+      <ServiceAreasPageClient />
+    </>
+  );
 }

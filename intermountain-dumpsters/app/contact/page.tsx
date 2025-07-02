@@ -1,9 +1,101 @@
 import ContactInfo from "@/components/ContactInfo";
+import ContactForm from "@/components/ContactForm";
 import Navigation from "@/components/Navigation";
+import { Metadata } from "next";
+import Script from "next/script";
+import { getContactInfo } from "@/lib/contact-info";
 
-export default function ContactPage() {
+export const metadata: Metadata = {
+  title: "Contact Us",
+  description: "Contact Intermountain Dumpsters for residential and commercial dumpster rental services. Get in touch for quotes, questions, or booking assistance. Fast response times and local service.",
+  keywords: [
+    "contact Intermountain Dumpsters",
+    "dumpster rental contact",
+    "dumpster rental quote",
+    "dumpster rental questions",
+    "local dumpster rental contact",
+    "construction dumpster contact",
+    "residential dumpster contact"
+  ],
+  openGraph: {
+    title: "Contact Us | Intermountain Dumpsters",
+    description: "Contact Intermountain Dumpsters for residential and commercial dumpster rental services. Get in touch for quotes, questions, or booking assistance.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Contact Us | Intermountain Dumpsters",
+    description: "Contact Intermountain Dumpsters for residential and commercial dumpster rental services.",
+  },
+};
+
+export default async function ContactPage() {
+  const contactInfo = await getContactInfo();
+  
+  // Structured data for contact page
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "name": "Contact Intermountain Dumpsters",
+    "description": "Contact page for Intermountain Dumpsters - residential and commercial dumpster rental services",
+    "url": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/contact` : "http://localhost:3000/contact",
+    "mainEntity": {
+      "@type": "Organization",
+      "name": "Intermountain Dumpsters",
+      "telephone": contactInfo.phone,
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": contactInfo.address
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": contactInfo.phone,
+        "contactType": "customer service",
+        "availableLanguage": "English"
+      }
+    }
+  };
+
+  // Breadcrumb structured data
+  const breadcrumbData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Contact Us",
+        "item": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/contact` : "http://localhost:3000/contact"
+      }
+    ]
+  };
+
   return (
     <div className="w-full flex flex-col gap-2 md:gap-4 items-center">
+      {/* Structured Data for SEO */}
+      <Script
+        id="contact-structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
+      
+      {/* Breadcrumb Structured Data */}
+      <Script
+        id="contact-breadcrumb-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbData),
+        }}
+      />
+
       {/* Navigation */}
       <Navigation currentPage="contact" />
 
@@ -25,106 +117,7 @@ export default function ContactPage() {
           </div>
 
           {/* Contact Form */}
-          <div className="space-y-6">
-            <h2 className="text-2xl font-semibold">Send us a Message</h2>
-            
-            <form className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="contactFirstName" className="block text-sm font-medium mb-2">
-                    First Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="contactFirstName"
-                    name="contactFirstName"
-                    required
-                    className="w-full px-3 py-2 border border-input rounded-md bg-background"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="contactLastName" className="block text-sm font-medium mb-2">
-                    Last Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="contactLastName"
-                    name="contactLastName"
-                    required
-                    className="w-full px-3 py-2 border border-input rounded-md bg-background"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="contactEmail" className="block text-sm font-medium mb-2">
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  id="contactEmail"
-                  name="contactEmail"
-                  required
-                  className="w-full px-3 py-2 border border-input rounded-md bg-background"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="contactPhone" className="block text-sm font-medium mb-2">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  id="contactPhone"
-                  name="contactPhone"
-                  className="w-full px-3 py-2 border border-input rounded-md bg-background"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="contactSubject" className="block text-sm font-medium mb-2">
-                  Subject *
-                </label>
-                <select
-                  id="contactSubject"
-                  name="contactSubject"
-                  required
-                  className="w-full px-3 py-2 border border-input rounded-md bg-background"
-                >
-                  <option value="">Select a subject</option>
-                  <option value="general">General Inquiry</option>
-                  <option value="residential">Residential Dumpster Rental</option>
-                  <option value="commercial">Commercial Dumpster Rental</option>
-                  <option value="pricing">Pricing Question</option>
-                  <option value="service-area">Service Area Question</option>
-                  <option value="booking">Booking Assistance</option>
-                  <option value="complaint">Complaint</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="contactMessage" className="block text-sm font-medium mb-2">
-                  Message *
-                </label>
-                <textarea
-                  id="contactMessage"
-                  name="contactMessage"
-                  rows={4}
-                  required
-                  placeholder="Please describe your inquiry..."
-                  className="w-full px-3 py-2 border border-input rounded-md bg-background"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
-              >
-                Send Message
-              </button>
-            </form>
-          </div>
+          <ContactForm />
         </div>
       </div>
     </div>

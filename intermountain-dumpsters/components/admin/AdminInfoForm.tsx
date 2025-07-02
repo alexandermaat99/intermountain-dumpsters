@@ -113,7 +113,7 @@ export default function AdminInfoForm({ contactInfo, onUpdate, onCancel }: Admin
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="emergency_phone">Emergency Phone</Label>
+                        <Label htmlFor="emergency_phone">Rush Phone</Label>
         <Input
           id="emergency_phone"
           value={formData.emergency_phone}

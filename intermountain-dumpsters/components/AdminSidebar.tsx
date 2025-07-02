@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Settings, Truck, ClipboardList, Menu, X, MapPin, LogOut } from 'lucide-react';
+import { Settings, Truck, ClipboardList, Menu, X, MapPin, LogOut, MessageSquare } from 'lucide-react';
 import { User } from '@supabase/supabase-js';
 import { useState } from 'react';
 import { useAuth } from '@/lib/contexts/AuthContext';
@@ -17,6 +17,11 @@ const navItems = [
     label: 'Rentals',
     href: '/admin/rentals',
     icon: <ClipboardList className="h-5 w-5 mr-2" />,
+  },
+  {
+    label: 'Contact Messages',
+    href: '/admin/contact-messages',
+    icon: <MessageSquare className="h-5 w-5 mr-2" />,
   },
   {
     label: 'Manage Admin',
