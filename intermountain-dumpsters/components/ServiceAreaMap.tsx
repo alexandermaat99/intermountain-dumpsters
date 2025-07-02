@@ -35,6 +35,7 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
   const markersRef = useRef<{ [key: number]: mapboxgl.Marker }>({});
   const popupsRef = useRef<{ [key: number]: mapboxgl.Popup }>({});
   const [mounted, setMounted] = useState(false);
+  const [mapLoaded, setMapLoaded] = useState(false);
   const cleanupRef = useRef(false);
   const initializedRef = useRef(false);
 
@@ -69,6 +70,7 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
     map.current.addControl(new mapboxgl.NavigationControl());
 
     map.current.on('load', () => {
+      setMapLoaded(true);
       // Ensure the map style is fully loaded before adding layers
       setTimeout(() => {
         if (!map.current?.isStyleLoaded()) {
@@ -195,12 +197,13 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
         map.current = null;
       }
       initializedRef.current = false;
+      setMapLoaded(false);
     };
-  }, [mounted, serviceAreas, selectedArea]);
+  }, [mounted, serviceAreas]);
 
   // Handle selected area changes - separate effect
   useEffect(() => {
-    if (cleanupRef.current || !map.current || !mounted || !map.current.isStyleLoaded()) return;
+    if (cleanupRef.current || !map.current || !mounted || !mapLoaded || !map.current.isStyleLoaded()) return;
 
     // Reset all circles and popups to default style
     serviceAreas.forEach(area => {
@@ -276,19 +279,22 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
           newMarkerElement.addEventListener('mouseleave', () => popup.remove());
         }
         
-        // Fly to selected area
+        // Fly to selected area with fast animation
         map.current!.flyTo({
           center: [selectedArea.longitude, selectedArea.latitude],
           zoom: 10,
-          essential: true
+          essential: true,
+          duration: 500,
+          easing: (t) => t
         });
 
-        if (popup) {
-          popup.addTo(map.current!);
+        // Show popup immediately
+        if (popup && map.current) {
+          popup.addTo(map.current);
         }
       }
     }
-  }, [mounted, serviceAreas, selectedArea]);
+  }, [mounted, mapLoaded, selectedArea]);
 
   return (
     <div className="w-full h-full relative">
