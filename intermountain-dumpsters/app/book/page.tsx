@@ -29,13 +29,13 @@ export default function BookPage() {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
+        "item": "https://intermountaindumpsters.com"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Book Your Dumpster",
-        "item": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/book` : "http://localhost:3000/book"
+        "item": "https://intermountaindumpsters.com/book"
       }
     ]
   };

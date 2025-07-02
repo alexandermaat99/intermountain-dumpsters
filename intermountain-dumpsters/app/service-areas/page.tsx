@@ -28,13 +28,13 @@ export default function ServiceAreasPage() {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
+        "item": "https://intermountaindumpsters.com"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Service Areas",
-        "item": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/service-areas` : "http://localhost:3000/service-areas"
+        "item": "https://intermountaindumpsters.com/service-areas"
       }
     ]
   };

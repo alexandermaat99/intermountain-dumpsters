@@ -6,7 +6,7 @@ import { Phone, Mail, Clock, Users, Award, Truck, Shield } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "About Us",
-  description: "Learn about Intermountain Dumpsters - a locally owned and operated dumpster rental company serving Utah since 2020. Family business with years of experience in waste management and construction services.",
+  description: "Learn about Intermountain Dumpsters - a locally owned and operated dumpster rental company serving Utah. Family business with years of experience in waste management and demolition services.",
   keywords: [
     "about Intermountain Dumpsters",
     "local dumpster rental company",
@@ -18,13 +18,13 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "About Us | Intermountain Dumpsters",
-    description: "Learn about Intermountain Dumpsters - a locally owned and operated dumpster rental company serving Utah since 2020.",
+    description: "Learn about Intermountain Dumpsters - a locally owned and operated dumpster rental company serving Utah.",
     type: "website",
   },
   twitter: {
     card: "summary",
     title: "About Us | Intermountain Dumpsters",
-    description: "Learn about Intermountain Dumpsters - a locally owned and operated dumpster rental company serving Utah since 2020.",
+    description: "Learn about Intermountain Dumpsters - a locally owned and operated dumpster rental company serving Utah.",
   },
 };
 
@@ -37,11 +37,11 @@ export default async function AboutPage() {
     "@type": "AboutPage",
     "name": "About Intermountain Dumpsters",
     "description": "About page for Intermountain Dumpsters - locally owned dumpster rental company serving Utah",
-    "url": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/about` : "http://localhost:3000/about",
+    "url": "https://intermountaindumpsters.com/about",
     "mainEntity": {
       "@type": "Organization",
       "name": "Intermountain Dumpsters",
-      "description": "Locally owned and operated dumpster rental company serving Utah since 2020",
+      "description": "Locally owned and operated dumpster rental company serving Utah",
       "foundingDate": "2020",
       "numberOfEmployees": "10-50",
       "address": {
@@ -65,13 +65,13 @@ export default async function AboutPage() {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
+        "item": "https://intermountaindumpsters.com"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "About Us",
-        "item": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/about` : "http://localhost:3000/about"
+        "item": "https://intermountaindumpsters.com/about"
       }
     ]
   };
@@ -119,13 +119,13 @@ export default async function AboutPage() {
             <h2 className="text-3xl font-bold mb-6">Our Story</h2>
             <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
               <p>
-                Founded in 2020, Intermountain Dumpsters was born from a simple mission: to provide reliable, 
+                Intermountain Dumpsters was born from a simple mission: to provide reliable, 
                 affordable dumpster rental services to our local community. As a family-owned business, we 
                 understand the importance of trust, quality, and personal service.
               </p>
               <p>
-                What started as a small operation serving Salt Lake City has grown into a trusted partner 
-                for construction companies, contractors, and homeowners throughout the Intermountain region. 
+                What started as a small operation serving the Intermountain area has grown into a trusted partner 
+                for construction companies, contractors, and homeowners throughout the region. 
                 Our commitment to excellence and customer satisfaction has remained unchanged since day one.
               </p>
               <p>
@@ -135,7 +135,7 @@ export default async function AboutPage() {
               </p>
             </div>
           </div>
-          <div className="bg-gray-100 rounded-lg p-8">
+          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-8">
             <h3 className="text-2xl font-semibold mb-6">Why Choose Us?</h3>
             <div className="space-y-4">
                              <div className="flex items-start gap-3">
@@ -149,7 +149,7 @@ export default async function AboutPage() {
                  <Award className="w-6 h-6 text-brand-green-dark mt-1 flex-shrink-0" />
                  <div>
                    <h4 className="font-semibold">Years of Experience</h4>
-                   <p className="text-muted-foreground">Expert knowledge in waste management and construction</p>
+                   <p className="text-muted-foreground">Expert knowledge in waste management and demolition</p>
                  </div>
                </div>
                <div className="flex items-start gap-3">
@@ -175,8 +175,8 @@ export default async function AboutPage() {
           <h2 className="text-3xl font-bold text-center mb-12">Our Mission & Values</h2>
           <div className="grid md:grid-cols-3 gap-8">
                          <div className="text-center space-y-4">
-               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                 <svg className="w-8 h-8 text-brand-green-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <div className="w-16 h-16 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mx-auto">
+                 <svg className="w-8 h-8 text-brand-green-dark dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                  </svg>
                </div>
@@ -186,8 +186,8 @@ export default async function AboutPage() {
                </p>
              </div>
              <div className="text-center space-y-4">
-               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                 <svg className="w-8 h-8 text-brand-green-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <div className="w-16 h-16 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mx-auto">
+                 <svg className="w-8 h-8 text-brand-green-dark dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                  </svg>
                </div>
@@ -197,8 +197,8 @@ export default async function AboutPage() {
                </p>
              </div>
              <div className="text-center space-y-4">
-               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                 <svg className="w-8 h-8 text-brand-green-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <div className="w-16 h-16 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mx-auto">
+                 <svg className="w-8 h-8 text-brand-green-dark dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                  </svg>
@@ -242,7 +242,7 @@ export default async function AboutPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
               <h3 className="text-xl font-semibold mb-4">Ready to Get Started?</h3>
               <p className="text-muted-foreground mb-6">
                 Whether you&apos;re planning a home renovation, construction project, or commercial cleanup, 
@@ -257,7 +257,7 @@ export default async function AboutPage() {
                  </a>
                  <a 
                    href="/contact" 
-                   className="block w-full border border-brand-green-dark text-brand-green-dark text-center py-3 px-6 rounded-lg font-semibold hover:bg-green-50 transition-colors"
+                   className="block w-full border border-brand-green-dark text-brand-green-dark dark:text-green-400 text-center py-3 px-6 rounded-lg font-semibold hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors"
                  >
                    Contact Us
                  </a>
@@ -267,7 +267,7 @@ export default async function AboutPage() {
         </div>
 
         {/* Contact Information */}
-        <div className="bg-gray-50 rounded-lg p-8">
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8">
           <h2 className="text-3xl font-bold text-center mb-8">Get in Touch</h2>
           <div className="grid md:grid-cols-3 gap-8">
                          <a 

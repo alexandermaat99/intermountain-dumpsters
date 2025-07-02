@@ -38,7 +38,7 @@ export default async function ContactPage() {
     "@type": "ContactPage",
     "name": "Contact Intermountain Dumpsters",
     "description": "Contact page for Intermountain Dumpsters - residential and commercial dumpster rental services",
-    "url": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/contact` : "http://localhost:3000/contact",
+    "url": "https://intermountaindumpsters.com/contact",
     "mainEntity": {
       "@type": "Organization",
       "name": "Intermountain Dumpsters",
@@ -65,13 +65,13 @@ export default async function ContactPage() {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
+        "item": "https://intermountaindumpsters.com"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Contact Us",
-        "item": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/contact` : "http://localhost:3000/contact"
+        "item": "https://intermountaindumpsters.com/contact"
       }
     ]
   };

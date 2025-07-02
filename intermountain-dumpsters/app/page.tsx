@@ -17,7 +17,7 @@ export default async function Home() {
     "@type": "LocalBusiness",
     "name": "Intermountain Dumpsters",
     "description": "Reliable residential and commercial dumpster rental services for construction, renovation, and cleanup projects. Fast delivery, competitive pricing, and exceptional customer service.",
-    "url": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000",
+    "url": "https://intermountaindumpsters.com",
     "telephone": contactInfo.phone,
     "email": contactInfo.email,
     "address": {
@@ -134,7 +134,7 @@ export default async function Home() {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
+        "item": "https://intermountaindumpsters.com"
       }
     ]
   };

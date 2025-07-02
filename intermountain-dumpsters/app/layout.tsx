@@ -7,9 +7,7 @@ import ConditionalFooter from "@/components/ConditionalFooter";
 import "./globals.css";
 import Script from "next/script";
 
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+const defaultUrl = "https://intermountaindumpsters.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
