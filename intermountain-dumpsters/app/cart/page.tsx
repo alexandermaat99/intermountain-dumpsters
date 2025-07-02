@@ -10,11 +10,13 @@ import Link from "next/link";
 import { CartItem } from "@/lib/types";
 import { useState, useEffect } from "react";
 import CheckoutModal from "@/components/CheckoutModal";
+import { Loader2 } from "lucide-react";
 
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart } = useCartContext();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [deletingItems, setDeletingItems] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     setIsClient(true);
@@ -22,6 +24,20 @@ export default function CartPage() {
 
   const handleCheckout = () => {
     setIsCheckoutOpen(true);
+  };
+
+  const handleDeleteItem = async (itemId: number) => {
+    setDeletingItems(prev => new Set(prev).add(itemId));
+    
+    // Simulate a short delay for better UX
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    removeFromCart(itemId);
+    setDeletingItems(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(itemId);
+      return newSet;
+    });
   };
 
   // Show loading state until client-side hydration is complete
@@ -120,10 +136,15 @@ export default function CartPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => removeFromCart(item.id)}
+                          onClick={() => handleDeleteItem(item.id)}
+                          disabled={deletingItems.has(item.id)}
                           className="text-destructive hover:text-destructive"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          {deletingItems.has(item.id) ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
                         </Button>
                       </div>
 
