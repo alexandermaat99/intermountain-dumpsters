@@ -339,11 +339,23 @@ export default function AdminDumpsterTypesPage() {
                   <Label htmlFor="edit-image">Photo</Label>
                   {/* Show current image preview */}
                   {editType?.image_path && (
-                    <img src={editType.image_path.startsWith('http') ? editType.image_path : `https://acsxwvvvlfajjizqwcia.supabase.co/storage/v1/object/public/dumpster-images/${editType.image_path}`} alt="Current" className="w-32 h-20 object-cover rounded mb-2 border" />
+                    <Image 
+                      src={editType.image_path.startsWith('http') ? editType.image_path : `https://acsxwvvvlfajjizqwcia.supabase.co/storage/v1/object/public/dumpster-images/${editType.image_path}`} 
+                      alt="Current" 
+                      width={128}
+                      height={80}
+                      className="w-32 h-20 object-cover rounded mb-2 border" 
+                    />
                   )}
                   {/* Show new image preview if selected */}
                   {editForm.image && (
-                    <img src={URL.createObjectURL(editForm.image)} alt="New" className="w-32 h-20 object-cover rounded mb-2 border" />
+                    <Image 
+                      src={URL.createObjectURL(editForm.image)} 
+                      alt="New" 
+                      width={128}
+                      height={80}
+                      className="w-32 h-20 object-cover rounded mb-2 border" 
+                    />
                   )}
                   <input id="edit-image" type="file" name="image" accept="image/*" onChange={handleEditChange} className="border rounded p-2 w-full" />
                 </div>
