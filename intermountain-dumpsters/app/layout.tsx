@@ -6,6 +6,7 @@ import { AuthProvider } from "@/lib/contexts/AuthContext";
 import ConditionalFooter from "@/components/ConditionalFooter";
 import "./globals.css";
 import Script from "next/script";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const defaultUrl = "https://intermountaindumpsters.com";
 
@@ -169,6 +170,7 @@ export default function RootLayout({
           </CartProvider>
           </AuthProvider>
         </AdminThemeProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
