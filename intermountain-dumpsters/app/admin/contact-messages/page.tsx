@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/lib/contexts/AuthContext';
-import { Mail, Phone, User, Calendar, MessageSquare, Loader2 } from 'lucide-react';
+import { Mail, Phone, User, MessageSquare, Loader2 } from 'lucide-react';
 import AdminSidebar from '@/components/AdminSidebar';
 
 interface ContactMessage {

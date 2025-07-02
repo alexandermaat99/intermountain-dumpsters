@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Navigation from "@/components/Navigation";
 import Script from "next/script";
 import { getContactInfo } from "@/lib/contact-info";
-import { MapPin, Phone, Mail, Clock, Users, Award, Truck, Shield } from "lucide-react";
+import { Phone, Mail, Clock, Users, Award, Truck, Shield } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -129,9 +129,9 @@ export default async function AboutPage() {
                 Our commitment to excellence and customer satisfaction has remained unchanged since day one.
               </p>
               <p>
-                We're proud to be your neighbors, serving the same communities where we live and work. 
-                When you choose Intermountain Dumpsters, you're supporting a local business that cares 
-                about your project's success and our community's well-being.
+                We&apos;re proud to be your neighbors, serving the same communities where we live and work. 
+                When you choose Intermountain Dumpsters, you&apos;re supporting a local business that cares 
+                about your project&apos;s success and our community&apos;s well-being.
               </p>
             </div>
           </div>
@@ -182,7 +182,7 @@ export default async function AboutPage() {
                </div>
                <h3 className="text-xl font-semibold">Customer First</h3>
                <p className="text-muted-foreground">
-                 Every decision we make is guided by what's best for our customers. Your satisfaction is our top priority.
+                 Every decision we make is guided by what&apos;s best for our customers. Your satisfaction is our top priority.
                </p>
              </div>
              <div className="text-center space-y-4">
@@ -205,7 +205,7 @@ export default async function AboutPage() {
                </div>
                <h3 className="text-xl font-semibold">Local Focus</h3>
                <p className="text-muted-foreground">
-                 We're committed to serving our local community and supporting the growth of our region.
+                 We&apos;re committed to serving our local community and supporting the growth of our region.
                </p>
              </div>
           </div>
@@ -245,7 +245,7 @@ export default async function AboutPage() {
             <div className="bg-gray-50 rounded-lg p-6">
               <h3 className="text-xl font-semibold mb-4">Ready to Get Started?</h3>
               <p className="text-muted-foreground mb-6">
-                Whether you're planning a home renovation, construction project, or commercial cleanup, 
+                Whether you&apos;re planning a home renovation, construction project, or commercial cleanup, 
                 we have the right dumpster for your needs.
               </p>
               <div className="space-y-3">
