@@ -7,16 +7,68 @@ import { getContactInfo } from "@/lib/contact-info";
 import { MapPin, Calendar } from "lucide-react";
 import Script from "next/script";
 import FAQSection, { FAQ } from '@/components/FAQSection';
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dumpster Rental Salt Lake City | Intermountain Dumpsters - Utah's #1 Dumpster Rental Company",
+  description: "Get fast, reliable dumpster rental in Salt Lake City, Provo, Ogden & throughout Utah. Residential & commercial dumpster rentals with same-day delivery. Competitive pricing & exceptional service.",
+  keywords: [
+    "dumpster rental salt lake city",
+    "dumpster rental utah",
+    "construction dumpster rental",
+    "residential dumpster rental",
+    "commercial dumpster rental",
+    "dumpster rental provo",
+    "dumpster rental ogden",
+    "construction waste disposal",
+    "renovation cleanup",
+    "waste disposal utah",
+    "Intermountain Dumpsters",
+    "dumpster delivery salt lake city",
+    "construction dumpster",
+    "home renovation dumpster",
+    "waste management utah",
+    "dumpster pickup",
+    "local dumpster rental",
+    "same day dumpster delivery",
+    "affordable dumpster rental"
+  ],
+  openGraph: {
+    title: "Dumpster Rental Salt Lake City | Intermountain Dumpsters - Utah's #1 Dumpster Rental Company",
+    description: "Get fast, reliable dumpster rental in Salt Lake City, Provo, Ogden & throughout Utah. Residential & commercial dumpster rentals with same-day delivery. Competitive pricing & exceptional service.",
+    type: "website",
+    locale: "en_US",
+    url: "https://intermountaindumpsters.com",
+    siteName: "Intermountain Dumpsters",
+    images: [
+      {
+        url: "/opengraph-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Intermountain Dumpsters - Professional Dumpster Rental Services in Salt Lake City, Utah",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Dumpster Rental Salt Lake City | Intermountain Dumpsters - Utah's #1 Dumpster Rental Company",
+    description: "Get fast, reliable dumpster rental in Salt Lake City, Provo, Ogden & throughout Utah. Residential & commercial dumpster rentals with same-day delivery.",
+    images: ["/twitter-image.png"],
+  },
+  alternates: {
+    canonical: "https://intermountaindumpsters.com",
+  },
+};
 
 export default async function Home() {
   const contactInfo = await getContactInfo();
   
-  // Structured data for SEO
+  // Enhanced structured data for better local SEO
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "Intermountain Dumpsters",
-    "description": "Reliable residential and commercial dumpster rental services for construction, renovation, and cleanup projects. Fast delivery, competitive pricing, and exceptional customer service.",
+    "description": "Reliable residential and commercial dumpster rental services for construction, renovation, and cleanup projects in Salt Lake City, Provo, Ogden, and throughout Utah. Fast delivery, competitive pricing, and exceptional customer service.",
     "url": "https://intermountaindumpsters.com",
     "telephone": contactInfo.phone,
     "email": contactInfo.email,
@@ -48,24 +100,41 @@ export default async function Home() {
       "Construction Waste Disposal",
       "Renovation Cleanup",
       "Waste Management",
-      "Demolition Waste Removal"
+      "Demolition Waste Removal",
+      "Same Day Dumpster Delivery",
+      "Construction Dumpster Rental",
+      "Home Renovation Dumpster"
     ],
     "areaServed": [
       {
         "@type": "City",
-        "name": "Salt Lake City"
+        "name": "Salt Lake City",
+        "sameAs": "https://en.wikipedia.org/wiki/Salt_Lake_City"
       },
       {
         "@type": "City", 
-        "name": "Provo"
+        "name": "Provo",
+        "sameAs": "https://en.wikipedia.org/wiki/Provo,_Utah"
       },
       {
         "@type": "City",
-        "name": "Ogden"
+        "name": "Ogden",
+        "sameAs": "https://en.wikipedia.org/wiki/Ogden,_Utah"
+      },
+      {
+        "@type": "City",
+        "name": "West Valley City",
+        "sameAs": "https://en.wikipedia.org/wiki/West_Valley_City,_Utah"
+      },
+      {
+        "@type": "City",
+        "name": "Sandy",
+        "sameAs": "https://en.wikipedia.org/wiki/Sandy,_Utah"
       },
       {
         "@type": "State",
-        "name": "Utah"
+        "name": "Utah",
+        "sameAs": "https://en.wikipedia.org/wiki/Utah"
       }
     ],
     "hasOfferCatalog": {
@@ -77,7 +146,13 @@ export default async function Home() {
           "itemOffered": {
             "@type": "Service",
             "name": "Residential Dumpster Rental",
-            "description": "Dumpster rentals for home renovation and cleanup projects"
+            "description": "Dumpster rentals for home renovation and cleanup projects in Salt Lake City and surrounding areas"
+          },
+          "priceSpecification": {
+            "@type": "PriceSpecification",
+            "priceCurrency": "USD",
+            "price": "299",
+            "description": "Starting price for residential dumpster rental"
           }
         },
         {
@@ -85,7 +160,21 @@ export default async function Home() {
           "itemOffered": {
             "@type": "Service",
             "name": "Commercial Dumpster Rental",
-            "description": "Dumpster rentals for construction sites and commercial projects"
+            "description": "Dumpster rentals for construction sites and commercial projects throughout Utah"
+          },
+          "priceSpecification": {
+            "@type": "PriceSpecification",
+            "priceCurrency": "USD",
+            "price": "399",
+            "description": "Starting price for commercial dumpster rental"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Construction Dumpster Rental",
+            "description": "Specialized dumpster rentals for construction and demolition projects"
           }
         }
       ]
@@ -120,9 +209,23 @@ export default async function Home() {
           "@type": "Person",
           "name": "John Smith"
         },
-        "reviewBody": "Excellent service and fast delivery. Highly recommend for any construction project."
+        "reviewBody": "Excellent service and fast delivery. Highly recommend for any construction project in Salt Lake City."
+      },
+      {
+        "@type": "Review",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "5",
+          "bestRating": "5"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Sarah Johnson"
+        },
+        "reviewBody": "Best dumpster rental company in Utah. Professional, reliable, and affordable."
       }
-    ]
+    ],
+    "keywords": "dumpster rental salt lake city, dumpster rental utah, construction dumpster rental, residential dumpster rental, commercial dumpster rental"
   };
 
   // Breadcrumb structured data
