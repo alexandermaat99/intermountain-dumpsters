@@ -12,6 +12,14 @@ import { useState, useEffect } from "react";
 import CheckoutModal from "@/components/CheckoutModal";
 import { Loader2 } from "lucide-react";
 
+const SUPABASE_IMAGE_URL = "https://acsxwvvvlfajjizqwcia.supabase.co/storage/v1/object/public/dumpster-images/";
+const getImageUrl = (image_path: string | undefined) => {
+  if (!image_path) return "/placeholder.png";
+  if (image_path.startsWith("http")) return image_path;
+  if (/\.(png|jpe?g|webp|gif|svg)$/i.test(image_path)) return SUPABASE_IMAGE_URL + image_path;
+  return "/" + image_path;
+};
+
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart } = useCartContext();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
@@ -113,7 +121,7 @@ export default function CartPage() {
                   <Card key={item.id} className="flex flex-col md:flex-row">
                     <div className="md:w-48 h-48 md:h-auto relative">
                       <Image
-                        src={item.image_path}
+                        src={getImageUrl(item.image_path)}
                         alt={`Image of ${item.name}`}
                         fill
                         style={{ objectFit: "cover" }}
