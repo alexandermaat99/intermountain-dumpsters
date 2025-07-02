@@ -19,7 +19,7 @@ const navItems = [
     icon: <ClipboardList className="h-5 w-5 mr-2" />,
   },
   {
-    label: 'Contact Messages',
+    label: 'Messages',
     href: '/admin/contact-messages',
     icon: <MessageSquare className="h-5 w-5 mr-2" />,
   },
