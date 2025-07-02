@@ -94,7 +94,7 @@ export default function BookPageClient() {
       setLoading(true);
       setError(null);
       
-      const { data, error: supabaseError } = await supabase.from('dumpster_types').select('*, dumpsters(count)');
+      const { data, error: supabaseError } = await supabase.from('dumpster_types').select('*, dumpsters(count)').order('price', { ascending: true });
       
       if (supabaseError) {
         console.error('Error fetching dumpster types:', supabaseError);
