@@ -86,7 +86,7 @@ export default function ServiceAreasList({ onAreaSelect, selectedArea, serviceAr
             Ready to book your dumpster?
           </p>
           <Link href="/book">
-            <Button className="w-full bg-[#2C6B9E] hover:bg-[#22527a] text-white">
+            <Button id="book-now-btn" className="w-full bg-[#2C6B9E] hover:bg-[#22527a] text-white">
               <Calendar className="w-4 h-4 mr-2" />
               Book Now
             </Button>
