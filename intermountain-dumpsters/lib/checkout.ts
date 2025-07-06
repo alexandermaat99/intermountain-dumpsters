@@ -71,7 +71,8 @@ export async function createPendingOrder(
     console.log('Created pending order:', pendingOrderData.id);
 
     // Create Stripe checkout session
-    const response = await fetch('/api/stripe/create-checkout-session', {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/stripe/create-checkout-session`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -111,6 +112,7 @@ export async function createPendingOrder(
 
 export async function confirmPendingOrder(pendingOrderId: number, stripeSessionId: string): Promise<SavedOrder | null> {
   try {
+
     // Get the pending order
     const { data: pendingOrder, error: fetchError } = await supabase
       .from('pending_orders')
