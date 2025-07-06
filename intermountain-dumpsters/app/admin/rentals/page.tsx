@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/contexts/AuthContext';
 import AdminSidebar from '@/components/AdminSidebar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, User as UserIcon, Package, DollarSign, Truck } from 'lucide-react';
+import { Loader2, User as UserIcon, Package, DollarSign, Truck, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -126,7 +126,7 @@ export default function RentalsPage() {
       if (daysUntil > 2) {
         return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Ordered</span>;
       } else if (daysUntil >= 0) {
-        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Needs Drop Off</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Needs Drop</span>;
       } else {
         return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Late</span>;
       }
@@ -244,7 +244,7 @@ export default function RentalsPage() {
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Dumpster Info</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Delivery Address</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Customer</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider min-w-[120px]">Status</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Payment</th>
                       </tr>
                     </thead>
@@ -255,9 +255,30 @@ export default function RentalsPage() {
                         </tr>
                       ) : (
                         mainRentals.map((rental) => (
-                          <tr key={rental.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => router.push(`/admin/rentals/${rental.id}`)} tabIndex={0} role="button" aria-label={`View rental #${rental.id}`}>
+                          <tr 
+                            key={rental.id} 
+                            className={`transition-colors cursor-pointer ${
+                              rental.emergency_delivery 
+                                ? 'bg-red-50 border-l-4 border-l-red-500'
+                                : 'hover:bg-gray-50'
+                            }`} 
+                            onClick={() => router.push(`/admin/rentals/${rental.id}`)} 
+                            tabIndex={0} 
+                            role="button" 
+                            aria-label={`View rental #${rental.id}`}
+                          >
                             {/* Delivery Date */}
-                            <td className="px-4 py-4 align-top text-sm font-semibold text-blue-900">{formatDate(rental.delivery_date_requested)}</td>
+                            <td className="px-4 py-4 align-top text-sm">
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-blue-900">{formatDate(rental.delivery_date_requested)}</span>
+                                {rental.emergency_delivery && (
+                                  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-bold animate-pulse">
+                                    <AlertTriangle className="h-3 w-3" />
+                                    EMERGENCY
+                                  </div>
+                                )}
+                              </div>
+                            </td>
                             {/* Days Until */}
                             <td className="px-4 py-4 align-top text-sm font-semibold text-green-700">{getDaysUntil(rental.delivery_date_requested)}</td>
                             {/* Dumpster Info */}
@@ -287,7 +308,7 @@ export default function RentalsPage() {
                               )}
                             </td>
                             {/* Status */}
-                            <td className="px-4 py-4 align-top text-sm">{getStatusBadge(rental)}</td>
+                            <td className="px-4 py-4 align-top text-sm min-w-[120px]">{getStatusBadge(rental)}</td>
                             {/* Payment */}
                             <td className="px-4 py-4 align-top text-sm">
                               <div className="font-medium">{formatCurrency(rental.total_amount)}</div>
@@ -321,15 +342,36 @@ export default function RentalsPage() {
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Dumpster Info</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Delivery Address</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Customer</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider min-w-[120px]">Status</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Payment</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
                         {archivedRentals.map((rental) => (
-                          <tr key={rental.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => router.push(`/admin/rentals/${rental.id}`)} tabIndex={0} role="button" aria-label={`View rental #${rental.id}`}>
+                          <tr 
+                            key={rental.id} 
+                            className={`transition-colors cursor-pointer ${
+                              rental.emergency_delivery 
+                                ? 'bg-red-50 border-l-4 border-l-red-500'
+                                : 'hover:bg-gray-50'
+                            }`} 
+                            onClick={() => router.push(`/admin/rentals/${rental.id}`)} 
+                            tabIndex={0} 
+                            role="button" 
+                            aria-label={`View rental #${rental.id}`}
+                          >
                             {/* Delivery Date */}
-                            <td className="px-4 py-4 align-top text-sm font-semibold text-blue-900">{formatDate(rental.delivery_date_requested)}</td>
+                            <td className="px-4 py-4 align-top text-sm">
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-blue-900">{formatDate(rental.delivery_date_requested)}</span>
+                                {rental.emergency_delivery && (
+                                  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-bold animate-pulse">
+                                    <AlertTriangle className="h-3 w-3" />
+                                    EMERGENCY
+                                  </div>
+                                )}
+                              </div>
+                            </td>
                             {/* Days Until */}
                             <td className="px-4 py-4 align-top text-sm font-semibold text-green-700">{getDaysUntil(rental.delivery_date_requested)}</td>
                             {/* Dumpster Info */}
@@ -359,7 +401,7 @@ export default function RentalsPage() {
                               )}
                             </td>
                             {/* Status */}
-                            <td className="px-4 py-4 align-top text-sm">{getStatusBadge(rental)}</td>
+                            <td className="px-4 py-4 align-top text-sm min-w-[120px]">{getStatusBadge(rental)}</td>
                             {/* Payment */}
                             <td className="px-4 py-4 align-top text-sm">
                               <div className="font-medium">{formatCurrency(rental.total_amount)}</div>
