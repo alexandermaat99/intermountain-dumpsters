@@ -18,6 +18,13 @@ export type CartItem = Omit<DumpsterType, 'quantity'> & {
     availableQuantity: number;
 };
 
+// Add CartState type here to avoid circular imports
+export type CartState = {
+  items: CartItem[];
+  itemCount: number;
+  total: number;
+};
+
 export type CustomerInfo = {
   first_name: string;
   last_name: string;
@@ -54,7 +61,7 @@ export type CheckoutData = {
     state: string;
     zip: string;
   };
-  cart?: any;
+  cart?: CartState; // Use proper CartState type
 };
 
 export type CheckoutStep = 'customer' | 'delivery' | 'insurance' | 'contract' | 'payment'; 

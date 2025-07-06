@@ -1,13 +1,7 @@
 'use client';
 
 import { createContext, useState, useEffect, ReactNode, useContext } from 'react';
-import { DumpsterType, CartItem } from '@/lib/types';
-
-export type CartState = {
-  items: CartItem[];
-  itemCount: number;
-  total: number;
-};
+import { DumpsterType, CartItem, CartState } from '@/lib/types';
 
 type CartContextType = {
   cart: CartState;
