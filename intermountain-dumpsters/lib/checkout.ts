@@ -54,7 +54,10 @@ export async function createPendingOrder(
           delivery_address: checkoutData.delivery.delivery_address,
         },
         insurance_info: checkoutData.insurance,
-        cart_info: {}, // You can add cart data here if needed
+        cart_info: {
+          ...checkoutData.cart,
+          dumpster_type_id: checkoutData.cart?.dumpster_type_id,
+        }, // Store cart data including dumpster_type_id
         total_amount: taxInfo.total,
         tax_amount: taxInfo.taxAmount,
         subtotal_amount: taxInfo.subtotal,
@@ -112,6 +115,9 @@ export async function createPendingOrder(
 
 export async function confirmPendingOrder(pendingOrderId: number, stripeSessionId: string): Promise<SavedOrder | null> {
   try {
+    console.log('=== CONFIRMING PENDING ORDER ===');
+    console.log('Pending Order ID:', pendingOrderId);
+    console.log('Stripe Session ID:', stripeSessionId);
 
     // Get the pending order
     const { data: pendingOrder, error: fetchError } = await supabase
@@ -121,9 +127,13 @@ export async function confirmPendingOrder(pendingOrderId: number, stripeSessionI
       .single();
 
     if (fetchError || !pendingOrder) {
-      console.error('Error fetching pending order:', fetchError);
+      console.error('❌ Error fetching pending order:', fetchError);
+      console.error('❌ Pending order data:', pendingOrder);
       return null;
     }
+
+    console.log('✅ Successfully fetched pending order');
+    console.log('Pending order data:', JSON.stringify(pendingOrder, null, 2));
 
     const customerToSave = pendingOrder.customer_info;
 
@@ -137,14 +147,15 @@ export async function confirmPendingOrder(pendingOrderId: number, stripeSessionI
       .single();
 
     if (customerLookupError && customerLookupError.code !== 'PGRST116') {
-      console.error('Error checking for existing customer:', customerLookupError);
+      console.error('❌ Error checking for existing customer:', customerLookupError);
     } else if (existingCustomer) {
       customerData = existingCustomer;
-      console.log('Found existing customer by email:', customerData.id);
+      console.log('✅ Found existing customer by email:', customerData.id);
     }
 
     // If no existing customer found, create a new one
     if (!customerData) {
+      console.log('Creating new customer...');
       const { data: newCustomerData, error: customerError } = await supabase
         .from('customers')
         .insert({
@@ -163,23 +174,29 @@ export async function confirmPendingOrder(pendingOrderId: number, stripeSessionI
         .single();
 
       if (customerError) {
-        console.error('Error saving new customer:', JSON.stringify(customerError, null, 2));
+        console.error('❌ Error saving new customer:', JSON.stringify(customerError, null, 2));
         return null;
       }
 
       customerData = newCustomerData;
-      console.log('Created new customer:', customerData.id);
+      console.log('✅ Created new customer:', customerData.id);
     }
 
     // Extract ZIP code for database storage
     const zipCode = pendingOrder.delivery_info.delivery_address.match(/\b\d{5}\b/)?.[0] || '';
+    console.log('Extracted ZIP code:', zipCode);
 
+    // Get dumpster_type_id from cart_info
+    const dumpsterTypeId = pendingOrder.cart_info?.dumpster_type_id || 1;
+    console.log('Using dumpster_type_id:', dumpsterTypeId);
+
+    console.log('Creating rental record...');
     // Create the actual rental record
     const { data: rentalResult, error: rentalError } = await supabase
       .from('rentals')
       .insert({
         customer_id: customerData.id,
-        dumpster_type_id: 1, // Default, should be dynamic based on cart
+        dumpster_type_id: dumpsterTypeId,
         delivery_date_requested: pendingOrder.delivery_info.delivery_date,
         delivery_address: pendingOrder.delivery_info.delivery_address,
         cancelation_insurance: pendingOrder.insurance_info.cancelation_insurance,
@@ -199,11 +216,29 @@ export async function confirmPendingOrder(pendingOrderId: number, stripeSessionI
       .single();
 
     if (rentalError) {
-      console.error('Error saving rental:', rentalError);
+      console.error('❌ Error saving rental:', rentalError);
+      console.error('❌ Rental insert data:', {
+        customer_id: customerData.id,
+        dumpster_type_id: dumpsterTypeId,
+        delivery_date_requested: pendingOrder.delivery_info.delivery_date,
+        delivery_address: pendingOrder.delivery_info.delivery_address,
+        cancelation_insurance: pendingOrder.insurance_info.cancelation_insurance,
+        driveway_insurance: pendingOrder.insurance_info.driveway_insurance,
+        emergency_delivery: pendingOrder.insurance_info.emergency_delivery,
+        delivered: false,
+        picked_up: false,
+        payment_status: 'completed',
+        total_amount: pendingOrder.total_amount,
+        subtotal_amount: pendingOrder.subtotal_amount,
+        tax_amount: pendingOrder.tax_amount,
+        tax_rate: pendingOrder.tax_amount / pendingOrder.subtotal_amount,
+        delivery_zip_code: zipCode,
+        stripe_session_id: stripeSessionId
+      });
       return null;
     }
 
-    console.log('Successfully created rental:', rentalResult.id);
+    console.log('✅ Successfully created rental:', rentalResult.id);
 
     // Delete the pending order
     const { error: deleteError } = await supabase
@@ -212,13 +247,13 @@ export async function confirmPendingOrder(pendingOrderId: number, stripeSessionI
       .eq('id', pendingOrderId);
 
     if (deleteError) {
-      console.error('Error deleting pending order:', deleteError);
+      console.error('❌ Error deleting pending order:', deleteError);
       // Don't return null here as the rental was created successfully
     } else {
-      console.log('Successfully deleted pending order');
+      console.log('✅ Successfully deleted pending order');
     }
 
-    console.log('Successfully confirmed pending order:', pendingOrderId);
+    console.log('✅ Successfully confirmed pending order:', pendingOrderId);
 
     return {
       customer_id: customerData.id,
@@ -229,7 +264,7 @@ export async function confirmPendingOrder(pendingOrderId: number, stripeSessionI
     };
 
   } catch (error) {
-    console.error('Error confirming pending order:', error);
+    console.error('❌ Error confirming pending order:', error);
     return null;
   }
 }

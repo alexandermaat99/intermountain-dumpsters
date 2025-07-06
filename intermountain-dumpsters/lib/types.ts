@@ -54,6 +54,7 @@ export type CheckoutData = {
     state: string;
     zip: string;
   };
+  cart?: any;
 };
 
 export type CheckoutStep = 'customer' | 'delivery' | 'insurance' | 'contract' | 'payment'; 

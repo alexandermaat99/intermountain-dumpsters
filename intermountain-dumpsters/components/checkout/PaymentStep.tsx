@@ -151,10 +151,11 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
         };
       }
 
-      // Save checkout data with billing address
+      // Save checkout data with billing address and cart
       const checkoutDataWithBilling = {
         ...checkoutData,
-        billing: showBillingAddress ? billingAddress : undefined
+        billing: showBillingAddress ? billingAddress : undefined,
+        cart: cart
       };
 
       const result = await createPendingOrder(checkoutDataWithBilling, taxInfo.total, customerAddress);

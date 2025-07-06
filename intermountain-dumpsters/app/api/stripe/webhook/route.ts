@@ -4,6 +4,7 @@ import { confirmPendingOrder } from '@/lib/checkout';
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('=== WEBHOOK RECEIVED ===');
     console.log('Webhook received at:', new Date().toISOString());
     
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -14,17 +15,21 @@ export async function POST(request: NextRequest) {
     const body = await request.text();
     const signature = request.headers.get('stripe-signature')!;
 
+    console.log('Webhook secret exists:', !!webhookSecret);
+    console.log('Signature exists:', !!signature);
+
     let event: Stripe.Event;
 
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-      console.log('Webhook signature verified successfully');
+      console.log('✅ Webhook signature verified successfully');
     } catch (err) {
-      console.error('Webhook signature verification failed:', err);
+      console.error('❌ Webhook signature verification failed:', err);
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
     console.log('Processing webhook event type:', event.type);
+    console.log('Event ID:', event.id);
 
     // Handle the event
     switch (event.type) {
@@ -32,27 +37,30 @@ export async function POST(request: NextRequest) {
         const session = event.data.object as Stripe.Checkout.Session;
         const pendingOrderId = parseInt(session.metadata?.pendingOrderId || '0');
         
-        console.log('Checkout session completed:', {
-          sessionId: session.id,
-          pendingOrderId: pendingOrderId,
-          paymentStatus: session.payment_status,
-          status: session.status
-        });
+        console.log('=== CHECKOUT SESSION COMPLETED ===');
+        console.log('Session ID:', session.id);
+        console.log('Pending Order ID:', pendingOrderId);
+        console.log('Payment Status:', session.payment_status);
+        console.log('Session Status:', session.status);
+        console.log('Session Metadata:', session.metadata);
         
         if (pendingOrderId) {
-          console.log('Attempting to confirm pending order:', pendingOrderId);
+          console.log('✅ Found pendingOrderId, attempting to confirm order:', pendingOrderId);
           try {
             const result = await confirmPendingOrder(pendingOrderId, session.id);
             if (result) {
-              console.log(`Payment completed and order confirmed for pending order ${pendingOrderId}`);
+              console.log('✅ Payment completed and order confirmed for pending order', pendingOrderId);
+              console.log('✅ Created rental with ID:', result.rental_id);
+              console.log('✅ Customer ID:', result.customer_id);
             } else {
-              console.error(`Failed to confirm pending order ${pendingOrderId} - confirmPendingOrder returned null`);
+              console.error('❌ Failed to confirm pending order', pendingOrderId, '- confirmPendingOrder returned null');
             }
           } catch (confirmError) {
-            console.error(`Error in confirmPendingOrder for pending order ${pendingOrderId}:`, confirmError);
+            console.error('❌ Error in confirmPendingOrder for pending order', pendingOrderId, ':', confirmError);
           }
         } else {
-          console.error('No pendingOrderId found in session metadata');
+          console.error('❌ No pendingOrderId found in session metadata');
+          console.log('Available metadata keys:', Object.keys(session.metadata || {}));
         }
         break;
 
@@ -90,9 +98,10 @@ export async function POST(request: NextRequest) {
         console.log(`Unhandled event type: ${event.type}`);
     }
 
+    console.log('=== WEBHOOK PROCESSING COMPLETE ===');
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('Webhook error:', error);
+    console.error('❌ Webhook error:', error);
     return NextResponse.json(
       { error: 'Webhook handler failed' },
       { status: 500 }
