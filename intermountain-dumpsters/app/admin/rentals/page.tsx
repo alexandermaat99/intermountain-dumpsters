@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/contexts/AuthContext';
 import AdminSidebar from '@/components/AdminSidebar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, User as UserIcon, Package, DollarSign, Truck } from 'lucide-react';
+import { Loader2, User as UserIcon, Package, DollarSign, Truck, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -64,6 +64,8 @@ export default function RentalsPage() {
   const { user, loading } = useAuth();
   const [rentals, setRentals] = useState<Rental[]>([]);
   const [rentalsLoading, setRentalsLoading] = useState(true);
+  const [deletingRentalId, setDeletingRentalId] = useState<number | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -158,6 +160,43 @@ export default function RentalsPage() {
     return diff;
   };
 
+  const handleDeleteRental = async (rentalId: number) => {
+    setDeletingRentalId(rentalId);
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        alert('Authentication required');
+        return;
+      }
+
+      const response = await fetch(`/api/admin/rentals/${rentalId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        alert(result.error || 'Failed to delete rental');
+        return;
+      }
+
+      // Remove the rental from the local state
+      setRentals(prev => prev.filter(rental => rental.id !== rentalId));
+      setShowDeleteConfirm(null);
+      
+    } catch (error) {
+      console.error('Error deleting rental:', error);
+      alert('Failed to delete rental. Please try again.');
+    } finally {
+      setDeletingRentalId(null);
+    }
+  };
+
   // Partition rentals into main and archived
   const mostRecentSunday = getMostRecentSunday();
   const mainRentals = rentals.filter(rental => {
@@ -246,12 +285,13 @@ export default function RentalsPage() {
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Customer</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Payment</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {mainRentals.length === 0 ? (
                         <tr>
-                          <td colSpan={7} className="text-center py-8 text-gray-500">No rentals found</td>
+                          <td colSpan={8} className="text-center py-8 text-gray-500">No rentals found</td>
                         </tr>
                       ) : (
                         mainRentals.map((rental) => (
@@ -301,6 +341,38 @@ export default function RentalsPage() {
                                 <div className="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 mt-1">Driveway Insurance</div>
                               )}
                             </td>
+                            {/* Actions */}
+                            <td className="px-4 py-4 align-top text-sm">
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    router.push(`/admin/rentals/${rental.id}`);
+                                  }}
+                                  className="text-xs"
+                                >
+                                  View
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowDeleteConfirm(rental.id);
+                                  }}
+                                  disabled={deletingRentalId === rental.id}
+                                  className="text-xs"
+                                >
+                                  {deletingRentalId === rental.id ? (
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                  ) : (
+                                    <Trash2 className="h-3 w-3" />
+                                  )}
+                                </Button>
+                              </div>
+                            </td>
                           </tr>
                         ))
                       )}
@@ -323,6 +395,7 @@ export default function RentalsPage() {
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Customer</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Payment</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
@@ -372,6 +445,38 @@ export default function RentalsPage() {
                               {rental.driveway_insurance && (
                                 <div className="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 mt-1">Driveway Insurance</div>
                               )}
+                            </td>
+                            {/* Actions */}
+                            <td className="px-4 py-4 align-top text-sm">
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    router.push(`/admin/rentals/${rental.id}`);
+                                  }}
+                                  className="text-xs"
+                                >
+                                  View
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowDeleteConfirm(rental.id);
+                                  }}
+                                  disabled={deletingRentalId === rental.id}
+                                  className="text-xs"
+                                >
+                                  {deletingRentalId === rental.id ? (
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                  ) : (
+                                    <Trash2 className="h-3 w-3" />
+                                  )}
+                                </Button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -612,6 +717,59 @@ export default function RentalsPage() {
           )}
         </div>
       </main>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <Trash2 className="h-5 w-5 text-red-600" />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Delete Rental</h3>
+                <p className="text-sm text-gray-600">This action cannot be undone.</p>
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-gray-700">
+                Are you sure you want to delete rental #{showDeleteConfirm}? This will permanently remove the rental record and all associated data.
+              </p>
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteConfirm(null)}
+                disabled={deletingRentalId === showDeleteConfirm}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => handleDeleteRental(showDeleteConfirm)}
+                disabled={deletingRentalId === showDeleteConfirm}
+                className="flex items-center gap-2"
+              >
+                {deletingRentalId === showDeleteConfirm ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4" />
+                    Delete Rental
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

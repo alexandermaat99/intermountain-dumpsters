@@ -56,7 +56,7 @@ export async function createPendingOrder(
         insurance_info: checkoutData.insurance,
         cart_info: {
           ...checkoutData.cart,
-          dumpster_type_id: checkoutData.cart?.dumpster_type_id,
+          dumpster_type_id: checkoutData.cart?.items && checkoutData.cart.items.length > 0 ? checkoutData.cart.items[0].id : undefined,
         }, // Store cart data including dumpster_type_id
         total_amount: taxInfo.total,
         tax_amount: taxInfo.taxAmount,
@@ -113,6 +113,88 @@ export async function createPendingOrder(
   }
 }
 
+// Utility function to find or create a customer with deduplication
+async function findOrCreateCustomer(customerInfo: CustomerInfo): Promise<{ id: number; isNew: boolean }> {
+  // Normalize email for consistent comparison
+  const normalizedEmail = customerInfo.email.toLowerCase().trim();
+  console.log('Looking up customer with normalized email:', normalizedEmail);
+
+  // First, try to find existing customer by exact email match
+  const { data: existingCustomer, error: customerLookupError } = await supabase
+    .from('customers')
+    .select('*')
+    .eq('email', normalizedEmail)
+    .single();
+
+  if (customerLookupError && customerLookupError.code !== 'PGRST116') {
+    console.error('❌ Error checking for existing customer:', customerLookupError);
+    throw new Error('Failed to check for existing customer');
+  }
+
+  if (existingCustomer) {
+    console.log('✅ Found existing customer by email:', existingCustomer.id);
+    console.log('Existing customer details:', {
+      id: existingCustomer.id,
+      name: `${existingCustomer.first_name} ${existingCustomer.last_name}`,
+      email: existingCustomer.email,
+      phone: existingCustomer.phone_number
+    });
+    return { id: existingCustomer.id, isNew: false };
+  }
+
+  // If no existing customer found, create a new one
+  console.log('Creating new customer...');
+  
+  // Prepare customer data with normalized email and trimmed fields
+  const newCustomerData = {
+    first_name: customerInfo.first_name.trim(),
+    last_name: customerInfo.last_name.trim(),
+    email: normalizedEmail,
+    phone_number: customerInfo.phone_number.trim(),
+    address_line_1: customerInfo.address_line_1.trim(),
+    address_line_2: customerInfo.address_line_2?.trim() || null,
+    city: customerInfo.city.trim(),
+    state: customerInfo.state.trim(),
+    zip: customerInfo.zip.trim(),
+    business: customerInfo.business
+  };
+
+  console.log('Inserting new customer with data:', newCustomerData);
+
+  const { data: newCustomer, error: customerError } = await supabase
+    .from('customers')
+    .insert(newCustomerData)
+    .select()
+    .single();
+
+  if (customerError) {
+    // If we get a unique constraint violation, try to fetch the existing customer again
+    if (customerError.code === '23505' && customerError.message.includes('email')) {
+      console.log('⚠️ Email already exists, fetching existing customer...');
+      
+      const { data: retryCustomer, error: retryError } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('email', normalizedEmail)
+        .single();
+
+      if (retryError) {
+        console.error('❌ Error fetching customer after constraint violation:', retryError);
+        throw new Error('Failed to retrieve existing customer after constraint violation');
+      }
+
+      console.log('✅ Successfully retrieved existing customer after constraint violation:', retryCustomer.id);
+      return { id: retryCustomer.id, isNew: false };
+    } else {
+      console.error('❌ Error saving new customer:', JSON.stringify(customerError, null, 2));
+      throw new Error('Failed to create new customer');
+    }
+  }
+
+  console.log('✅ Created new customer:', newCustomer.id);
+  return { id: newCustomer.id, isNew: true };
+}
+
 export async function confirmPendingOrder(pendingOrderId: number, stripeSessionId: string): Promise<SavedOrder | null> {
   try {
     console.log('=== CONFIRMING PENDING ORDER ===');
@@ -137,57 +219,18 @@ export async function confirmPendingOrder(pendingOrderId: number, stripeSessionI
 
     const customerToSave = pendingOrder.customer_info;
 
-    // Check for existing customer by email
-    let customerData = null;
-    
-    const { data: existingCustomer, error: customerLookupError } = await supabase
-      .from('customers')
-      .select('*')
-      .ilike('email', customerToSave.email.trim())
-      .single();
-
-    if (customerLookupError && customerLookupError.code !== 'PGRST116') {
-      console.error('❌ Error checking for existing customer:', customerLookupError);
-    } else if (existingCustomer) {
-      customerData = existingCustomer;
-      console.log('✅ Found existing customer by email:', customerData.id);
-    }
-
-    // If no existing customer found, create a new one
-    if (!customerData) {
-      console.log('Creating new customer...');
-      const { data: newCustomerData, error: customerError } = await supabase
-        .from('customers')
-        .insert({
-          first_name: customerToSave.first_name,
-          last_name: customerToSave.last_name,
-          email: customerToSave.email.toLowerCase().trim(),
-          phone_number: customerToSave.phone_number,
-          address_line_1: customerToSave.address_line_1,
-          address_line_2: customerToSave.address_line_2,
-          city: customerToSave.city,
-          state: customerToSave.state,
-          zip: customerToSave.zip,
-          business: customerToSave.business
-        })
-        .select()
-        .single();
-
-      if (customerError) {
-        console.error('❌ Error saving new customer:', JSON.stringify(customerError, null, 2));
-        return null;
-      }
-
-      customerData = newCustomerData;
-      console.log('✅ Created new customer:', customerData.id);
-    }
+    // Use the new utility function to find or create customer
+    const { id: customerId, isNew } = await findOrCreateCustomer(customerToSave);
+    console.log(`Customer ${isNew ? 'created' : 'found'}:`, customerId);
 
     // Extract ZIP code for database storage
     const zipCode = pendingOrder.delivery_info.delivery_address.match(/\b\d{5}\b/)?.[0] || '';
     console.log('Extracted ZIP code:', zipCode);
 
     // Get dumpster_type_id from cart_info
-    const dumpsterTypeId = pendingOrder.cart_info?.dumpster_type_id || 1;
+    const cartInfo = pendingOrder.cart_info as any;
+    const dumpsterTypeId = cartInfo?.dumpster_type_id || 
+                          (cartInfo?.items && cartInfo.items.length > 0 ? cartInfo.items[0].id : 1);
     console.log('Using dumpster_type_id:', dumpsterTypeId);
 
     console.log('Creating rental record...');
@@ -195,7 +238,7 @@ export async function confirmPendingOrder(pendingOrderId: number, stripeSessionI
     const { data: rentalResult, error: rentalError } = await supabase
       .from('rentals')
       .insert({
-        customer_id: customerData.id,
+        customer_id: customerId,
         dumpster_type_id: dumpsterTypeId,
         delivery_date_requested: pendingOrder.delivery_info.delivery_date,
         delivery_address: pendingOrder.delivery_info.delivery_address,
@@ -218,7 +261,7 @@ export async function confirmPendingOrder(pendingOrderId: number, stripeSessionI
     if (rentalError) {
       console.error('❌ Error saving rental:', rentalError);
       console.error('❌ Rental insert data:', {
-        customer_id: customerData.id,
+        customer_id: customerId,
         dumpster_type_id: dumpsterTypeId,
         delivery_date_requested: pendingOrder.delivery_info.delivery_date,
         delivery_address: pendingOrder.delivery_info.delivery_address,
@@ -256,7 +299,7 @@ export async function confirmPendingOrder(pendingOrderId: number, stripeSessionI
     console.log('✅ Successfully confirmed pending order:', pendingOrderId);
 
     return {
-      customer_id: customerData.id,
+      customer_id: customerId,
       rental_id: rentalResult.id,
       total_amount: pendingOrder.total_amount,
       tax_amount: pendingOrder.tax_amount,

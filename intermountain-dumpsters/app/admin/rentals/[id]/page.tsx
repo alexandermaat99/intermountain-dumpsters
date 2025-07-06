@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Loader2, Pencil, ArrowLeft, ShieldCheck, AlertTriangle, Clipboard, Check } from 'lucide-react';
+import { Loader2, Pencil, ArrowLeft, ShieldCheck, AlertTriangle, Clipboard, Check, Trash2 } from 'lucide-react';
 
 export default function RentalDetailPage() {
   const { id } = useParams();
@@ -40,6 +40,10 @@ export default function RentalDetailPage() {
 
   // Add state for copy feedback
   const [copied, setCopied] = useState(false);
+  
+  // Add state for delete functionality
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -261,6 +265,50 @@ export default function RentalDetailPage() {
     setSaving(false);
   };
 
+  // Delete rental handler
+  const handleDeleteRental = async () => {
+    setDeleting(true);
+    setError('');
+    setSuccess('');
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        setError('Authentication required');
+        return;
+      }
+
+      const response = await fetch(`/api/admin/rentals/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.error || 'Failed to delete rental');
+        return;
+      }
+
+      setSuccess('Rental deleted successfully!');
+      setShowDeleteConfirm(false);
+      
+      // Redirect back to rentals list after a short delay
+      setTimeout(() => {
+        router.push('/admin/rentals');
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Error deleting rental:', error);
+      setError('Failed to delete rental. Please try again.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -277,11 +325,22 @@ export default function RentalDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center p-2 sm:p-6">
       <div className="w-full max-w-xl">
-        <div className="flex items-center mb-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()} className="mr-2">
-            <ArrowLeft className="h-5 w-5" />
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <Button variant="ghost" size="icon" onClick={() => router.back()} className="mr-2">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <span className="font-semibold text-xl tracking-tight">Rental #{rental && (rental.id as React.ReactNode)}</span>
+          </div>
+          <Button 
+            variant="destructive" 
+            size="sm" 
+            onClick={() => setShowDeleteConfirm(true)}
+            className="flex items-center gap-2"
+          >
+            <Trash2 className="h-4 w-4" />
+            Delete Rental
           </Button>
-          <span className="font-semibold text-xl tracking-tight">Rental #{rental && (rental.id as React.ReactNode)}</span>
         </div>
         <Card className="shadow-xl rounded-2xl border border-gray-100">
           <CardHeader className="pb-2">
@@ -496,6 +555,59 @@ export default function RentalDetailPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <Trash2 className="h-5 w-5 text-red-600" />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Delete Rental</h3>
+                <p className="text-sm text-gray-600">This action cannot be undone.</p>
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-gray-700">
+                Are you sure you want to delete rental #{rental?.id as string}? This will permanently remove the rental record and all associated data.
+              </p>
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteRental}
+                disabled={deleting}
+                className="flex items-center gap-2"
+              >
+                {deleting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4" />
+                    Delete Rental
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
