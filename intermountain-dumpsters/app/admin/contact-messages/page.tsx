@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/lib/contexts/AuthContext';
-import { Mail, Phone, User, MessageSquare, Loader2 } from 'lucide-react';
+import { Mail, Phone, User, MessageSquare, Loader2, ChevronDown, ChevronRight } from 'lucide-react';
 import AdminSidebar from '@/components/AdminSidebar';
 
 interface ContactMessage {
@@ -27,6 +27,7 @@ export default function ContactMessagesPage() {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
+  const [showArchived, setShowArchived] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -120,6 +121,10 @@ export default function ContactMessagesPage() {
     return subjectMap[subject] || subject;
   };
 
+  // Separate messages into active and archived
+  const activeMessages = messages.filter(message => message.status !== 'archived');
+  const archivedMessages = messages.filter(message => message.status === 'archived');
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -195,7 +200,8 @@ export default function ContactMessagesPage() {
                     </div>
                   ) : (
                     <div className="divide-y">
-                      {messages.map((message) => (
+                      {/* Active Messages */}
+                      {activeMessages.map((message) => (
                         <div
                           key={message.id}
                           className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
@@ -217,6 +223,47 @@ export default function ContactMessagesPage() {
                           </div>
                         </div>
                       ))}
+                      
+                      {/* Archived Messages Section */}
+                      {archivedMessages.length > 0 && (
+                        <>
+                          <div className="p-4 border-t border-gray-200">
+                            <button
+                              onClick={() => setShowArchived(!showArchived)}
+                              className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors w-full"
+                            >
+                              {showArchived ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                              Archived Messages ({archivedMessages.length})
+                            </button>
+                          </div>
+                          {showArchived && (
+                            <div className="divide-y">
+                              {archivedMessages.map((message) => (
+                                <div
+                                  key={message.id}
+                                  className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
+                                    selectedMessage?.id === message.id ? 'bg-blue-50 border-r-2 border-blue-500' : ''
+                                  }`}
+                                  onClick={() => setSelectedMessage(message)}
+                                >
+                                  <div className="flex justify-between items-start mb-2">
+                                    <div className="font-medium">
+                                      {message.first_name} {message.last_name}
+                                    </div>
+                                    {getStatusBadge(message.status)}
+                                  </div>
+                                  <div className="text-sm text-gray-600 mb-1">
+                                    {getSubjectLabel(message.subject)}
+                                  </div>
+                                  <div className="text-xs text-gray-500">
+                                    {formatDate(message.created_at)}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </>
+                      )}
                     </div>
                   )}
                 </CardContent>
