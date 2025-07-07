@@ -437,13 +437,21 @@ export default function RentalsPage() {
                 ) : (
                   mainRentals.map((rental) => (
                     <Link href={`/admin/rentals/${rental.id}`} key={rental.id} className="hover:shadow-lg transition-shadow w-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded block">
-                      <Card className="w-full">
+                      <Card className={`w-full ${rental.emergency_delivery ? 'bg-red-50 border-l-4 border-l-red-500' : ''}`}>
                         <CardContent className="p-4">
                           <div className="flex flex-col gap-2 mb-4">
                             <div>
-                              <h3 className="text-lg font-semibold text-gray-900">
-                                {formatDate(rental.delivery_date_requested)}
-                              </h3>
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="text-lg font-semibold text-gray-900">
+                                  {formatDate(rental.delivery_date_requested)}
+                                </h3>
+                                {rental.emergency_delivery && (
+                                  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-bold animate-pulse">
+                                    <AlertTriangle className="h-3 w-3" />
+                                    EMERGENCY
+                                  </div>
+                                )}
+                              </div>
                               <span className="inline-block text-xs font-semibold text-green-700 bg-green-50 rounded px-2 py-0.5 mt-1 mb-1">
                                 {getDaysUntil(rental.delivery_date_requested)} days until
                               </span>
@@ -545,13 +553,21 @@ export default function RentalsPage() {
                     <h2 className="text-lg font-bold mb-2 text-gray-700">Archived Orders</h2>
                     {archivedRentals.map((rental) => (
                       <Link href={`/admin/rentals/${rental.id}`} key={rental.id} className="hover:shadow-lg transition-shadow w-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded block">
-                        <Card className="w-full">
+                        <Card className={`w-full ${rental.emergency_delivery ? 'bg-red-50 border-l-4 border-l-red-500' : ''}`}>
                           <CardContent className="p-4">
                             <div className="flex flex-col gap-2 mb-4">
                               <div>
-                                <h3 className="text-lg font-semibold text-gray-900">
-                                  {formatDate(rental.delivery_date_requested)}
-                                </h3>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h3 className="text-lg font-semibold text-gray-900">
+                                    {formatDate(rental.delivery_date_requested)}
+                                  </h3>
+                                  {rental.emergency_delivery && (
+                                    <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-bold animate-pulse">
+                                      <AlertTriangle className="h-3 w-3" />
+                                      EMERGENCY
+                                    </div>
+                                  )}
+                                </div>
                                 <span className="inline-block text-xs font-semibold text-green-700 bg-green-50 rounded px-2 py-0.5 mt-1 mb-1">
                                   {getDaysUntil(rental.delivery_date_requested)} days until
                                 </span>
