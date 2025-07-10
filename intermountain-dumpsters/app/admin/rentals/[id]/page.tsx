@@ -311,8 +311,20 @@ export default function RentalDetailPage() {
         throw new Error(result.error || 'Failed to create follow-up charge');
       }
 
-      setFollowUpChargeSuccess(`Follow-up charge of $${amount.toFixed(2)} created successfully!`);
-      setFollowUpChargeAmount('');
+      if (result.success) {
+        // Payment was automatically processed
+        setFollowUpChargeSuccess(`Follow-up charge of $${amount.toFixed(2)} processed successfully!`);
+        setFollowUpChargeAmount('');
+      } else if (result.requiresCustomerAction) {
+        // Customer needs to provide payment method
+        setFollowUpChargeSuccess(`Follow-up charge of $${amount.toFixed(2)} created. Customer needs to provide payment method to complete the charge.`);
+        setFollowUpChargeAmount('');
+      } else {
+        // Unexpected response
+        setFollowUpChargeSuccess(`Follow-up charge of $${amount.toFixed(2)} created successfully!`);
+        setFollowUpChargeAmount('');
+      }
+      
       fetchRental(); // Refresh rental data to show updated status
     } catch (error) {
       console.error('Error creating follow-up charge:', error);
@@ -577,7 +589,9 @@ export default function RentalDetailPage() {
                         ? 'bg-green-100 text-green-800' 
                         : rental.follow_up_charge_status === 'failed'
                         ? 'bg-red-100 text-red-800'
-                        : 'bg-yellow-100 text-yellow-800'
+                        : rental.follow_up_charge_status === 'pending'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-gray-100 text-gray-800'
                     }`}>
                       {rental.follow_up_charge_status === 'completed' ? 'Completed' :
                        rental.follow_up_charge_status === 'failed' ? 'Failed' :

@@ -9,6 +9,12 @@ The follow-up charge system allows admins to charge customers additional fees af
 - Daily rental fees (per day the dumpster was on site)
 - Additional service fees
 
+### **Key Features:**
+- ✅ **Automatic Charging**: No customer action required for follow-up charges
+- ✅ **Saved Payment Methods**: Customer payment info securely stored by Stripe
+- ✅ **Customer Consent**: Clear opt-in for saving payment information
+- ✅ **Secure Processing**: All charges go through Stripe's secure infrastructure
+
 ## Database Schema
 
 The following fields are already present in your `rentals` table:
@@ -40,7 +46,7 @@ ALTER TABLE admin_info ADD COLUMN IF NOT EXISTS day_rate numeric DEFAULT 20.00;
    - `checkout.session.completed`
    - `checkout.session.expired`
    - `payment_intent.payment_failed`
-   - `payment_intent.succeeded` ← **NEW EVENT**
+   - `payment_intent.succeeded`
 
 ## How It Works
 
@@ -52,8 +58,10 @@ ALTER TABLE admin_info ADD COLUMN IF NOT EXISTS day_rate numeric DEFAULT 20.00;
 
 ### 2. Automatic Payment Processing
 - Stripe automatically attempts to charge the customer's saved payment method
+- Uses the default payment method saved during initial checkout
 - If successful: Webhook updates rental status to "completed"
 - If failed: Webhook updates rental status to "failed"
+- **No customer action required** - charges happen automatically
 
 ### 3. Status Tracking
 - **Pending**: Charge created, payment processing

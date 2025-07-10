@@ -33,36 +33,6 @@ export async function POST(request: NextRequest) {
 
     // Handle the event
     switch (event.type) {
-      case 'checkout.session.completed':
-        const session = event.data.object as Stripe.Checkout.Session;
-        const pendingOrderId = parseInt(session.metadata?.pendingOrderId || '0');
-        
-        console.log('=== CHECKOUT SESSION COMPLETED ===');
-        console.log('Session ID:', session.id);
-        console.log('Pending Order ID:', pendingOrderId);
-        console.log('Payment Status:', session.payment_status);
-        console.log('Session Status:', session.status);
-        console.log('Session Metadata:', session.metadata);
-        
-        if (pendingOrderId) {
-          console.log('✅ Found pendingOrderId, attempting to confirm order:', pendingOrderId);
-          try {
-            const result = await confirmPendingOrder(pendingOrderId, session.id);
-            if (result) {
-              console.log('✅ Payment completed and order confirmed for pending order', pendingOrderId);
-              console.log('✅ Created rental with ID:', result.rental_id);
-              console.log('✅ Customer ID:', result.customer_id);
-            } else {
-              console.error('❌ Failed to confirm pending order', pendingOrderId, '- confirmPendingOrder returned null');
-            }
-          } catch (confirmError) {
-            console.error('❌ Error in confirmPendingOrder for pending order', pendingOrderId, ':', confirmError);
-          }
-        } else {
-          console.error('❌ No pendingOrderId found in session metadata');
-          console.log('Available metadata keys:', Object.keys(session.metadata || {}));
-        }
-        break;
 
       case 'checkout.session.expired':
         const expiredSession = event.data.object as Stripe.Checkout.Session;
@@ -137,6 +107,60 @@ export async function POST(request: NextRequest) {
               console.log(`Updated rental ${rentalId} follow-up charge status to completed`);
             }
           }
+        }
+        break;
+
+      case 'setup_intent.succeeded':
+        const setupIntent = event.data.object as Stripe.SetupIntent;
+        console.log('Setup intent succeeded:', setupIntent.id);
+        console.log('Customer ID:', setupIntent.customer);
+        console.log('Payment method ID:', setupIntent.payment_method);
+        
+        // Payment method was successfully saved to customer
+        if (setupIntent.customer && setupIntent.payment_method) {
+          console.log('✅ Payment method saved for customer:', setupIntent.customer);
+        }
+        break;
+
+      case 'setup_intent.setup_failed':
+        const failedSetupIntent = event.data.object as Stripe.SetupIntent;
+        console.log('Setup intent failed:', failedSetupIntent.id);
+        console.log('Failure reason:', failedSetupIntent.last_setup_error);
+        break;
+
+      case 'checkout.session.completed':
+        const session = event.data.object as Stripe.Checkout.Session;
+        const pendingOrderId = parseInt(session.metadata?.pendingOrderId || '0');
+        
+        console.log('=== CHECKOUT SESSION COMPLETED ===');
+        console.log('Session ID:', session.id);
+        console.log('Pending Order ID:', pendingOrderId);
+        console.log('Payment Status:', session.payment_status);
+        console.log('Session Status:', session.status);
+        console.log('Session Metadata:', session.metadata);
+        
+        if (pendingOrderId) {
+          console.log('✅ Found pendingOrderId, attempting to confirm order:', pendingOrderId);
+          try {
+            const result = await confirmPendingOrder(pendingOrderId, session.id);
+            if (result) {
+              console.log('✅ Payment completed and order confirmed for pending order', pendingOrderId);
+              console.log('✅ Created rental with ID:', result.rental_id);
+              console.log('✅ Customer ID:', result.customer_id);
+              
+              // If payment method was collected, it's automatically saved to the customer
+              if (session.payment_method_collection === 'always') {
+                console.log('✅ Payment method saved for future use');
+              }
+            } else {
+              console.error('❌ Failed to confirm pending order', pendingOrderId, '- confirmPendingOrder returned null');
+            }
+          } catch (confirmError) {
+            console.error('❌ Error in confirmPendingOrder for pending order', pendingOrderId, ':', confirmError);
+          }
+        } else {
+          console.error('❌ No pendingOrderId found in session metadata');
+          console.log('Available metadata keys:', Object.keys(session.metadata || {}));
         }
         break;
 
