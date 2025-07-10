@@ -21,11 +21,20 @@ export const metadata: Metadata = {
     title: "Contact Us | Intermountain Dumpsters",
     description: "Contact Intermountain Dumpsters for residential and commercial dumpster rental services. Get in touch for quotes, questions, or booking assistance.",
     type: "website",
+    images: [
+      {
+        url: "/hero_image_v2.png",
+        width: 1200,
+        height: 630,
+        alt: "Intermountain Dumpsters - Professional Dumpster Rental Services",
+      },
+    ],
   },
   twitter: {
     card: "summary",
     title: "Contact Us | Intermountain Dumpsters",
     description: "Contact Intermountain Dumpsters for residential and commercial dumpster rental services.",
+    images: ["/hero_image_v2.png"],
   },
 };
 

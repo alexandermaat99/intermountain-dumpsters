@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     siteName: "Intermountain Dumpsters",
     images: [
       {
-        url: "/opengraph-image.png",
+        url: "/hero_image_v2.png",
         width: 1200,
         height: 630,
         alt: "Intermountain Dumpsters - Professional Dumpster Rental Services in Salt Lake City, Utah",
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Dumpster Rental Salt Lake City | Intermountain Dumpsters - Utah's #1 Dumpster Rental Company",
     description: "Get fast, reliable dumpster rental in Salt Lake City, Provo, Ogden & throughout Utah. Residential & commercial dumpster rentals with same-day delivery.",
-    images: ["/twitter-image.png"],
+    images: ["/hero_image_v2.png"],
   },
   alternates: {
     canonical: "https://intermountaindumpsters.com",

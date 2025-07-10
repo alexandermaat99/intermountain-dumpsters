@@ -15,6 +15,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Service Areas | Intermountain Dumpsters",
     description: "View our service areas for dumpster rental throughout the Intermountain region. Check if we serve your location and see our coverage map.",
+    images: [
+      {
+        url: "/hero_image_v2.png",
+        width: 1200,
+        height: 630,
+        alt: "Intermountain Dumpsters - Professional Dumpster Rental Services",
+      },
+    ],
   },
 };
 

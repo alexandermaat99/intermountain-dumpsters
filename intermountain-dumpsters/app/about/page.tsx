@@ -20,11 +20,20 @@ export const metadata: Metadata = {
     title: "About Us | Intermountain Dumpsters",
     description: "Learn about Intermountain Dumpsters - a locally owned and operated dumpster rental company serving Utah.",
     type: "website",
+    images: [
+      {
+        url: "/hero_image_v2.png",
+        width: 1200,
+        height: 630,
+        alt: "Intermountain Dumpsters - Professional Dumpster Rental Services",
+      },
+    ],
   },
   twitter: {
     card: "summary",
     title: "About Us | Intermountain Dumpsters",
     description: "Learn about Intermountain Dumpsters - a locally owned and operated dumpster rental company serving Utah.",
+    images: ["/hero_image_v2.png"],
   },
 };
 

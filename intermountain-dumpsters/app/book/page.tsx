@@ -16,6 +16,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Book Your Dumpster | Intermountain Dumpsters",
     description: "Browse and book residential and commercial dumpsters for your construction, renovation, or cleanup project. Fast delivery and competitive pricing.",
+    images: [
+      {
+        url: "/hero_image_v2.png",
+        width: 1200,
+        height: 630,
+        alt: "Intermountain Dumpsters - Professional Dumpster Rental Services",
+      },
+    ],
   },
 };
 
