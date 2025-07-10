@@ -90,8 +90,54 @@ export async function POST(request: NextRequest) {
         break;
 
       case 'payment_intent.payment_failed':
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        console.log('Payment failed:', paymentIntent.id);
+        const failedPaymentIntent = event.data.object as Stripe.PaymentIntent;
+        console.log('Payment failed:', failedPaymentIntent.id);
+        
+        // Handle follow-up charge payment failure
+        if (failedPaymentIntent.metadata?.charge_type === 'follow_up_charge') {
+          const rentalId = failedPaymentIntent.metadata?.rental_id;
+          if (rentalId) {
+            const { supabase } = await import('@/lib/supabaseClient');
+            const { error } = await supabase
+              .from('rentals')
+              .update({
+                follow_up_charge_status: 'failed',
+              })
+              .eq('id', rentalId);
+            
+            if (error) {
+              console.error('Error updating rental follow-up charge status:', error);
+            } else {
+              console.log(`Updated rental ${rentalId} follow-up charge status to failed`);
+            }
+          }
+        }
+        break;
+
+      case 'payment_intent.succeeded':
+        const succeededPaymentIntent = event.data.object as Stripe.PaymentIntent;
+        console.log('Payment succeeded:', succeededPaymentIntent.id);
+        
+        // Handle follow-up charge payment success
+        if (succeededPaymentIntent.metadata?.charge_type === 'follow_up_charge') {
+          const rentalId = succeededPaymentIntent.metadata?.rental_id;
+          if (rentalId) {
+            const { supabase } = await import('@/lib/supabaseClient');
+            const { error } = await supabase
+              .from('rentals')
+              .update({
+                follow_up_charge_status: 'completed',
+                follow_up_charge_completed_at: new Date().toISOString(),
+              })
+              .eq('id', rentalId);
+            
+            if (error) {
+              console.error('Error updating rental follow-up charge status:', error);
+            } else {
+              console.log(`Updated rental ${rentalId} follow-up charge status to completed`);
+            }
+          }
+        }
         break;
 
       default:
