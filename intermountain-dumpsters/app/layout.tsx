@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     siteName: "Intermountain Dumpsters",
     images: [
       {
-        url: "/hero_image.PNG",
+        url: "/hero_image_v2.png",
         width: 1200,
         height: 630,
         alt: "Intermountain Dumpsters - Professional Dumpster Rental Services",
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Intermountain Dumpsters - Residential & Commercial Dumpster Rental Services",
     description: "Reliable residential and commercial dumpster rental services for construction, renovation, and cleanup projects. Fast delivery, competitive pricing, and exceptional customer service.",
-    images: ["/hero_image.PNG"],
+    images: ["/hero_image_v2.png"],
     creator: "@intermountaindumpsters",
   },
   robots: {
