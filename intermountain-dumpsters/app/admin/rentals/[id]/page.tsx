@@ -19,7 +19,12 @@ export default function RentalDetailPage() {
     follow_up_charge_amount?: number;
     follow_up_charge_status?: string;
     follow_up_charge_date?: string;
-    [key: string]: any;
+    delivery_address?: string;
+    delivery_date_requested?: string;
+    cancelation_insurance?: boolean;
+    driveway_insurance?: boolean;
+    emergency_delivery?: boolean;
+    [key: string]: unknown;
   } | null>(null);
   const [saving, setSaving] = useState(false);
   const [availableDumpsters, setAvailableDumpsters] = useState<({ id: number; identification: string; dumpster_type_id: number; status?: 'assigned' | 'in_use' })[]>([]);
