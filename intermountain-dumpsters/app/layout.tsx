@@ -105,6 +105,18 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        {/* Organization Logo Structured Data for Google */}
+        <script type="application/ld+json">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "Intermountain Dumpsters",
+              "url": "https://intermountaindumpsters.com",
+              "logo": "https://intermountaindumpsters.com/GreenLogoIcon192.png"
+            }
+          `}
+        </script>
         {/* Google Tag Manager */}
         {process.env.NEXT_PUBLIC_GTM_ID && (
           <Script
