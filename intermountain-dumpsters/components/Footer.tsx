@@ -1,10 +1,12 @@
+'use client';
+
 import Link from "next/link";
-import { getContactInfo } from "@/lib/contact-info";
+import { useContactInfo } from "@/lib/hooks/useContactInfo";
 import { FooterThemeSwitcher } from "./FooterThemeSwitcher";
 
-export default async function Footer() {
-  const contactInfo = await getContactInfo();
-  
+export default function Footer() {
+  const { contactInfo, loading, error } = useContactInfo();
+
   return (
     <footer className="w-full border-t border-transparent bg-brand-green-dark text-white">
       <div className="max-w-7xl mx-auto px-5 py-12">
@@ -43,21 +45,29 @@ export default async function Footer() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Contact Info</h3>
             <div className="space-y-2 text-sm text-white/80">
-              <p>{contactInfo.address}</p>
-              <p>
-                <span className="font-semibold text-white">Phone:</span>{" "}
-                <a href={`tel:${contactInfo.phone.replace(/[^\d+]/g, "")}`} className="hover:underline">
-                  {contactInfo.phone}
-                </a>
-              </p>
-              <div className="text-sm">
-                <span className="font-semibold text-white">Hours:</span>
-                <div className="mt-1 space-y-1">
-                  <p>Mon-Fri: {contactInfo.business_hours.monday_friday}</p>
-                  <p>Sat: {contactInfo.business_hours.saturday}</p>
-                  <p>Sun: {contactInfo.business_hours.sunday}</p>
-                </div>
-              </div>
+              {loading ? (
+                <p>Loading contact info...</p>
+              ) : error ? (
+                <p className="text-red-400">Failed to load contact info.</p>
+              ) : (
+                <>
+                  <p>{contactInfo.address}</p>
+                  <p>
+                    <span className="font-semibold text-white">Phone:</span>{" "}
+                    <a href={`tel:${contactInfo.phone.replace(/[^\d+]/g, "")}`} className="hover:underline">
+                      {contactInfo.phone}
+                    </a>
+                  </p>
+                  <div className="text-sm">
+                    <span className="font-semibold text-white">Hours:</span>
+                    <div className="mt-1 space-y-1">
+                      <p>Mon-Fri: {contactInfo.business_hours.monday_friday}</p>
+                      <p>Sat: {contactInfo.business_hours.saturday}</p>
+                      <p>Sun: {contactInfo.business_hours.sunday}</p>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
