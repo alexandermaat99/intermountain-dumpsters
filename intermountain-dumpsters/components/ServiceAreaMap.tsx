@@ -199,7 +199,7 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
       initializedRef.current = false;
       setMapLoaded(false);
     };
-  }, [mounted, serviceAreas]);
+  }, [mounted, serviceAreas, selectedArea]);
 
   // Handle selected area changes - separate effect
   useEffect(() => {
@@ -294,7 +294,7 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
         }
       }
     }
-  }, [mounted, mapLoaded, selectedArea]);
+  }, [mounted, mapLoaded, selectedArea, serviceAreas]);
 
   return (
     <div className="w-full h-full relative">

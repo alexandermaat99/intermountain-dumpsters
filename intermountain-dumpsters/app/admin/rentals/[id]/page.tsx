@@ -14,7 +14,18 @@ export default function RentalDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [rental, setRental] = useState<Record<string, unknown> | null>(null);
+  const [rental, setRental] = useState<{
+    id: number;
+    follow_up_charge_amount?: number;
+    follow_up_charge_status?: string;
+    follow_up_charge_date?: string;
+    delivery_address?: string;
+    delivery_date_requested?: string;
+    cancelation_insurance?: boolean;
+    driveway_insurance?: boolean;
+    emergency_delivery?: boolean;
+    [key: string]: unknown;
+  } | null>(null);
   const [saving, setSaving] = useState(false);
   const [availableDumpsters, setAvailableDumpsters] = useState<({ id: number; identification: string; dumpster_type_id: number; status?: 'assigned' | 'in_use' })[]>([]);
   const [loadingDumpsters, setLoadingDumpsters] = useState(false);
@@ -37,6 +48,12 @@ export default function RentalDetailPage() {
     driveway_insurance: false,
     emergency_delivery: false,
   });
+
+  // Follow-up charge state
+  const [followUpChargeAmount, setFollowUpChargeAmount] = useState('');
+  const [followUpChargeLoading, setFollowUpChargeLoading] = useState(false);
+  const [followUpChargeError, setFollowUpChargeError] = useState('');
+  const [followUpChargeSuccess, setFollowUpChargeSuccess] = useState('');
 
   // Add state for copy feedback
   const [copied, setCopied] = useState(false);
@@ -259,6 +276,62 @@ export default function RentalDetailPage() {
       fetchRental();
     }
     setSaving(false);
+  };
+
+  // Follow-up charge handler
+  const handleFollowUpCharge = async () => {
+    if (!followUpChargeAmount || parseFloat(followUpChargeAmount) <= 0) {
+      setFollowUpChargeError('Please enter a valid amount');
+      return;
+    }
+
+    setFollowUpChargeLoading(true);
+    setFollowUpChargeError('');
+    setFollowUpChargeSuccess('');
+
+    try {
+      const amount = parseFloat(followUpChargeAmount);
+      const description = `Follow-up charge for rental #${id}`;
+
+      const response = await fetch('/api/stripe/post-rental-charge', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          rentalId: id,
+          amount: amount,
+          description: description,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to create follow-up charge');
+      }
+
+      if (result.success) {
+        // Payment was automatically processed
+        setFollowUpChargeSuccess(`Follow-up charge of $${amount.toFixed(2)} processed successfully!`);
+        setFollowUpChargeAmount('');
+      } else if (result.requiresCustomerAction) {
+        // Customer needs to provide payment method
+        setFollowUpChargeSuccess(`Follow-up charge of $${amount.toFixed(2)} created. Customer needs to provide payment method to complete the charge.`);
+        setFollowUpChargeAmount('');
+      } else {
+        // Unexpected response
+        setFollowUpChargeSuccess(`Follow-up charge of $${amount.toFixed(2)} created successfully!`);
+        setFollowUpChargeAmount('');
+      }
+      
+      fetchRental(); // Refresh rental data to show updated status
+    } catch (error) {
+      console.error('Error creating follow-up charge:', error);
+      setFollowUpChargeError(error instanceof Error ? error.message : 'Failed to create follow-up charge');
+    } finally {
+      setFollowUpChargeLoading(false);
+    }
   };
 
   if (loading) {
@@ -489,6 +562,82 @@ export default function RentalDetailPage() {
                     <Button size="sm" variant="outline" onClick={handleOtherInfoCancel}>
                       Cancel
                     </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* FOLLOW-UP CHARGE SECTION */}
+            <div className="bg-orange-50/60 border border-orange-100 rounded-xl p-5 shadow-sm">
+              <div className="mb-3">
+                <span className="font-semibold text-orange-900 text-lg">Follow-Up Charge</span>
+              </div>
+              
+              {/* Current follow-up charge status */}
+              {rental?.follow_up_charge_amount && (
+                <div className="mb-4 p-3 bg-white rounded-lg border border-orange-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-gray-700">Current Follow-Up Charge:</span>
+                    <span className="text-lg font-bold text-orange-700">
+                      ${(rental.follow_up_charge_amount as number).toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600">Status:</span>
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
+                      rental.follow_up_charge_status === 'completed' 
+                        ? 'bg-green-100 text-green-800' 
+                        : rental.follow_up_charge_status === 'failed'
+                        ? 'bg-red-100 text-red-800'
+                        : rental.follow_up_charge_status === 'pending'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {rental.follow_up_charge_status === 'completed' ? 'Completed' :
+                       rental.follow_up_charge_status === 'failed' ? 'Failed' :
+                       rental.follow_up_charge_status === 'pending' ? 'Pending' : 'Unknown'}
+                    </span>
+                  </div>
+                  {rental.follow_up_charge_date && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      Created: {new Date(rental.follow_up_charge_date as string).toLocaleDateString()}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Create new follow-up charge */}
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-semibold mb-1 text-gray-700">Charge Amount ($)</label>
+                  <Input
+                    type="number"
+                    value={followUpChargeAmount}
+                    onChange={(e) => setFollowUpChargeAmount(e.target.value)}
+                    placeholder="0.00"
+                    min="0"
+                    step="0.01"
+                    className="max-w-xs"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={handleFollowUpCharge} 
+                    disabled={followUpChargeLoading || !followUpChargeAmount}
+                    className="bg-orange-600 hover:bg-orange-700 text-white font-semibold shadow"
+                  >
+                    {followUpChargeLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                    Create Follow-Up Charge
+                  </Button>
+                </div>
+                {followUpChargeError && (
+                  <div className="text-red-600 text-sm bg-red-50 p-2 rounded border border-red-200">
+                    {followUpChargeError}
+                  </div>
+                )}
+                {followUpChargeSuccess && (
+                  <div className="text-green-600 text-sm bg-green-50 p-2 rounded border border-green-200">
+                    {followUpChargeSuccess}
                   </div>
                 )}
               </div>

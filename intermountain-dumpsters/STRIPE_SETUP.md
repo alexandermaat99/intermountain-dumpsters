@@ -30,6 +30,7 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
    - `checkout.session.completed`
    - `checkout.session.expired`
    - `payment_intent.payment_failed`
+   - `payment_intent.succeeded`
 4. Copy the webhook signing secret to your environment variables
 
 ## 4. Testing
@@ -60,11 +61,13 @@ Use these test card numbers for testing:
 - ✅ Success/failure page handling
 - ✅ Database integration for order tracking
 - ✅ Customer address handling (billing vs delivery)
+- ✅ Follow-up charges for post-rental fees
 
 ## 7. API Endpoints
 
 - `POST /api/stripe/create-checkout-session` - Creates Stripe checkout session
 - `POST /api/stripe/webhook` - Handles Stripe webhook events
+- `POST /api/stripe/post-rental-charge` - Creates follow-up charges for rentals
 
 ## 8. Database Updates
 

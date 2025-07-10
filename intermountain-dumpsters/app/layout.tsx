@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     siteName: "Intermountain Dumpsters",
     images: [
       {
-        url: "/opengraph-image.png",
+        url: "/hero_image.PNG",
         width: 1200,
         height: 630,
         alt: "Intermountain Dumpsters - Professional Dumpster Rental Services",
@@ -60,9 +60,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-  title: "Intermountain Dumpsters - Residential & Commercial Dumpster Rental Services",
-  description: "Reliable residential and commercial dumpster rental services for construction, renovation, and cleanup projects. Fast delivery, competitive pricing, and exceptional customer service.",
-    images: ["/twitter-image.png"],
+    title: "Intermountain Dumpsters - Residential & Commercial Dumpster Rental Services",
+    description: "Reliable residential and commercial dumpster rental services for construction, renovation, and cleanup projects. Fast delivery, competitive pricing, and exceptional customer service.",
+    images: ["/hero_image.PNG"],
     creator: "@intermountaindumpsters",
   },
   robots: {
@@ -105,6 +105,18 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        {/* Organization Logo Structured Data for Google */}
+        <script type="application/ld+json">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "Intermountain Dumpsters",
+              "url": "https://intermountaindumpsters.com",
+              "logo": "https://intermountaindumpsters.com/GreenLogoIcon192.png"
+            }
+          `}
+        </script>
         {/* Google Tag Manager */}
         {process.env.NEXT_PUBLIC_GTM_ID && (
           <Script
