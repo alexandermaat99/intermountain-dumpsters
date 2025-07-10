@@ -117,6 +117,10 @@ export default function RootLayout({
             }
           `}
         </script>
+        {/* Facebook App ID for Open Graph */}
+        {process.env.NEXT_PUBLIC_FACEBOOK_APP_ID && (
+          <meta property="fb:app_id" content={process.env.NEXT_PUBLIC_FACEBOOK_APP_ID} />
+        )}
         {/* Google Tag Manager */}
         {process.env.NEXT_PUBLIC_GTM_ID && (
           <Script

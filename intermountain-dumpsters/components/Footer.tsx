@@ -22,6 +22,8 @@ export default function Footer() {
             </p>
           </div>
 
+          {/* idek */}
+
           {/* Quick Links */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Quick Links</h3>
