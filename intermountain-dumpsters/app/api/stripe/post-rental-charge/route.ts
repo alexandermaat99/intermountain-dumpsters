@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create a payment intent for the follow-up charge
-    const paymentIntentData: any = {
+    const paymentIntentData: Stripe.PaymentIntentCreateParams = {
       amount: Math.round(amount * 100), // Convert to cents
       currency: 'usd',
       customer: rental.customer.stripe_customer_id,
