@@ -135,6 +135,22 @@ export async function confirmPendingOrder(pendingOrderId: number, stripeSessionI
     console.log('✅ Successfully fetched pending order');
     console.log('Pending order data:', JSON.stringify(pendingOrder, null, 2));
 
+    // Get Stripe customer ID from session metadata
+    let stripeCustomerId = null;
+    try {
+      const stripe = new (await import('stripe')).default(process.env.STRIPE_SECRET_KEY!, {
+        apiVersion: '2025-05-28.basil',
+      });
+      
+      const session = await stripe.checkout.sessions.retrieve(stripeSessionId);
+      stripeCustomerId = session.customer as string;
+      
+      console.log('✅ Retrieved Stripe customer ID:', stripeCustomerId);
+    } catch (error) {
+      console.error('❌ Error retrieving Stripe session:', error);
+      // Continue without Stripe customer ID - will use email-based lookup
+    }
+
     const customerToSave = pendingOrder.customer_info;
 
     // Check for existing customer by email
@@ -168,7 +184,8 @@ export async function confirmPendingOrder(pendingOrderId: number, stripeSessionI
           city: customerToSave.city,
           state: customerToSave.state,
           zip: customerToSave.zip,
-          business: customerToSave.business
+          business: customerToSave.business,
+          stripe_customer_id: stripeCustomerId
         })
         .select()
         .single();
@@ -180,6 +197,20 @@ export async function confirmPendingOrder(pendingOrderId: number, stripeSessionI
 
       customerData = newCustomerData;
       console.log('✅ Created new customer:', customerData.id);
+    } else if (stripeCustomerId && !customerData.stripe_customer_id) {
+      // Update existing customer with Stripe customer ID if they don't have one
+      console.log('Updating existing customer with Stripe customer ID...');
+      const { error: updateError } = await supabase
+        .from('customers')
+        .update({ stripe_customer_id: stripeCustomerId })
+        .eq('id', customerData.id);
+
+      if (updateError) {
+        console.error('❌ Error updating customer with Stripe ID:', updateError);
+      } else {
+        console.log('✅ Updated existing customer with Stripe customer ID');
+        customerData.stripe_customer_id = stripeCustomerId;
+      }
     }
 
     // Extract ZIP code for database storage

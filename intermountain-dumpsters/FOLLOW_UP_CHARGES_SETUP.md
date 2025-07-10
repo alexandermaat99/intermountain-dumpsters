@@ -108,6 +108,11 @@ Check your Stripe Dashboard → Developers → Webhooks → Recent deliveries to
 1. **"Customer has no Stripe customer ID"**
    - Make sure customers have `stripe_customer_id` values
    - This is set when they complete their first checkout
+   - **For existing customers without Stripe IDs, run:**
+     ```bash
+     node scripts/update-stripe-customer-ids.js
+     ```
+   - This script will look up existing customers in Stripe by email and update their records
 
 2. **Webhook not receiving events**
    - Verify webhook endpoint URL is correct

@@ -17,6 +17,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if customer already exists in Stripe
+    let stripeCustomerId = null;
+    try {
+      const existingCustomers = await stripe.customers.list({
+        email: customerEmail,
+        limit: 1,
+      });
+      
+      if (existingCustomers.data.length > 0) {
+        stripeCustomerId = existingCustomers.data[0].id;
+      } else {
+        // Create new Stripe customer
+        const customer = await stripe.customers.create({
+          email: customerEmail,
+          name: customerName,
+          metadata: {
+            pendingOrderId: pendingOrderId.toString(),
+          },
+        });
+        stripeCustomerId = customer.id;
+      }
+    } catch (error) {
+      console.error('Error handling Stripe customer:', error);
+      // Fall back to customer_email if customer creation fails
+    }
+
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -36,12 +62,13 @@ export async function POST(request: NextRequest) {
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cart`,
-      customer_email: customerEmail,
+      ...(stripeCustomerId ? { customer: stripeCustomerId } : { customer_email: customerEmail }),
       metadata: {
         pendingOrderId: pendingOrderId.toString(),
         customerName,
         deliveryAddress,
         deliveryDate,
+        stripeCustomerId: stripeCustomerId || '',
       },
     });
 
