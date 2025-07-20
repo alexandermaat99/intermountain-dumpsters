@@ -131,3 +131,6 @@ jspm_packages/
 # Temporary folders
 tmp/
 temp/
+
+# Documentation folder
+/docs
