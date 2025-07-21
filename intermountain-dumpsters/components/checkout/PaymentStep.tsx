@@ -32,7 +32,6 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
   });
   const [billingErrors, setBillingErrors] = useState<{[key: string]: string}>({});
   const [taxInfo, setTaxInfo] = useState<TaxInfo | null>(null);
-  const [savePaymentInfo, setSavePaymentInfo] = useState(true);
 
   // Initialize billing address from checkoutData if it exists
   useEffect(() => {
@@ -423,21 +422,13 @@ export default function PaymentStep({ checkoutData, cart, insuranceTotal, total,
       <Card className="bg-blue-50 border-blue-200">
         <CardContent className="pt-6">
           <div className="flex items-start space-x-3">
-            <input
-              type="checkbox"
-              id="save_payment_info"
-              checked={savePaymentInfo}
-              onChange={(e) => setSavePaymentInfo(e.target.checked)}
-              className="mt-1 rounded"
-            />
             <div className="flex-1">
-              <Label htmlFor="save_payment_info" className="text-sm font-medium text-blue-900">
-                Save payment information for future charges
-              </Label>
-              <p className="text-xs text-blue-700 mt-1">
-                By checking this box, you authorize us to save your payment method for future charges related to this rental, 
-                such as weight-based fees or additional days. Your payment information is securely stored by Stripe and will 
-                only be used for charges you approve. You can remove this authorization at any time by contacting us.
+              <h4 className="text-sm font-medium text-blue-900 mb-2">
+                Follow-Up Charges
+              </h4>
+              <p className="text-xs text-blue-700">
+                After your rental period, you may receive an invoice for additional charges such as weight-based fees or extra days. 
+                These invoices will be sent via email and can be paid securely online.
               </p>
             </div>
           </div>

@@ -59,38 +59,17 @@ export async function POST(request: NextRequest) {
         }
         break;
 
-      case 'payment_intent.payment_failed':
-        const failedPaymentIntent = event.data.object as Stripe.PaymentIntent;
-        console.log('Payment failed:', failedPaymentIntent.id);
-        
-        // Handle follow-up charge payment failure
-        if (failedPaymentIntent.metadata?.charge_type === 'follow_up_charge') {
-          const rentalId = failedPaymentIntent.metadata?.rental_id;
-          if (rentalId) {
-            const { supabase } = await import('@/lib/supabaseClient');
-            const { error } = await supabase
-              .from('rentals')
-              .update({
-                follow_up_charge_status: 'failed',
-              })
-              .eq('id', rentalId);
-            
-            if (error) {
-              console.error('Error updating rental follow-up charge status:', error);
-            } else {
-              console.log(`Updated rental ${rentalId} follow-up charge status to failed`);
-            }
-          }
-        }
-        break;
 
-      case 'payment_intent.succeeded':
-        const succeededPaymentIntent = event.data.object as Stripe.PaymentIntent;
-        console.log('Payment succeeded:', succeededPaymentIntent.id);
+
+
+
+      case 'invoice.payment_succeeded':
+        const paidInvoice = event.data.object as Stripe.Invoice;
+        console.log('Invoice payment succeeded:', paidInvoice.id);
         
-        // Handle follow-up charge payment success
-        if (succeededPaymentIntent.metadata?.charge_type === 'follow_up_charge') {
-          const rentalId = succeededPaymentIntent.metadata?.rental_id;
+        // Handle follow-up charge invoice payment success
+        if (paidInvoice.metadata?.charge_type === 'follow_up_charge') {
+          const rentalId = paidInvoice.metadata?.rental_id;
           if (rentalId) {
             const { supabase } = await import('@/lib/supabaseClient');
             const { error } = await supabase
@@ -110,22 +89,29 @@ export async function POST(request: NextRequest) {
         }
         break;
 
-      case 'setup_intent.succeeded':
-        const setupIntent = event.data.object as Stripe.SetupIntent;
-        console.log('Setup intent succeeded:', setupIntent.id);
-        console.log('Customer ID:', setupIntent.customer);
-        console.log('Payment method ID:', setupIntent.payment_method);
+      case 'invoice.payment_failed':
+        const failedInvoice = event.data.object as Stripe.Invoice;
+        console.log('Invoice payment failed:', failedInvoice.id);
         
-        // Payment method was successfully saved to customer
-        if (setupIntent.customer && setupIntent.payment_method) {
-          console.log('✅ Payment method saved for customer:', setupIntent.customer);
+        // Handle follow-up charge invoice payment failure
+        if (failedInvoice.metadata?.charge_type === 'follow_up_charge') {
+          const rentalId = failedInvoice.metadata?.rental_id;
+          if (rentalId) {
+            const { supabase } = await import('@/lib/supabaseClient');
+            const { error } = await supabase
+              .from('rentals')
+              .update({
+                follow_up_charge_status: 'failed',
+              })
+              .eq('id', rentalId);
+            
+            if (error) {
+              console.error('Error updating rental follow-up charge status:', error);
+            } else {
+              console.log(`Updated rental ${rentalId} follow-up charge status to failed`);
+            }
+          }
         }
-        break;
-
-      case 'setup_intent.setup_failed':
-        const failedSetupIntent = event.data.object as Stripe.SetupIntent;
-        console.log('Setup intent failed:', failedSetupIntent.id);
-        console.log('Failure reason:', failedSetupIntent.last_setup_error);
         break;
 
       case 'checkout.session.completed':
