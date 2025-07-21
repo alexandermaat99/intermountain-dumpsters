@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
               name: 'Dumpster Rental',
               description: `Delivery to: ${deliveryAddress} on ${deliveryDate}`,
             },
-            unit_amount: Math.round(amount * 100), // Convert to cents
+            unit_amount: Math.round(amount * 100), // This should include your calculated tax
           },
           quantity: 1,
         },
@@ -88,10 +88,8 @@ export async function POST(request: NextRequest) {
         deliveryDate,
         stripeCustomerId: stripeCustomerId || '',
       },
-      // Enable automatic email receipts
       payment_method_collection: 'always',
-      // This automatically sends a receipt email when payment is successful
-      automatic_tax: { enabled: true },
+      // Removed automatic_tax and invoice_creation
     });
 
     console.log('✅ Checkout session created successfully:', session.id);
