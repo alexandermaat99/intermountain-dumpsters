@@ -88,6 +88,19 @@ export async function POST(request: NextRequest) {
         deliveryDate,
         stripeCustomerId: stripeCustomerId || '',
       },
+      // Enable automatic email receipts
+      payment_method_collection: 'always',
+      invoice_creation: {
+        enabled: true,
+        invoice_data: {
+          description: `Dumpster Rental - Delivery to: ${deliveryAddress} on ${deliveryDate}`,
+          metadata: {
+            type: 'initial_payment',
+            delivery_address: deliveryAddress,
+            delivery_date: deliveryDate,
+          },
+        },
+      },
     });
 
     console.log('✅ Checkout session created successfully:', session.id);

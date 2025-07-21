@@ -87,6 +87,11 @@ export async function POST(request: NextRequest) {
             }
           }
         }
+        
+        // Handle payment confirmation invoice (these are already paid)
+        if (paidInvoice.metadata?.charge_type === 'payment_confirmation') {
+          console.log('✅ Payment confirmation invoice processed successfully');
+        }
         break;
 
       case 'invoice.payment_failed':
@@ -138,6 +143,47 @@ export async function POST(request: NextRequest) {
               if (session.payment_method_collection === 'always') {
                 console.log('✅ Payment method saved for future use');
               }
+              
+              // Send payment confirmation email
+              try {
+                const { sendPaymentConfirmationEmail } = await import('@/lib/email-service');
+                
+                // Get rental details for email
+                const { supabase } = await import('@/lib/supabaseClient');
+                const { data: rental, error: rentalError } = await supabase
+                  .from('rentals')
+                  .select(`
+                    *,
+                    customer:customers(email, first_name, last_name, stripe_customer_id),
+                    dumpster_type:dumpster_types(name)
+                  `)
+                  .eq('id', result.rental_id)
+                  .single();
+                
+                if (!rentalError && rental) {
+                  const emailData = {
+                    customerEmail: rental.customer.email,
+                    customerName: `${rental.customer.first_name} ${rental.customer.last_name}`,
+                    rentalId: result.rental_id,
+                    totalAmount: result.total_amount,
+                    deliveryDate: rental.delivery_date_requested,
+                    deliveryAddress: rental.delivery_address,
+                    dumpsterType: rental.dumpster_type?.name || 'Dumpster',
+                    stripeCustomerId: rental.customer.stripe_customer_id
+                  };
+                  
+                  const emailSent = await sendPaymentConfirmationEmail(emailData);
+                  if (emailSent) {
+                    console.log('✅ Payment confirmation email sent successfully');
+                  } else {
+                    console.log('⚠️ Failed to send payment confirmation email');
+                  }
+                } else {
+                  console.error('❌ Error fetching rental details for email:', rentalError);
+                }
+              } catch (emailError) {
+                console.error('❌ Error sending confirmation email:', emailError);
+              }
             } else {
               console.error('❌ Failed to confirm pending order', pendingOrderId, '- confirmPendingOrder returned null');
             }
@@ -147,6 +193,30 @@ export async function POST(request: NextRequest) {
         } else {
           console.error('❌ No pendingOrderId found in session metadata');
           console.log('Available metadata keys:', Object.keys(session.metadata || {}));
+        }
+        break;
+
+      case 'invoice.sent':
+        const sentInvoice = event.data.object as Stripe.Invoice;
+        console.log('Invoice sent:', sentInvoice.id);
+        
+        // Log confirmation emails being sent
+        if (sentInvoice.metadata?.charge_type === 'payment_confirmation') {
+          console.log('✅ Payment confirmation email delivered to customer');
+        } else if (sentInvoice.metadata?.charge_type === 'order_confirmation') {
+          console.log('✅ Order confirmation email delivered to customer');
+        } else if (sentInvoice.metadata?.type === 'initial_payment') {
+          console.log('✅ Initial payment receipt email delivered to customer');
+        }
+        break;
+
+      case 'invoice.created':
+        const createdInvoice = event.data.object as Stripe.Invoice;
+        console.log('Invoice created:', createdInvoice.id);
+        
+        // Log initial payment invoice creation
+        if (createdInvoice.metadata?.type === 'initial_payment') {
+          console.log('✅ Initial payment invoice created for checkout session');
         }
         break;
 

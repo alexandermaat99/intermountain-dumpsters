@@ -24,6 +24,13 @@ export default function RentalDetailPage() {
     cancelation_insurance?: boolean;
     driveway_insurance?: boolean;
     emergency_delivery?: boolean;
+    customer?: {
+      id: number;
+      email: string;
+      first_name: string;
+      last_name: string;
+      stripe_customer_id?: string;
+    };
     [key: string]: unknown;
   } | null>(null);
   const [saving, setSaving] = useState(false);
@@ -57,6 +64,7 @@ export default function RentalDetailPage() {
   
   // Test email state
   const [testEmailLoading, setTestEmailLoading] = useState(false);
+  const [testPaymentEmailLoading, setTestPaymentEmailLoading] = useState(false);
 
   // Add state for copy feedback
   const [copied, setCopied] = useState(false);
@@ -72,7 +80,16 @@ export default function RentalDetailPage() {
     setError('');
     const { data, error } = await supabase
       .from('rentals')
-      .select('*')
+      .select(`
+        *,
+        customer:customers(
+          id,
+          email,
+          first_name,
+          last_name,
+          stripe_customer_id
+        )
+      `)
       .eq('id', id)
       .single();
     if (error) {
@@ -372,6 +389,47 @@ export default function RentalDetailPage() {
       setFollowUpChargeError(error instanceof Error ? error.message : 'Failed to send test email');
     } finally {
       setTestEmailLoading(false);
+    }
+  };
+
+  const handleTestPaymentEmail = async () => {
+    setTestPaymentEmailLoading(true);
+    setFollowUpChargeError('');
+    setFollowUpChargeSuccess('');
+
+    try {
+      // Get customer details from the rental
+      if (!rental?.customer?.email || !rental?.customer?.stripe_customer_id) {
+        throw new Error('Customer email or Stripe customer ID not found');
+      }
+
+      const response = await fetch('/api/stripe/test-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customerEmail: rental.customer.email,
+          stripeCustomerId: rental.customer.stripe_customer_id,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to send test payment email');
+      }
+
+      if (result.success) {
+        setFollowUpChargeSuccess(`Test payment confirmation email sent successfully! Check ${rental.customer.email}`);
+      } else {
+        throw new Error('Unexpected response from test payment email endpoint');
+      }
+    } catch (error) {
+      console.error('Error sending test payment email:', error);
+      setFollowUpChargeError(error instanceof Error ? error.message : 'Failed to send test payment email');
+    } finally {
+      setTestPaymentEmailLoading(false);
     }
   };
 
@@ -677,7 +735,16 @@ export default function RentalDetailPage() {
                     className="border-blue-300 text-blue-700 hover:bg-blue-50"
                   >
                     {testEmailLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                    Test Email
+                    Test Follow-Up Email
+                  </Button>
+                  <Button 
+                    onClick={handleTestPaymentEmail} 
+                    disabled={testPaymentEmailLoading}
+                    variant="outline"
+                    className="border-green-300 text-green-700 hover:bg-green-50"
+                  >
+                    {testPaymentEmailLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                    Test Payment Email
                   </Button>
                 </div>
                 {followUpChargeError && (
