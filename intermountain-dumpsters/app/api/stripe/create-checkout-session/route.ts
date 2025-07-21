@@ -90,17 +90,8 @@ export async function POST(request: NextRequest) {
       },
       // Enable automatic email receipts
       payment_method_collection: 'always',
-      invoice_creation: {
-        enabled: true,
-        invoice_data: {
-          description: `Dumpster Rental - Delivery to: ${deliveryAddress} on ${deliveryDate}`,
-          metadata: {
-            type: 'initial_payment',
-            delivery_address: deliveryAddress,
-            delivery_date: deliveryDate,
-          },
-        },
-      },
+      // This automatically sends a receipt email when payment is successful
+      automatic_tax: { enabled: true },
     });
 
     console.log('✅ Checkout session created successfully:', session.id);

@@ -64,7 +64,6 @@ export default function RentalDetailPage() {
   
   // Test email state
   const [testEmailLoading, setTestEmailLoading] = useState(false);
-  const [testPaymentEmailLoading, setTestPaymentEmailLoading] = useState(false);
 
   // Add state for copy feedback
   const [copied, setCopied] = useState(false);
@@ -354,84 +353,8 @@ export default function RentalDetailPage() {
     }
   };
 
-  const handleTestEmail = async () => {
-    setTestEmailLoading(true);
-    setFollowUpChargeError('');
-    setFollowUpChargeSuccess('');
+  // Remove the handleTestEmail function
 
-    try {
-      const response = await fetch('/api/stripe/test-invoice-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          rentalId: id,
-          testEmail: null, // Use customer's email
-          amount: 25.00,
-          description: 'Test follow-up charge email'
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to send test email');
-      }
-
-      if (result.success) {
-        setFollowUpChargeSuccess(`Test email sent successfully! Check your email and Stripe dashboard. Invoice URL: ${result.invoiceUrl}`);
-      } else {
-        throw new Error('Unexpected response from test email endpoint');
-      }
-    } catch (error) {
-      console.error('Error sending test email:', error);
-      setFollowUpChargeError(error instanceof Error ? error.message : 'Failed to send test email');
-    } finally {
-      setTestEmailLoading(false);
-    }
-  };
-
-  const handleTestPaymentEmail = async () => {
-    setTestPaymentEmailLoading(true);
-    setFollowUpChargeError('');
-    setFollowUpChargeSuccess('');
-
-    try {
-      // Get customer details from the rental
-      if (!rental?.customer?.email || !rental?.customer?.stripe_customer_id) {
-        throw new Error('Customer email or Stripe customer ID not found');
-      }
-
-      const response = await fetch('/api/stripe/test-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          customerEmail: rental.customer.email,
-          stripeCustomerId: rental.customer.stripe_customer_id,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to send test payment email');
-      }
-
-      if (result.success) {
-        setFollowUpChargeSuccess(`Test payment confirmation email sent successfully! Check ${rental.customer.email}`);
-      } else {
-        throw new Error('Unexpected response from test payment email endpoint');
-      }
-    } catch (error) {
-      console.error('Error sending test payment email:', error);
-      setFollowUpChargeError(error instanceof Error ? error.message : 'Failed to send test payment email');
-    } finally {
-      setTestPaymentEmailLoading(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -727,24 +650,6 @@ export default function RentalDetailPage() {
                   >
                     {followUpChargeLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                     Create Follow-Up Charge
-                  </Button>
-                  <Button 
-                    onClick={handleTestEmail} 
-                    disabled={testEmailLoading}
-                    variant="outline"
-                    className="border-blue-300 text-blue-700 hover:bg-blue-50"
-                  >
-                    {testEmailLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                    Test Follow-Up Email
-                  </Button>
-                  <Button 
-                    onClick={handleTestPaymentEmail} 
-                    disabled={testPaymentEmailLoading}
-                    variant="outline"
-                    className="border-green-300 text-green-700 hover:bg-green-50"
-                  >
-                    {testPaymentEmailLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                    Test Payment Email
                   </Button>
                 </div>
                 {followUpChargeError && (
