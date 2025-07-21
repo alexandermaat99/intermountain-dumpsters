@@ -62,9 +62,6 @@ export default function RentalDetailPage() {
   const [followUpChargeError, setFollowUpChargeError] = useState('');
   const [followUpChargeSuccess, setFollowUpChargeSuccess] = useState('');
   
-  // Test email state
-  const [testEmailLoading, setTestEmailLoading] = useState(false);
-
   // Add state for copy feedback
   const [copied, setCopied] = useState(false);
 
