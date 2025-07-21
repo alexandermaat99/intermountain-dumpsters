@@ -114,6 +114,7 @@ export async function sendOrderConfirmationEmail(data: PaymentConfirmationData):
       const sentInvoice = await stripe.invoices.sendInvoice(paidInvoice.id!);
       
       console.log('✅ Order confirmation email sent successfully');
+      console.log('📧 Invoice ID:', sentInvoice.id);
       return true;
     }
     
