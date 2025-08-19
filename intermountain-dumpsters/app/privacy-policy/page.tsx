@@ -1,6 +1,10 @@
+'use client';
+
 import Link from "next/link";
+import { useContactInfo } from "@/lib/hooks/useContactInfo";
 
 export default function PrivacyPolicy() {
+  const { contactInfo, loading, error } = useContactInfo();
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-4xl mx-auto px-5 py-12">
@@ -108,6 +112,10 @@ export default function PrivacyPolicy() {
                 <li><strong>Business Transfers:</strong> In the event of a merger or acquisition, 
                 your information may be transferred as part of the business assets</li>
               </ul>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                <strong>Important Note:</strong> All the above categories exclude text messaging originator opt-in data and consent; 
+                this information will not be shared with any third parties.
+              </p>
             </section>
 
             <section className="mb-8">
@@ -192,12 +200,25 @@ export default function PrivacyPolicy() {
                 please contact us:
               </p>
               <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                <p className="text-gray-700 dark:text-gray-300">
-                  <strong>Intermountain Dumpsters</strong><br />
-                  Email: privacy@intermountaindumpsters.com<br />
-                  Phone: (555) 123-4567<br />
-                  Address: [Your Business Address]
-                </p>
+                {loading ? (
+                  <p className="text-gray-700 dark:text-gray-300">
+                    Loading contact information...
+                  </p>
+                ) : error ? (
+                  <p className="text-gray-700 dark:text-gray-300">
+                    <strong>Intermountain Dumpsters</strong><br />
+                    Email: privacy@intermountaindumpsters.com<br />
+                    Phone: (555) 123-4567<br />
+                    Address: [Your Business Address]
+                  </p>
+                ) : (
+                  <p className="text-gray-700 dark:text-gray-300">
+                    <strong>Intermountain Dumpsters</strong><br />
+                    Email: privacy@intermountaindumpsters.com<br />
+                    Phone: {contactInfo.phone}<br />
+                    Address: {contactInfo.address}
+                  </p>
+                )}
               </div>
             </section>
           </div>
