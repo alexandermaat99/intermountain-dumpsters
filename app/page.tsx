@@ -184,7 +184,7 @@ export default async function Home() {
       "https://www.linkedin.com/company/intermountain-dumpsters"
     ],
     "image": [
-      "https://www.intermountaindumpsters.com/hero_image.png",
+      "https://www.intermountaindumpsters.com/hero_image_v2.png",
       "https://www.intermountaindumpsters.com/GreenHorizontalLogo.svg"
     ],
     "logo": "https://www.intermountaindumpsters.com/GreenHorizontalLogo.svg",
@@ -296,7 +296,7 @@ export default async function Home() {
       {/* Hero Section - This will now be full-width */}
       <div 
         className="w-full h-[70vh] md:h-[60vh] bg-cover bg-center bg-no-repeat relative"
-        style={{ backgroundImage: "url('/hero_image.png')" }}
+        style={{ backgroundImage: "url('/hero_image_v2.png')" }}
       >
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative z-10 flex flex-col items-start justify-center h-full text-white text-left max-w-6xl w-full mx-auto p-5 md:p-10">
