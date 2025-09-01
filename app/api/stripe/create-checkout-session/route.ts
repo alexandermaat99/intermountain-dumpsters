@@ -94,7 +94,6 @@ export async function POST(request: NextRequest) {
         deliveryDate,
         stripeCustomerId: stripeCustomerId || '',
       },
-      payment_method_collection: 'always',
     });
 
     console.log('✅ Checkout session created successfully:', session.id);
