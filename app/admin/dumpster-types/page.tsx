@@ -19,6 +19,10 @@ interface DumpsterType {
   image_path: string;
   description: string;
   long_description: string;
+  length: number;
+  width: number;
+  height: number;
+  uses: string;
 }
 
 const SUPABASE_IMAGE_URL = "https://acsxwvvvlfajjizqwcia.supabase.co/storage/v1/object/public/dumpster-images/";
@@ -44,7 +48,17 @@ export default function AdminDumpsterTypesPage() {
   const [formLoading, setFormLoading] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editType, setEditType] = useState<DumpsterType | null>(null);
-  const [editForm, setEditForm] = useState({ name: '', price: '', descriptor: '', long_description: '', image: null as File | null });
+  const [editForm, setEditForm] = useState({ 
+    name: '', 
+    price: '', 
+    descriptor: '', 
+    long_description: '', 
+    length: '',
+    width: '',
+    height: '',
+    uses: '',
+    image: null as File | null 
+  });
   const [editLoading, setEditLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
   const [editError, setEditError] = useState<string | null>(null);
@@ -123,6 +137,10 @@ export default function AdminDumpsterTypesPage() {
     setEditType(type);
     setEditForm({
       name: type.name,
+      length: String(type.length),
+      width: String(type.width),
+      height: String(type.height),
+      uses: type.uses,
       price: String(type.price),
       descriptor: type.descriptor,
       long_description: type.long_description || '',
@@ -172,6 +190,10 @@ export default function AdminDumpsterTypesPage() {
       price: Number(editForm.price),
       descriptor: editForm.descriptor,
       long_description: editForm.long_description,
+      length: Number(editForm.length),
+      width: Number(editForm.width),
+      height: Number(editForm.height),
+      uses: editForm.uses,
       image_path,
     }).eq('id', editType.id);
     setEditLoading(false);
@@ -316,7 +338,7 @@ export default function AdminDumpsterTypesPage() {
           {/* Edit Modal */}
           <Dialog open={editModalOpen} onClose={closeEditModal} className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-            <Dialog.Panel className="relative bg-white rounded-lg shadow-xl w-full max-w-md mx-auto p-6 z-10">
+            <Dialog.Panel className="relative bg-white rounded-lg shadow-xl w-full max-w-md mx-auto p-6 z-10 max-h-[90vh] overflow-y-auto">
               <Dialog.Title className="text-lg font-bold mb-4">Edit Dumpster Type</Dialog.Title>
               <form onSubmit={handleEditSubmit} className="flex flex-col gap-4">
                 <div className="space-y-2">
@@ -330,6 +352,22 @@ export default function AdminDumpsterTypesPage() {
                 <div className="space-y-2">
                   <Label htmlFor="edit-price">Price</Label>
                   <input id="edit-price" type="number" name="price" value={editForm.price} onChange={handleEditChange} className="border rounded p-2 w-full" placeholder="Price" min={0} step={0.01} required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-length">Length (ft)</Label>
+                  <input id="edit-length" type="number" name="length" value={editForm.length} onChange={handleEditChange} className="border rounded p-2 w-full" placeholder="Length" min={0} step={0.01} required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-width">Width (ft)</Label>
+                  <input id="edit-width" type="number" name="width" value={editForm.width} onChange={handleEditChange} className="border rounded p-2 w-full" placeholder="Width" min={0} step={0.01} required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-height">Height (ft)</Label>
+                  <input id="edit-height" type="number" name="height" value={editForm.height} onChange={handleEditChange} className="border rounded p-2 w-full" placeholder="Height" min={0} step={0.01} required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-uses">Best for (uses)</Label>
+                  <input id="edit-uses" type="text" name="uses" value={editForm.uses} onChange={handleEditChange} className="border rounded p-2 w-full" placeholder="Best for" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="edit-long-description">Long Description</Label>
