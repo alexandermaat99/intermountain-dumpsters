@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/contexts/AuthContext';
 import AdminSidebar from '@/components/AdminSidebar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, User as UserIcon, Package, DollarSign, Truck, AlertTriangle } from 'lucide-react';
+import { Loader2, User as UserIcon, Package, DollarSign, Truck, AlertTriangle, ChevronDown, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -33,6 +33,7 @@ interface Rental {
   tax_rate: number;
   delivery_zip_code: string;
   delivery_address: string;
+  archived: boolean;
   customer?: {
     first_name: string;
     last_name: string;
@@ -64,6 +65,7 @@ export default function RentalsPage() {
   const { user, loading } = useAuth();
   const [rentals, setRentals] = useState<Rental[]>([]);
   const [rentalsLoading, setRentalsLoading] = useState(true);
+  const [showArchived, setShowArchived] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -96,6 +98,44 @@ export default function RentalsPage() {
       console.error('Error fetching rentals:', error);
     } finally {
       setRentalsLoading(false);
+    }
+  };
+
+  const archiveRental = async (rentalId: number) => {
+    try {
+      const { error } = await supabase
+        .from('rentals')
+        .update({ archived: true })
+        .eq('id', rentalId);
+
+      if (error) {
+        console.error('Error archiving rental:', error);
+        return;
+      }
+
+      // Refresh the rentals list
+      fetchRentals();
+    } catch (error) {
+      console.error('Error archiving rental:', error);
+    }
+  };
+
+  const unarchiveRental = async (rentalId: number) => {
+    try {
+      const { error } = await supabase
+        .from('rentals')
+        .update({ archived: false })
+        .eq('id', rentalId);
+
+      if (error) {
+        console.error('Error unarchiving rental:', error);
+        return;
+      }
+
+      // Refresh the rentals list
+      fetchRentals();
+    } catch (error) {
+      console.error('Error unarchiving rental:', error);
     }
   };
 
@@ -159,19 +199,8 @@ export default function RentalsPage() {
   };
 
   // Partition rentals into main and archived
-  const mostRecentSunday = getMostRecentSunday();
-  const mainRentals = rentals.filter(rental => {
-    if (!rental.picked_up) return true;
-    if (!rental.date_picked_up) return true;
-    // If picked up, only show if completed after most recent Sunday
-    return new Date(rental.date_picked_up) >= mostRecentSunday;
-  });
-  const archivedRentals = rentals.filter(rental => {
-    if (!rental.picked_up) return false;
-    if (!rental.date_picked_up) return false;
-    // Archived if completed before most recent Sunday
-    return new Date(rental.date_picked_up) < mostRecentSunday;
-  });
+  const mainRentals = rentals.filter(rental => !rental.archived);
+  const archivedRentals = rentals.filter(rental => rental.archived);
 
   if (loading) {
     return (
@@ -246,12 +275,13 @@ export default function RentalsPage() {
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Customer</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider min-w-[120px]">Status</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Payment</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {mainRentals.length === 0 ? (
                         <tr>
-                          <td colSpan={7} className="text-center py-8 text-gray-500">No rentals found</td>
+                          <td colSpan={8} className="text-center py-8 text-gray-500">No rentals found</td>
                         </tr>
                       ) : (
                         mainRentals.map((rental) => (
@@ -322,6 +352,22 @@ export default function RentalsPage() {
                                 <div className="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 mt-1">Driveway Insurance</div>
                               )}
                             </td>
+                            {/* Actions */}
+                            <td className="px-4 py-4 align-top text-sm">
+                              <div className="flex flex-col gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    archiveRental(rental.id);
+                                  }}
+                                  className="text-xs"
+                                >
+                                  Archive
+                                </Button>
+                              </div>
+                            </td>
                           </tr>
                         ))
                       )}
@@ -332,9 +378,16 @@ export default function RentalsPage() {
               {/* Archived Orders Table (desktop) */}
               {archivedRentals.length > 0 && (
                 <div className="hidden md:block mt-10">
-                  <h2 className="text-lg font-bold mb-2 text-gray-700">Archived Orders</h2>
-                  <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-                    <table className="min-w-full divide-y divide-gray-200">
+                  <button
+                    onClick={() => setShowArchived(!showArchived)}
+                    className="flex items-center gap-2 text-lg font-bold mb-2 text-gray-700 hover:text-gray-900 transition-colors"
+                  >
+                    {showArchived ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                    Archived Orders ({archivedRentals.length})
+                  </button>
+                  {showArchived && (
+                    <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+                      <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Delivery Date</th>
@@ -344,6 +397,7 @@ export default function RentalsPage() {
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Customer</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider min-w-[120px]">Status</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Payment</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
@@ -415,11 +469,28 @@ export default function RentalsPage() {
                                 <div className="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 mt-1">Driveway Insurance</div>
                               )}
                             </td>
+                            {/* Actions */}
+                            <td className="px-4 py-4 align-top text-sm">
+                              <div className="flex flex-col gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    unarchiveRental(rental.id);
+                                  }}
+                                  className="text-xs"
+                                >
+                                  Unarchive
+                                </Button>
+                              </div>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
+                    )}
                 </div>
               )}
               {/* Card layout for mobile */}
@@ -550,8 +621,15 @@ export default function RentalsPage() {
                 )}
                 {archivedRentals.length > 0 && (
                   <div className="flex flex-col gap-4 md:hidden mt-10">
-                    <h2 className="text-lg font-bold mb-2 text-gray-700">Archived Orders</h2>
-                        {archivedRentals.map((rental) => (
+                    <button
+                      onClick={() => setShowArchived(!showArchived)}
+                      className="flex items-center gap-2 text-lg font-bold mb-2 text-gray-700 hover:text-gray-900 transition-colors"
+                    >
+                      {showArchived ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                      Archived Orders ({archivedRentals.length})
+                    </button>
+                    {showArchived && (
+                      archivedRentals.map((rental) => (
                           <Link href={`/admin/rentals/${rental.id}`} key={rental.id} className="hover:shadow-lg transition-shadow w-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded block">
                             <Card className={`w-full ${rental.emergency_delivery ? 'bg-red-50 border-l-4 border-l-red-500' : ''}`}>
                               <CardContent className="p-4">
@@ -659,10 +737,26 @@ export default function RentalsPage() {
                                     </div>
                                   </div>
                                 )}
+                                {/* Actions */}
+                                <div className="mt-4 pt-4 border-t border-gray-200">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      unarchiveRental(rental.id);
+                                    }}
+                                    className="w-full text-xs"
+                                  >
+                                    Unarchive
+                                  </Button>
+                                </div>
                               </CardContent>
                             </Card>
                           </Link>
-                        ))}
+                        ))
+                    )}
                   </div>
                 )}
               </div>

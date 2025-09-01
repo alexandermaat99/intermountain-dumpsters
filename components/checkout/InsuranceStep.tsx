@@ -125,7 +125,7 @@ export default function InsuranceStep({ insurance, onUpdate, onNext, onBack }: I
                   <span className="text-sm font-semibold text-primary">{formatRushDeliveryFee()}</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  We&apos;ll deliver your dumpster within 2 hours of your call for an additional fee.
+                  We&apos;ll deliver your dumpster within 2 hours of order confirmation -  If not completed, the extra charge will be reimbursed.
                 </p>
               </div>
             </div>

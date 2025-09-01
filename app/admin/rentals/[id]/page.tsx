@@ -377,8 +377,10 @@ export default function RentalDetailPage() {
         </div>
         <Card className="shadow-xl rounded-2xl border border-gray-100">
           <CardHeader className="pb-2">
-            <div className="flex items-center gap-2 text-base text-gray-500 font-medium truncate">
-              {rental && (rental.delivery_address as React.ReactNode)}
+            <div className="flex items-start gap-2 text-base text-gray-500 font-medium">
+              <span className="break-words leading-relaxed">
+                {rental && (rental.delivery_address as React.ReactNode)}
+              </span>
               <button
                 type="button"
                 onClick={async () => {
