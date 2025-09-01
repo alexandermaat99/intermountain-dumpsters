@@ -81,6 +81,12 @@ export async function POST(request: NextRequest) {
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cart`,
       ...(stripeCustomerId ? { customer: stripeCustomerId } : { customer_email: customerEmail }),
+      invoice_creation: {
+        enabled: true,
+        invoice_data: {
+          description: `Dumpster rental delivery to ${deliveryAddress} on ${deliveryDate}`,
+        },
+      },
       metadata: {
         pendingOrderId: pendingOrderId.toString(),
         customerName,
@@ -89,7 +95,6 @@ export async function POST(request: NextRequest) {
         stripeCustomerId: stripeCustomerId || '',
       },
       payment_method_collection: 'always',
-      // Removed automatic_tax and invoice_creation
     });
 
     console.log('✅ Checkout session created successfully:', session.id);

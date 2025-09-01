@@ -39,8 +39,8 @@ const iconVariants = {
     }
   },
   hover: {
-    rotate: 360,
-    transition: { duration: 0.6 }
+    scale: 1.1,
+    transition: { duration: 0.2 }
   }
 };
 
