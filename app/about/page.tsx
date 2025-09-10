@@ -121,12 +121,12 @@ export default async function AboutPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl w-full mx-auto p-5 py-16">
+      <div className="max-w-6xl w-full mx-auto p-5 py-24">
         {/* Company Story */}
-        <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
+        <div className="grid md:grid-cols-2 gap-16 items-center mb-40">
           <div>
-            <h2 className="text-3xl font-bold mb-6">Our Story</h2>
-            <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
+            <h2 className="text-3xl font-bold mb-8">Our Story</h2>
+            <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
               <p>
                 Intermountain Dumpsters was born from a simple mission: to provide reliable, 
                 affordable dumpster rental services to our local community. As a family-owned business, we 
@@ -144,9 +144,9 @@ export default async function AboutPage() {
               </p>
             </div>
           </div>
-          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-8">
-            <h3 className="text-2xl font-semibold mb-6">Why Choose Us?</h3>
-            <div className="space-y-4">
+          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-10">
+            <h3 className="text-2xl font-semibold mb-8">Why Choose Us?</h3>
+            <div className="space-y-6">
                              <div className="flex items-start gap-3">
                  <Users className="w-6 h-6 text-brand-green-dark mt-1 flex-shrink-0" />
                  <div>
@@ -180,10 +180,10 @@ export default async function AboutPage() {
         </div>
 
         {/* Mission & Values */}
-        <div className="mb-20">
-          <h2 className="text-3xl font-bold text-center mb-12">Our Mission & Values</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-                         <div className="text-center space-y-4">
+        <div className="mb-40">
+          <h2 className="text-3xl font-bold text-center mb-20">Our Mission & Values</h2>
+          <div className="grid md:grid-cols-3 gap-16">
+                         <div className="text-center space-y-8">
                <div className="w-16 h-16 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mx-auto">
                  <svg className="w-8 h-8 text-brand-green-dark dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -194,7 +194,7 @@ export default async function AboutPage() {
                  Every decision we make is guided by what&apos;s best for our customers. Your satisfaction is our top priority.
                </p>
              </div>
-             <div className="text-center space-y-4">
+             <div className="text-center space-y-8">
                <div className="w-16 h-16 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mx-auto">
                  <svg className="w-8 h-8 text-brand-green-dark dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
@@ -205,7 +205,7 @@ export default async function AboutPage() {
                  We maintain the highest standards in everything we do, from equipment maintenance to customer service.
                </p>
              </div>
-             <div className="text-center space-y-4">
+             <div className="text-center space-y-8">
                <div className="w-16 h-16 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mx-auto">
                  <svg className="w-8 h-8 text-brand-green-dark dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -221,9 +221,9 @@ export default async function AboutPage() {
         </div>
 
         {/* Service Areas */}
-        <div className="mb-20">
-          <h2 className="text-3xl font-bold text-center mb-12">Serving the Intermountain Region</h2>
-          <div className="grid md:grid-cols-2 gap-8">
+        <div className="mb-40">
+          <h2 className="text-3xl font-bold text-center mb-20">Serving the Intermountain Region</h2>
+          <div className="grid md:grid-cols-2 gap-12">
             <div>
               <h3 className="text-2xl font-semibold mb-6">Our Coverage Area</h3>
               <p className="text-lg text-muted-foreground mb-6">
@@ -276,12 +276,12 @@ export default async function AboutPage() {
         </div>
 
         {/* Contact Information */}
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8">
-          <h2 className="text-3xl font-bold text-center mb-8">Get in Touch</h2>
-          <div className="grid md:grid-cols-3 gap-8">
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-12 mt-20 mb-20">
+          <h2 className="text-3xl font-bold text-center mb-16">Get in Touch</h2>
+          <div className="grid md:grid-cols-3 gap-16">
                          <a 
                href={`tel:${contactInfo.phone.replace(/[^\d+]/g, "")}`}
-               className="text-center space-y-3 block hover:scale-105 transition-transform cursor-pointer"
+               className="text-center space-y-6 block hover:scale-105 transition-transform cursor-pointer"
              >
                <Phone className="w-8 h-8 text-brand-green-dark mx-auto" />
                <h3 className="font-semibold">Phone</h3>
@@ -291,7 +291,7 @@ export default async function AboutPage() {
              </a>
              <a 
                href={`mailto:${contactInfo.email}`}
-               className="text-center space-y-3 block hover:scale-105 transition-transform cursor-pointer"
+               className="text-center space-y-6 block hover:scale-105 transition-transform cursor-pointer"
              >
                <Mail className="w-8 h-8 text-brand-green-dark mx-auto" />
                <h3 className="font-semibold">Email</h3>
@@ -299,7 +299,7 @@ export default async function AboutPage() {
                  {contactInfo.email}
                </p>
              </a>
-             <div className="text-center space-y-3">
+             <div className="text-center space-y-6">
                <Clock className="w-8 h-8 text-brand-green-dark mx-auto" />
                <h3 className="font-semibold">Business Hours</h3>
                <p className="text-muted-foreground">
