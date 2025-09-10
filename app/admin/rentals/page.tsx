@@ -51,7 +51,15 @@ interface Rental {
   };
 }
 
-
+// Helper to get most recent Sunday (start of week)
+function getMostRecentSunday(date = new Date()) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const day = d.getDay();
+  // 0 = Sunday, so if today is Sunday, return today
+  d.setDate(d.getDate() - day);
+  return d;
+}
 
 export default function RentalsPage() {
   const { user, loading } = useAuth();

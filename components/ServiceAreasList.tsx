@@ -22,9 +22,12 @@ interface ServiceAreasListProps {
 
 export default function ServiceAreasList({ onAreaSelect, selectedArea, serviceAreas, loading, error }: ServiceAreasListProps) {
   const handleAreaClick = (area: ServiceArea) => {
+    console.log('Service area clicked:', area);
     if (selectedArea?.id === area.id) {
+      console.log('Deselecting area');
       onAreaSelect(null); // Deselect if clicking the same area
     } else {
+      console.log('Selecting area:', area);
       onAreaSelect(area);
     }
   };

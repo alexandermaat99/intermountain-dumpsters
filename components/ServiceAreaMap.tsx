@@ -45,7 +45,20 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
 
   // Initialize map - only run once when mounted and serviceAreas are available
   useEffect(() => {
-    if (!mounted || !mapContainer.current || map.current || serviceAreas.length === 0 || initializedRef.current) return;
+    console.log('ServiceAreaMap: Map initialization effect triggered', {
+      mounted,
+      mapContainer: !!mapContainer.current,
+      mapExists: !!map.current,
+      serviceAreasLength: serviceAreas.length,
+      initialized: initializedRef.current
+    });
+    
+    if (!mounted || !mapContainer.current || map.current || serviceAreas.length === 0 || initializedRef.current) {
+      console.log('ServiceAreaMap: Map initialization skipped - conditions not met');
+      return;
+    }
+    
+    console.log('ServiceAreaMap: Initializing map...');
     
     // Check if Mapbox token is available
     if (!process.env.NEXT_PUBLIC_MAPBOX_TOKEN) {
@@ -70,12 +83,15 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
     map.current.addControl(new mapboxgl.NavigationControl());
 
     map.current.on('load', () => {
+      console.log('ServiceAreaMap: Map loaded event fired');
       setMapLoaded(true);
       // Ensure the map style is fully loaded before adding layers
       setTimeout(() => {
+        console.log('ServiceAreaMap: Checking if style is loaded:', map.current?.isStyleLoaded());
         if (!map.current?.isStyleLoaded()) {
           // Retry after a short delay
           setTimeout(() => {
+            console.log('ServiceAreaMap: Retry - style loaded:', map.current?.isStyleLoaded());
             if (map.current?.isStyleLoaded()) {
               addMapLayers();
             }
@@ -88,9 +104,15 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
 
     // Function to add map layers
     const addMapLayers = () => {
+      console.log('ServiceAreaMap: addMapLayers called');
       if (cleanupRef.current || !map.current?.isStyleLoaded()) {
+        console.log('ServiceAreaMap: addMapLayers skipped - conditions not met', {
+          cleanupRef: cleanupRef.current,
+          styleLoaded: map.current?.isStyleLoaded()
+        });
         return;
       }
+      console.log('ServiceAreaMap: Adding map layers for', serviceAreas.length, 'areas');
 
       // Create circles for each service area
       serviceAreas.forEach((area) => {
@@ -199,11 +221,22 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
       initializedRef.current = false;
       setMapLoaded(false);
     };
-  }, [mounted, serviceAreas, selectedArea]);
+  }, [mounted, serviceAreas]);
 
   // Handle selected area changes - separate effect
   useEffect(() => {
-    if (cleanupRef.current || !map.current || !mounted || !mapLoaded || !map.current.isStyleLoaded()) return;
+    if (cleanupRef.current || !map.current || !mounted || !mapLoaded || !map.current.isStyleLoaded()) {
+      console.log('ServiceAreaMap: Skipping selected area update - conditions not met', {
+        cleanupRef: cleanupRef.current,
+        mapExists: !!map.current,
+        mounted,
+        mapLoaded,
+        styleLoaded: map.current?.isStyleLoaded()
+      });
+      return;
+    }
+
+    console.log('ServiceAreaMap: Updating selected area', selectedArea);
 
     // Reset all circles and popups to default style
     serviceAreas.forEach(area => {
@@ -294,7 +327,7 @@ export default function ServiceAreaMap({ selectedArea, serviceAreas, loading }: 
         }
       }
     }
-  }, [mounted, mapLoaded, selectedArea, serviceAreas]);
+  }, [mounted, mapLoaded, selectedArea]);
 
   return (
     <div className="w-full h-full relative">

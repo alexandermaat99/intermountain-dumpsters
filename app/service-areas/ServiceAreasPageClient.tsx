@@ -22,6 +22,11 @@ export default function ServiceAreasPageClient() {
   const [serviceAreas, setServiceAreas] = useState<ServiceArea[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  // Debug selected area changes
+  useEffect(() => {
+    console.log('Selected area changed:', selectedArea);
+  }, [selectedArea]);
+
   useEffect(() => {
     async function fetchServiceAreas() {
       try {
