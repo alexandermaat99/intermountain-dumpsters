@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 interface ContactFormData {
   firstName: string;
@@ -17,6 +18,7 @@ interface ContactFormProps {
 }
 
 export default function ContactForm({ className = "" }: ContactFormProps) {
+  const router = useRouter();
   const [formData, setFormData] = useState<ContactFormData>({
     firstName: '',
     lastName: '',
@@ -28,7 +30,7 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<{
-    type: 'success' | 'error' | null;
+    type: 'error' | null;
     message: string;
   }>({ type: null, message: '' });
 
@@ -57,19 +59,8 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
       const result = await response.json();
 
       if (response.ok) {
-        setSubmitStatus({
-          type: 'success',
-          message: 'Thank you! Your message has been sent successfully. We\'ll get back to you soon.'
-        });
-        // Reset form on success
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          subject: '',
-          message: ''
-        });
+        // Redirect to success page instead of showing popup
+        router.push('/contact/success');
       } else {
         setSubmitStatus({
           type: 'error',
@@ -90,13 +81,9 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
     <div className={`space-y-6 ${className}`}>
       <h2 className="text-2xl font-semibold">Send us a Message</h2>
       
-      {/* Status Messages */}
+      {/* Error Messages */}
       {submitStatus.type && (
-        <div className={`p-4 rounded-lg ${
-          submitStatus.type === 'success' 
-            ? 'bg-green-50 text-green-800 border border-green-200' 
-            : 'bg-red-50 text-red-800 border border-red-200'
-        }`}>
+        <div className="p-4 rounded-lg bg-red-50 text-red-800 border border-red-200">
           {submitStatus.message}
         </div>
       )}
