@@ -1,6 +1,7 @@
 import { supabase } from './supabaseClient';
 import { CheckoutData, CustomerInfo } from './types';
 import { calculateTaxFromServiceArea } from './tax-calculator-db';
+import { sendOrderConfirmation, sendAdminNotification } from './email';
 
 export interface SavedOrder {
   customer_id: number;
@@ -270,6 +271,45 @@ export async function confirmPendingOrder(pendingOrderId: number, stripeSessionI
     }
 
     console.log('✅ Successfully created rental:', rentalResult.id);
+
+    // Send confirmation emails
+    try {
+      console.log('📧 Sending confirmation emails...');
+      
+      // Fetch the complete order data for emails
+      const { data: completeOrderData, error: orderFetchError } = await supabase
+        .from('rentals')
+        .select(`
+          *,
+          customer:customers(first_name, last_name, email, phone_number),
+          dumpster_type:dumpster_types(name, descriptor, price)
+        `)
+        .eq('id', rentalResult.id)
+        .single();
+
+      if (orderFetchError || !completeOrderData) {
+        console.error('❌ Error fetching complete order data for emails:', orderFetchError);
+      } else {
+        // Send customer confirmation email
+        const customerEmailResult = await sendOrderConfirmation(completeOrderData);
+        if (customerEmailResult.success) {
+          console.log('✅ Customer confirmation email sent successfully');
+        } else {
+          console.error('❌ Failed to send customer confirmation email:', customerEmailResult.error);
+        }
+
+        // Send admin notification email
+        const adminEmailResult = await sendAdminNotification(completeOrderData);
+        if (adminEmailResult.success) {
+          console.log('✅ Admin notification email sent successfully');
+        } else {
+          console.error('❌ Failed to send admin notification email:', adminEmailResult.error);
+        }
+      }
+    } catch (emailError) {
+      console.error('❌ Error sending emails:', emailError);
+      // Don't fail the order if emails fail
+    }
 
     // Delete the pending order
     const { error: deleteError } = await supabase
