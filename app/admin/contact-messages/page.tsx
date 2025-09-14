@@ -156,11 +156,22 @@ export default function ContactMessagesPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading...</p>
-        </div>
+      <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+        <AdminSidebar user={user} />
+        <main className="flex-1 p-2 sm:p-4 md:p-8">
+          <div className="max-w-6xl mx-auto w-full">
+            <div className="animate-pulse space-y-6">
+              <div className="flex justify-between items-center mb-6">
+                <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+                <div className="h-4 bg-gray-200 rounded w-20"></div>
+              </div>
+              <div className="grid lg:grid-cols-2 gap-6">
+                <div className="h-96 bg-gray-200 rounded"></div>
+                <div className="h-96 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
@@ -187,13 +198,17 @@ export default function ContactMessagesPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
         <AdminSidebar user={user} />
-        <main className="flex-1 p-6">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-20 bg-gray-200 rounded"></div>
-              ))}
+        <main className="flex-1 p-2 sm:p-4 md:p-8">
+          <div className="max-w-6xl mx-auto w-full">
+            <div className="animate-pulse space-y-6">
+              <div className="flex justify-between items-center mb-6">
+                <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+                <div className="h-4 bg-gray-200 rounded w-20"></div>
+              </div>
+              <div className="grid lg:grid-cols-2 gap-6">
+                <div className="h-96 bg-gray-200 rounded"></div>
+                <div className="h-96 bg-gray-200 rounded"></div>
+              </div>
             </div>
           </div>
         </main>

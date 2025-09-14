@@ -237,8 +237,18 @@ export default function AdminDumpstersPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+      <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+        <AdminSidebar user={user} />
+        <main className="flex-1 p-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+            <div className="space-y-3">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-16 bg-gray-200 rounded"></div>
+              ))}
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
@@ -277,9 +287,12 @@ export default function AdminDumpstersPage() {
           )}
 
           {pageLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-6 w-6 animate-spin text-gray-400 mx-auto mb-2" />
-              <p className="text-sm text-gray-500 ml-2">Loading inventory...</p>
+            <div className="animate-pulse space-y-4">
+              <div className="space-y-3">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="h-16 bg-gray-200 rounded"></div>
+                ))}
+              </div>
             </div>
           ) : dumpsterTypes.length === 0 ? (
             <div className="text-gray-500 text-center py-8">

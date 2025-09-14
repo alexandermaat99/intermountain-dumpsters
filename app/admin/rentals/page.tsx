@@ -225,11 +225,18 @@ export default function RentalsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading...</p>
-        </div>
+      <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+        <AdminSidebar user={user} />
+        <main className="flex-1 p-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+            <div className="space-y-3">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="h-24 bg-gray-200 rounded"></div>
+              ))}
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
@@ -275,10 +282,11 @@ export default function RentalsPage() {
           </div>
 
           {rentalsLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-center">
-                <Loader2 className="h-6 w-6 animate-spin text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">Loading rentals...</p>
+            <div className="animate-pulse space-y-4">
+              <div className="space-y-3">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="h-24 bg-gray-200 rounded"></div>
+                ))}
               </div>
             </div>
           ) : (

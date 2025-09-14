@@ -412,10 +412,12 @@ export default function RentalDetailPage() {
   // Remove the handleTestEmail function
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading...</p>
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center p-2 sm:p-6">
+        <div className="w-full max-w-xl">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+            <div className="h-96 bg-gray-200 rounded"></div>
+          </div>
         </div>
       </div>
     );
@@ -434,8 +436,13 @@ export default function RentalDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center p-2 sm:p-6">
+        <div className="w-full max-w-xl">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+            <div className="h-96 bg-gray-200 rounded"></div>
+          </div>
+        </div>
       </div>
     );
   }

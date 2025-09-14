@@ -11,8 +11,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export default function ServiceAreasPage() {
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [serviceAreas, setServiceAreas] = useState<ServiceArea[]>([]);
+  const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [creating, setCreating] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -36,11 +37,15 @@ export default function ServiceAreasPage() {
 
   const loadServiceAreas = async () => {
     try {
+      setLoading(true);
+      setError('');
       const areas = await getServiceAreas();
       setServiceAreas(areas);
     } catch (error) {
       console.error('Error loading service areas:', error);
       setError('Failed to load service areas');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -182,13 +187,54 @@ export default function ServiceAreasPage() {
     }
   };
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+        <AdminSidebar user={user} />
+        <main className="flex-1 p-2 sm:p-4 md:p-8">
+          <div className="max-w-6xl mx-auto w-full">
+            <div className="animate-pulse space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+                <div>
+                  <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+                <div className="h-10 bg-gray-200 rounded w-32"></div>
+              </div>
+              <div className="space-y-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="h-20 bg-gray-200 rounded"></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading service areas...</p>
-        </div>
+      <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+        <AdminSidebar user={user} />
+        <main className="flex-1 p-2 sm:p-4 md:p-8">
+          <div className="max-w-6xl mx-auto w-full">
+            <div className="animate-pulse space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+                <div>
+                  <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+                <div className="h-10 bg-gray-200 rounded w-32"></div>
+              </div>
+              <div className="space-y-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="h-20 bg-gray-200 rounded"></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }

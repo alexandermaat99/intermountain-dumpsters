@@ -73,10 +73,18 @@ export default function TaxInfoPage() {
         return (
             <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
                 <AdminSidebar user={user} />
-                <main className="flex-1 flex items-center justify-center p-4">
-                    <div className="text-center">
-                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-                        <p className="text-gray-600">Loading...</p>
+                <main className="flex-1 p-2 sm:p-4 md:p-8">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="animate-pulse space-y-6">
+                            <div className="mb-8">
+                                <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
+                                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="h-32 bg-gray-200 rounded"></div>
+                                <div className="h-32 bg-gray-200 rounded"></div>
+                            </div>
+                        </div>
                     </div>
                 </main>
             </div>
@@ -101,10 +109,18 @@ export default function TaxInfoPage() {
         return (
             <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
                 <AdminSidebar user={user} />
-                <main className="flex-1 flex items-center justify-center p-4">
-                    <div className="text-center">
-                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-                        <p className="text-gray-600">Loading tax data...</p>
+                <main className="flex-1 p-2 sm:p-4 md:p-8">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="animate-pulse space-y-6">
+                            <div className="mb-8">
+                                <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
+                                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="h-32 bg-gray-200 rounded"></div>
+                                <div className="h-32 bg-gray-200 rounded"></div>
+                            </div>
+                        </div>
                     </div>
                 </main>
             </div>
