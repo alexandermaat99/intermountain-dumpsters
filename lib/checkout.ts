@@ -290,7 +290,8 @@ export async function confirmPendingOrder(pendingOrderId: number, stripeSessionI
         console.error('❌ Error fetching complete order data for emails:', orderFetchError);
       } else {
         // Send emails via API route
-        const emailResponse = await fetch('/api/send-emails', {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3001';
+        const emailResponse = await fetch(`${baseUrl}/api/send-emails`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

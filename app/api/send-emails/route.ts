@@ -28,13 +28,23 @@ interface OrderData {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('📧 Send-emails API called');
+    console.log('📧 Environment check:', {
+      hasResendKey: !!process.env.RESEND_API_KEY,
+      adminEmail: process.env.ADMIN_EMAIL || 'admin@intermountaindumpsters.com'
+    });
     const orderData: OrderData = await request.json();
+    console.log('📧 Order data received:', { id: orderData.id, customer: orderData.customer.email });
 
     // Send customer confirmation email
+    console.log('📧 Sending customer confirmation email...');
     const customerEmailResult = await sendOrderConfirmation(orderData);
+    console.log('📧 Customer email result:', customerEmailResult);
     
     // Send admin notification email
+    console.log('📧 Sending admin notification email...');
     const adminEmailResult = await sendAdminNotification(orderData);
+    console.log('📧 Admin email result:', adminEmailResult);
 
     return NextResponse.json({
       success: true,
@@ -42,7 +52,7 @@ export async function POST(request: NextRequest) {
       adminEmail: adminEmailResult
     });
   } catch (error) {
-    console.error('Error in send-emails API:', error);
+    console.error('❌ Error in send-emails API:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to send emails' },
       { status: 500 }
