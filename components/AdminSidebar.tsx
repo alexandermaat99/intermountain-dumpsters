@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Settings, Truck, ClipboardList, Menu, X, MapPin, LogOut, MessageSquare } from 'lucide-react';
+import { Settings, Truck, ClipboardList, Menu, X, MapPin, LogOut, MessageSquare, Receipt, ReceiptIcon } from 'lucide-react';
 import { User } from '@supabase/supabase-js';
 import { useState } from 'react';
 import { useAuth } from '@/lib/contexts/AuthContext';
@@ -43,6 +43,11 @@ const navItems = [
     href: '/admin/dumpsters',
     icon: <Truck className="h-5 w-5 mr-2" />,
   },
+  {
+    label: 'Tax Info',
+    href: '/admin/tax-info',
+    icon: <Receipt className="h-5 w-5 mr-2" />,
+  }
 ];
 
 export default function AdminSidebar({ user }: AdminSidebarProps) {
