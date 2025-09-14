@@ -6,7 +6,8 @@ import { useAuth } from '@/lib/contexts/AuthContext';
 import AdminSidebar from '@/components/AdminSidebar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, User as UserIcon, Package, DollarSign, Truck, AlertTriangle, ChevronDown, ChevronRight } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Loader2, User as UserIcon, Package, DollarSign, Truck, AlertTriangle, ChevronDown, ChevronRight, Trash2, MoreVertical, Archive } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -34,6 +35,7 @@ interface Rental {
   delivery_zip_code: string;
   delivery_address: string;
   archived: boolean;
+  deleted: boolean;
   customer?: {
     first_name: string;
     last_name: string;
@@ -57,6 +59,8 @@ export default function RentalsPage() {
   const [rentals, setRentals] = useState<Rental[]>([]);
   const [rentalsLoading, setRentalsLoading] = useState(true);
   const [showArchived, setShowArchived] = useState(false);
+  const [deepArchiveConfirm, setDeepArchiveConfirm] = useState<{ show: boolean; rental: Rental | null }>({ show: false, rental: null });
+  const [deepArchiving, setDeepArchiving] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -77,6 +81,7 @@ export default function RentalsPage() {
           dumpster_type:dumpster_types(name, descriptor, price),
           dumpster:dumpsters(identification)
         `)
+        .eq('deleted', false)
         .order('delivery_date_requested', { ascending: true });
 
       if (error) {
@@ -127,6 +132,31 @@ export default function RentalsPage() {
       fetchRentals();
     } catch (error) {
       console.error('Error unarchiving rental:', error);
+    }
+  };
+
+  const deepArchiveRental = async (rentalId: number) => {
+    try {
+      setDeepArchiving(true);
+      
+      // Mark the rental as deleted (soft delete)
+      const { error } = await supabase
+        .from('rentals')
+        .update({ deleted: true })
+        .eq('id', rentalId);
+
+      if (error) {
+        console.error('Error deep archiving rental:', error);
+        return;
+      }
+
+      // Close confirmation dialog and refresh the rentals list
+      setDeepArchiveConfirm({ show: false, rental: null });
+      fetchRentals();
+    } catch (error) {
+      console.error('Error deep archiving rental:', error);
+    } finally {
+      setDeepArchiving(false);
     }
   };
 
@@ -260,13 +290,14 @@ export default function RentalsPage() {
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Delivery Date</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Order Received</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Days Until</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Dumpster Info</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Delivery Address</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Customer</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider min-w-[120px]">Status</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Payment</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"></th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -300,6 +331,8 @@ export default function RentalsPage() {
                                 )}
                               </div>
                             </td>
+                            {/* Order Received */}
+                            <td className="px-4 py-4 align-top text-sm text-gray-600">{formatDate(rental.created_at)}</td>
                             {/* Days Until */}
                             <td className="px-4 py-4 align-top text-sm font-semibold text-green-700">{getDaysUntil(rental.delivery_date_requested)}</td>
                             {/* Dumpster Info */}
@@ -345,19 +378,40 @@ export default function RentalsPage() {
                             </td>
                             {/* Actions */}
                             <td className="px-4 py-4 align-top text-sm">
-                              <div className="flex flex-col gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    archiveRental(rental.id);
-                                  }}
-                                  className="text-xs"
-                                >
-                                  Archive
-                                </Button>
-                              </div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="h-8 w-8 p-0"
+                                  >
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      archiveRental(rental.id);
+                                    }}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Archive className="h-4 w-4" />
+                                    Archive
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setDeepArchiveConfirm({ show: true, rental });
+                                    }}
+                                    className="flex items-center gap-2 text-red-600 focus:text-red-600"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                    Deep Archive
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </td>
                           </tr>
                         ))
@@ -382,6 +436,7 @@ export default function RentalsPage() {
                       <thead className="bg-gray-50">
                         <tr>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Delivery Date</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Order Received</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Days Until</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Dumpster Info</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Delivery Address</th>
@@ -417,6 +472,8 @@ export default function RentalsPage() {
                                 )}
                               </div>
                             </td>
+                            {/* Order Received */}
+                            <td className="px-4 py-4 align-top text-sm text-gray-600">{formatDate(rental.created_at)}</td>
                             {/* Days Until */}
                             <td className="px-4 py-4 align-top text-sm font-semibold text-green-700">{getDaysUntil(rental.delivery_date_requested)}</td>
                             {/* Dumpster Info */}
@@ -462,19 +519,40 @@ export default function RentalsPage() {
                             </td>
                             {/* Actions */}
                             <td className="px-4 py-4 align-top text-sm">
-                              <div className="flex flex-col gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    unarchiveRental(rental.id);
-                                  }}
-                                  className="text-xs"
-                                >
-                                  Unarchive
-                                </Button>
-                              </div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="h-8 w-8 p-0"
+                                  >
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      unarchiveRental(rental.id);
+                                    }}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Archive className="h-4 w-4" />
+                                    Unarchive
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setDeepArchiveConfirm({ show: true, rental });
+                                    }}
+                                    className="flex items-center gap-2 text-red-600 focus:text-red-600"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                    Deep Archive
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </td>
                           </tr>
                         ))}
@@ -498,35 +576,82 @@ export default function RentalsPage() {
                   </Card>
                 ) : (
                   mainRentals.map((rental) => (
-                    <Link href={`/admin/rentals/${rental.id}`} key={rental.id} className="hover:shadow-lg transition-shadow w-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded block">
+                    <Link 
+                      href={`/admin/rentals/${rental.id}`} 
+                      key={rental.id} 
+                      className="hover:shadow-lg transition-shadow w-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded block"
+                    >
                       <Card className={`w-full ${rental.emergency_delivery ? 'bg-red-50 border-l-4 border-l-red-500' : ''}`}>
                         <CardContent className="p-4">
-                          <div className="flex flex-col gap-2 mb-4">
-                            <div>
-                              <div className="flex items-center gap-2 mb-1">
-                                <h3 className="text-lg font-semibold text-gray-900">
-                                  {formatDate(rental.delivery_date_requested)}
-                                </h3>
-                                {rental.emergency_delivery && (
-                                  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-bold animate-pulse">
-                                    <AlertTriangle className="h-3 w-3" />
-                                    EMERGENCY
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex-1">
+                              <div className="flex flex-col gap-2">
+                                <div>
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <h3 className="text-lg font-semibold text-gray-900">
+                                      {formatDate(rental.delivery_date_requested)}
+                                    </h3>
+                                    {rental.emergency_delivery && (
+                                      <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-bold animate-pulse">
+                                        <AlertTriangle className="h-3 w-3" />
+                                        EMERGENCY
+                                      </div>
+                                    )}
                                   </div>
-                                )}
+                                  <div className="text-xs text-gray-600 mt-1 mb-1">
+                                    Order received: {formatDate(rental.created_at)}
+                                  </div>
+                                  <span className="inline-block text-xs font-semibold text-green-700 bg-green-50 rounded px-2 py-0.5 mt-1 mb-1">
+                                    {getDaysUntil(rental.delivery_date_requested)} days until
+                                  </span>
+                                  <p className="text-xs text-blue-900 font-medium">
+                                    {rental.delivery_address}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    {rental.delivery_zip_code}
+                                  </p>
+                                </div>
+                                <div className="flex gap-2 mt-2">
+                                  {getStatusBadge(rental)}
+                                  {getPaymentStatusBadge(rental.payment_status)}
+                                </div>
                               </div>
-                              <span className="inline-block text-xs font-semibold text-green-700 bg-green-50 rounded px-2 py-0.5 mt-1 mb-1">
-                                {getDaysUntil(rental.delivery_date_requested)} days until
-                              </span>
-                              <p className="text-xs text-blue-900 font-medium">
-                                {rental.delivery_address}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {rental.delivery_zip_code}
-                              </p>
                             </div>
-                            <div className="flex gap-2 mt-2">
-                              {getStatusBadge(rental)}
-                              {getPaymentStatusBadge(rental.payment_status)}
+                            <div className="ml-4">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="h-8 w-8 p-0"
+                                  >
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      archiveRental(rental.id);
+                                    }}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Archive className="h-4 w-4" />
+                                    Archive
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setDeepArchiveConfirm({ show: true, rental });
+                                    }}
+                                    className="flex items-center gap-2 text-red-600 focus:text-red-600"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                    Deep Archive
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                           </div>
                           <div className="grid grid-cols-1 gap-4">
@@ -621,37 +746,84 @@ export default function RentalsPage() {
                     </button>
                     {showArchived && (
                       archivedRentals.map((rental) => (
-                          <Link href={`/admin/rentals/${rental.id}`} key={rental.id} className="hover:shadow-lg transition-shadow w-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded block">
-                            <Card className={`w-full ${rental.emergency_delivery ? 'bg-red-50 border-l-4 border-l-red-500' : ''}`}>
-                              <CardContent className="p-4">
-                                <div className="flex flex-col gap-2 mb-4">
-                                  <div>
-                                    <div className="flex items-center gap-2 mb-1">
-                                      <h3 className="text-lg font-semibold text-gray-900">
-                                        {formatDate(rental.delivery_date_requested)}
-                                      </h3>
-                                      {rental.emergency_delivery && (
-                                        <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-bold animate-pulse">
-                                          <AlertTriangle className="h-3 w-3" />
-                                          EMERGENCY
-                                        </div>
-                                      )}
+                        <Link 
+                          href={`/admin/rentals/${rental.id}`} 
+                          key={rental.id} 
+                          className="hover:shadow-lg transition-shadow w-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded block"
+                        >
+                          <Card className={`w-full ${rental.emergency_delivery ? 'bg-red-50 border-l-4 border-l-red-500' : ''}`}>
+                            <CardContent className="p-4">
+                              <div className="flex justify-between items-start mb-4">
+                                <div className="flex-1">
+                                  <div className="flex flex-col gap-2">
+                                    <div>
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <h3 className="text-lg font-semibold text-gray-900">
+                                          {formatDate(rental.delivery_date_requested)}
+                                        </h3>
+                                        {rental.emergency_delivery && (
+                                          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-bold animate-pulse">
+                                            <AlertTriangle className="h-3 w-3" />
+                                            EMERGENCY
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div className="text-xs text-gray-600 mt-1 mb-1">
+                                        Order received: {formatDate(rental.created_at)}
+                                      </div>
+                                      <span className="inline-block text-xs font-semibold text-green-700 bg-green-50 rounded px-2 py-0.5 mt-1 mb-1">
+                                        {getDaysUntil(rental.delivery_date_requested)} days until
+                                      </span>
+                                      <p className="text-xs text-blue-900 font-medium">
+                                        {rental.delivery_address}
+                                      </p>
+                                      <p className="text-xs text-gray-500">
+                                        {rental.delivery_zip_code}
+                                      </p>
                                     </div>
-                                    <span className="inline-block text-xs font-semibold text-green-700 bg-green-50 rounded px-2 py-0.5 mt-1 mb-1">
-                                      {getDaysUntil(rental.delivery_date_requested)} days until
-                                    </span>
-                                    <p className="text-xs text-blue-900 font-medium">
-                                      {rental.delivery_address}
-                                    </p>
-                                    <p className="text-xs text-gray-500">
-                                      {rental.delivery_zip_code}
-                                    </p>
-                                  </div>
-                                  <div className="flex gap-2 mt-2">
-                                    {getStatusBadge(rental)}
-                                    {getPaymentStatusBadge(rental.payment_status)}
+                                    <div className="flex gap-2 mt-2">
+                                      {getStatusBadge(rental)}
+                                      {getPaymentStatusBadge(rental.payment_status)}
+                                    </div>
                                   </div>
                                 </div>
+                                <div className="ml-4">
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="h-8 w-8 p-0"
+                                      >
+                                        <MoreVertical className="h-4 w-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      <DropdownMenuItem
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          unarchiveRental(rental.id);
+                                        }}
+                                        className="flex items-center gap-2"
+                                      >
+                                        <Archive className="h-4 w-4" />
+                                        Unarchive
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setDeepArchiveConfirm({ show: true, rental });
+                                        }}
+                                        className="flex items-center gap-2 text-red-600 focus:text-red-600"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                        Deep Archive
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </div>
+                              </div>
                                 <div className="grid grid-cols-1 gap-4">
                                   {/* Dumpster Info */}
                                   <div className="space-y-2">
@@ -728,24 +900,9 @@ export default function RentalsPage() {
                                     </div>
                                   </div>
                                 )}
-                                {/* Actions */}
-                                <div className="mt-4 pt-4 border-t border-gray-200">
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      unarchiveRental(rental.id);
-                                    }}
-                                    className="w-full text-xs"
-                                  >
-                                    Unarchive
-                                  </Button>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          </Link>
+                            </CardContent>
+                          </Card>
+                        </Link>
                         ))
                     )}
                   </div>
@@ -755,6 +912,61 @@ export default function RentalsPage() {
           )}
         </div>
       </main>
+
+      {/* Deep Archive Confirmation Dialog */}
+      {deepArchiveConfirm.show && deepArchiveConfirm.rental && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <Trash2 className="h-5 w-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Deep Archive Rental</h3>
+                <p className="text-sm text-gray-500">This will hide the rental from the website but preserve the record</p>
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-gray-700 mb-2">
+                Are you sure you want to deep archive rental #{deepArchiveConfirm.rental.id}?
+              </p>
+              <div className="bg-gray-50 p-3 rounded text-sm">
+                <p><strong>Customer:</strong> {deepArchiveConfirm.rental.customer?.first_name} {deepArchiveConfirm.rental.customer?.last_name}</p>
+                <p><strong>Delivery Date:</strong> {formatDate(deepArchiveConfirm.rental.delivery_date_requested)}</p>
+                <p><strong>Amount:</strong> {formatCurrency(deepArchiveConfirm.rental.total_amount)}</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setDeepArchiveConfirm({ show: false, rental: null })}
+                disabled={deepArchiving}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => deepArchiveRental(deepArchiveConfirm.rental!.id)}
+                disabled={deepArchiving}
+              >
+                {deepArchiving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Deep Archiving...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Deep Archive Rental
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

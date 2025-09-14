@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/lib/contexts/AuthContext';
-import { Mail, Phone, User, MessageSquare, Loader2, ChevronDown, ChevronRight } from 'lucide-react';
+import { Mail, Phone, User, MessageSquare, Loader2, ChevronDown, ChevronRight, Trash2 } from 'lucide-react';
 import AdminSidebar from '@/components/AdminSidebar';
 
 interface ContactMessage {
@@ -18,6 +18,7 @@ interface ContactMessage {
   subject: string;
   message: string;
   status: 'new' | 'read' | 'replied' | 'archived';
+  deleted: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -28,6 +29,8 @@ export default function ContactMessagesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
   const [showArchived, setShowArchived] = useState(false);
+  const [deepArchiveConfirm, setDeepArchiveConfirm] = useState<{ show: boolean; message: ContactMessage | null }>({ show: false, message: null });
+  const [deepArchiving, setDeepArchiving] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -40,6 +43,7 @@ export default function ContactMessagesPage() {
       const { data, error } = await supabase
         .from('contact_messages')
         .select('*')
+        .eq('deleted', false)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -78,6 +82,31 @@ export default function ContactMessagesPage() {
       }
     } catch (error) {
       console.error('Error updating message status:', error);
+    }
+  };
+
+  const deepArchiveMessage = async (messageId: number) => {
+    try {
+      setDeepArchiving(true);
+      
+      // Mark the message as deleted (soft delete)
+      const { error } = await supabase
+        .from('contact_messages')
+        .update({ deleted: true })
+        .eq('id', messageId);
+
+      if (error) {
+        console.error('Error deep archiving message:', error);
+        return;
+      }
+
+      // Close confirmation dialog and refresh the messages list
+      setDeepArchiveConfirm({ show: false, message: null });
+      fetchMessages();
+    } catch (error) {
+      console.error('Error deep archiving message:', error);
+    } finally {
+      setDeepArchiving(false);
     }
   };
 
@@ -308,6 +337,15 @@ export default function ContactMessagesPage() {
                         >
                           Archive
                         </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => setDeepArchiveConfirm({ show: true, message: selectedMessage })}
+                          className="flex items-center gap-1"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Deep Archive
+                        </Button>
                       </div>
                     </div>
                   </CardHeader>
@@ -368,6 +406,61 @@ export default function ContactMessagesPage() {
           </div>
         </div>
       </main>
+
+      {/* Deep Archive Confirmation Dialog */}
+      {deepArchiveConfirm.show && deepArchiveConfirm.message && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <Trash2 className="h-5 w-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Deep Archive Message</h3>
+                <p className="text-sm text-gray-500">This will hide the message from the website but preserve the record</p>
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-gray-700 mb-2">
+                Are you sure you want to deep archive this message from {deepArchiveConfirm.message.first_name} {deepArchiveConfirm.message.last_name}?
+              </p>
+              <div className="bg-gray-50 p-3 rounded text-sm">
+                <p><strong>Subject:</strong> {getSubjectLabel(deepArchiveConfirm.message.subject)}</p>
+                <p><strong>Email:</strong> {deepArchiveConfirm.message.email}</p>
+                <p><strong>Date:</strong> {formatDate(deepArchiveConfirm.message.created_at)}</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setDeepArchiveConfirm({ show: false, message: null })}
+                disabled={deepArchiving}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => deepArchiveMessage(deepArchiveConfirm.message!.id)}
+                disabled={deepArchiving}
+              >
+                {deepArchiving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Deep Archiving...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Deep Archive Message
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

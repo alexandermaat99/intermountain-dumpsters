@@ -3,14 +3,16 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/lib/contexts/AuthContext';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Loader2, Pencil, ArrowLeft, ShieldCheck, AlertTriangle, Clipboard, Check } from 'lucide-react';
+import { Loader2, Pencil, ArrowLeft, ShieldCheck, AlertTriangle, Clipboard, Check, Trash2, User, Mail, ExternalLink, Phone } from 'lucide-react';
 
 export default function RentalDetailPage() {
   const { id } = useParams();
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -29,6 +31,7 @@ export default function RentalDetailPage() {
       email: string;
       first_name: string;
       last_name: string;
+      phone_number?: string;
       stripe_customer_id?: string;
     };
     [key: string]: unknown;
@@ -36,6 +39,8 @@ export default function RentalDetailPage() {
   const [saving, setSaving] = useState(false);
   const [availableDumpsters, setAvailableDumpsters] = useState<({ id: number; identification: string; dumpster_type_id: number; status?: 'assigned' | 'in_use' })[]>([]);
   const [loadingDumpsters, setLoadingDumpsters] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Driver update state
   const [driverFields, setDriverFields] = useState({
@@ -74,6 +79,9 @@ export default function RentalDetailPage() {
   const fetchRental = async () => {
     setLoading(true);
     setError('');
+    
+    console.log('Fetching rental with ID:', id);
+    
     const { data, error } = await supabase
       .from('rentals')
       .select(`
@@ -83,11 +91,15 @@ export default function RentalDetailPage() {
           email,
           first_name,
           last_name,
+          phone_number,
           stripe_customer_id
         )
       `)
       .eq('id', id)
+      .eq('deleted', false)
       .single();
+      
+    console.log('Rental fetch result:', { data, error });
     if (error) {
       setError('Could not fetch rental.');
     } else {
@@ -350,8 +362,56 @@ export default function RentalDetailPage() {
     }
   };
 
+  const deepArchiveRental = async () => {
+    if (!rental) return;
+    
+    try {
+      setDeleting(true);
+      
+      // Mark the rental as deleted (soft delete)
+      const { error } = await supabase
+        .from('rentals')
+        .update({ deleted: true })
+        .eq('id', rental.id);
+
+      if (error) {
+        console.error('Error deep archiving rental:', error);
+        return;
+      }
+
+      // Redirect back to rentals list
+      router.push('/admin/rentals');
+    } catch (error) {
+      console.error('Error deep archiving rental:', error);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   // Remove the handleTestEmail function
 
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
+          <p className="text-gray-600">Please sign in to access this page</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -369,11 +429,22 @@ export default function RentalDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center p-2 sm:p-6">
       <div className="w-full max-w-xl">
-        <div className="flex items-center mb-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()} className="mr-2">
-            <ArrowLeft className="h-5 w-5" />
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <Button variant="ghost" size="icon" onClick={() => router.back()} className="mr-2">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <span className="font-semibold text-xl tracking-tight">Rental #{rental && (rental.id as React.ReactNode)}</span>
+          </div>
+          <Button 
+            variant="destructive" 
+            size="sm"
+            onClick={() => setDeleteConfirm(true)}
+            className="flex items-center gap-2"
+          >
+            <Trash2 className="h-4 w-4" />
+            Deep Archive
           </Button>
-          <span className="font-semibold text-xl tracking-tight">Rental #{rental && (rental.id as React.ReactNode)}</span>
         </div>
         <Card className="shadow-xl rounded-2xl border border-gray-100">
           <CardHeader className="pb-2">
@@ -399,6 +470,109 @@ export default function RentalDetailPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-10 p-6">
+            {/* CUSTOMER INFORMATION SECTION */}
+            {rental?.customer && (
+              <div className="bg-green-50/60 border border-green-100 rounded-xl p-5 shadow-sm">
+
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <p className="text-sm text-gray-600">Name</p>
+                        <p className="font-semibold text-gray-900">
+                          {rental.customer.first_name} {rental.customer.last_name}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    
+                    <div className="flex items-center gap-3">
+                      <Mail className="h-4 w-4 text-green-600" />
+                      <div>
+                        <p className="text-sm text-gray-600">Email</p>
+                        <a 
+                          href={`mailto:${rental.customer.email}`}
+                          className="font-semibold text-blue-600 hover:text-blue-800 underline flex items-center gap-1"
+                        >
+                          {rental.customer.email}
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </div>
+                    </div>
+                    
+                    {rental.customer.phone_number && (
+                      <div className="flex items-center gap-3">
+                        <Phone className="h-4 w-4 text-green-600" />
+                        <div>
+                          <p className="text-sm text-gray-600">Phone</p>
+                          <a 
+                            href={`tel:${rental.customer.phone_number}`}
+                            className="font-semibold text-blue-600 hover:text-blue-800 underline flex items-center gap-1"
+                          >
+                            {rental.customer.phone_number}
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center">
+                        <span className="text-xs font-bold text-green-700">#</span>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Customer ID</p>
+                        <p className="font-semibold text-gray-900">{rental.customer.id}</p>
+                      </div>
+                    </div>
+                    
+                    {rental.customer.stripe_customer_id && (
+                      <div className="flex items-center gap-3">
+                        <div className="w-4 h-4 bg-purple-100 rounded-full flex items-center justify-center">
+                          <span className="text-xs font-bold text-purple-700">S</span>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600">Stripe Customer</p>
+                          <p className="font-mono text-xs text-gray-700 break-all">
+                            {rental.customer.stripe_customer_id}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between mb-4">
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        // You can implement customer details page navigation here
+                        // For now, we'll copy customer info to clipboard
+                        const customerInfo = `${rental.customer?.first_name} ${rental.customer?.last_name}\nEmail: ${rental.customer?.email}${rental.customer?.phone_number ? `\nPhone: ${rental.customer.phone_number}` : ''}\nCustomer ID: ${rental.customer?.id}`;
+                        navigator.clipboard.writeText(customerInfo);
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      }}
+                      className="flex items-center gap-2 text-green-700 border-green-200 hover:bg-green-100"
+                    >
+                      <Clipboard className="h-4 w-4" />
+                      Copy Info
+                    </Button>
+                    </div>
+                </div>
+                
+                {copied && (
+                  <div className="mt-3 flex items-center gap-2 text-green-600 text-sm">
+                    <Check className="h-4 w-4" />
+                    Customer information copied to clipboard!
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* DRIVER UPDATE SECTION */}
             <form onSubmit={handleDriverSave} className="bg-blue-50/60 border border-blue-100 rounded-xl p-5 flex flex-col gap-4 mb-4 shadow-sm">
               <div className="mb-2">
@@ -666,6 +840,63 @@ export default function RentalDetailPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Deep Archive Confirmation Dialog */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <Trash2 className="h-5 w-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Deep Archive Rental</h3>
+                <p className="text-sm text-gray-500">This will hide the rental from the website but preserve the record</p>
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-gray-700 mb-2">
+                Are you sure you want to deep archive rental #{rental?.id}?
+              </p>
+              {rental && (
+                <div className="bg-gray-50 p-3 rounded text-sm">
+                  <p><strong>Customer:</strong> {rental.customer?.first_name} {rental.customer?.last_name}</p>
+                  <p><strong>Delivery Date:</strong> {new Date(rental.delivery_date_requested || '').toLocaleDateString()}</p>
+                  <p><strong>Address:</strong> {rental.delivery_address}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setDeleteConfirm(false)}
+                disabled={deleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={deepArchiveRental}
+                disabled={deleting}
+              >
+                {deleting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Deep Archiving...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Deep Archive Rental
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
