@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/contexts/AuthContext';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Loader2, Pencil, ArrowLeft, ShieldCheck, AlertTriangle, Clipboard, Check, Trash2, User, Mail, ExternalLink, Phone } from 'lucide-react';
+import { Loader2, Pencil, ArrowLeft, ShieldCheck, AlertTriangle, Clipboard, Check, Trash2, Mail, ExternalLink, Phone } from 'lucide-react';
 
 export default function RentalDetailPage() {
   const { id } = useParams();
