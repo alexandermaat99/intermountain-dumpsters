@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Settings, Truck, ClipboardList, Menu, X, MapPin, LogOut, MessageSquare, Receipt, ReceiptIcon } from 'lucide-react';
+import { Settings, Truck, ClipboardList, Menu, X, MapPin, LogOut, MessageSquare, Receipt } from 'lucide-react';
 import { User } from '@supabase/supabase-js';
 import { useState } from 'react';
 import { useAuth } from '@/lib/contexts/AuthContext';
