@@ -1,3 +1,4 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -25,7 +26,31 @@ interface OrderData {
   emergency_delivery: boolean;
 }
 
-export async function sendOrderConfirmation(orderData: OrderData) {
+export async function POST(request: NextRequest) {
+  try {
+    const orderData: OrderData = await request.json();
+
+    // Send customer confirmation email
+    const customerEmailResult = await sendOrderConfirmation(orderData);
+    
+    // Send admin notification email
+    const adminEmailResult = await sendAdminNotification(orderData);
+
+    return NextResponse.json({
+      success: true,
+      customerEmail: customerEmailResult,
+      adminEmail: adminEmailResult
+    });
+  } catch (error) {
+    console.error('Error in send-emails API:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to send emails' },
+      { status: 500 }
+    );
+  }
+}
+
+async function sendOrderConfirmation(orderData: OrderData) {
   try {
     const { data, error } = await resend.emails.send({
       from: 'Intermountain Dumpsters <orders@intermountaindumpsters.com>',
@@ -47,7 +72,7 @@ export async function sendOrderConfirmation(orderData: OrderData) {
   }
 }
 
-export async function sendAdminNotification(orderData: OrderData) {
+async function sendAdminNotification(orderData: OrderData) {
   try {
     const { data, error } = await resend.emails.send({
       from: 'Intermountain Dumpsters <orders@intermountaindumpsters.com>',

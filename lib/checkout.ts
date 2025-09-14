@@ -1,7 +1,6 @@
 import { supabase } from './supabaseClient';
 import { CheckoutData, CustomerInfo } from './types';
 import { calculateTaxFromServiceArea } from './tax-calculator-db';
-import { sendOrderConfirmation, sendAdminNotification } from './email';
 
 export interface SavedOrder {
   customer_id: number;
@@ -290,20 +289,20 @@ export async function confirmPendingOrder(pendingOrderId: number, stripeSessionI
       if (orderFetchError || !completeOrderData) {
         console.error('❌ Error fetching complete order data for emails:', orderFetchError);
       } else {
-        // Send customer confirmation email
-        const customerEmailResult = await sendOrderConfirmation(completeOrderData);
-        if (customerEmailResult.success) {
-          console.log('✅ Customer confirmation email sent successfully');
-        } else {
-          console.error('❌ Failed to send customer confirmation email:', customerEmailResult.error);
-        }
+        // Send emails via API route
+        const emailResponse = await fetch('/api/send-emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(completeOrderData),
+        });
 
-        // Send admin notification email
-        const adminEmailResult = await sendAdminNotification(completeOrderData);
-        if (adminEmailResult.success) {
-          console.log('✅ Admin notification email sent successfully');
+        if (emailResponse.ok) {
+          const emailResult = await emailResponse.json();
+          console.log('✅ Emails sent successfully:', emailResult);
         } else {
-          console.error('❌ Failed to send admin notification email:', adminEmailResult.error);
+          console.error('❌ Failed to send emails:', await emailResponse.text());
         }
       }
     } catch (emailError) {
