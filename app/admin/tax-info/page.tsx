@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { DollarSign, Receipt, Loader2 } from 'lucide-react';
+import { DollarSign, Receipt } from 'lucide-react';
 import AdminSidebar from '@/components/AdminSidebar';
 
 export default function TaxInfoPage() {

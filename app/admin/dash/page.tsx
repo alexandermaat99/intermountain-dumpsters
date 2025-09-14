@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/contexts/AuthContext';
 import AdminSidebar from '@/components/AdminSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getContactInfoClient, ContactInfo } from '@/lib/contact-info';
-import { Loader2, Settings } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import AdminInfoForm from '@/components/admin/AdminInfoForm';
 import AdminInfoSummary from '@/components/admin/AdminInfoSummary';
 import AdminAccountsCard from '@/components/admin/AdminAccountsCard';
