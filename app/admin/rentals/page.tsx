@@ -198,7 +198,7 @@ export default function RentalsPage() {
 
   const getPaymentStatusBadge = (status: string) => {
     switch (status) {
-      case 'paid':
+      case 'completed':
         return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Paid</span>;
       case 'pending':
         return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>;

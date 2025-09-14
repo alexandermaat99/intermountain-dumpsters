@@ -7,7 +7,9 @@ import { useAuth } from '@/lib/contexts/AuthContext';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+
 import { Loader2, Pencil, ArrowLeft, ShieldCheck, AlertTriangle, Clipboard, Check, Trash2, Mail, ExternalLink, Phone } from 'lucide-react';
+//imports icons from lucide-react
 
 export default function RentalDetailPage() {
   const { id } = useParams();
@@ -26,6 +28,9 @@ export default function RentalDetailPage() {
     cancelation_insurance?: boolean;
     driveway_insurance?: boolean;
     emergency_delivery?: boolean;
+    subtotal_amount?: number;
+    tax_amount?: number;
+    payment_status?: string;
     customer?: {
       id: number;
       email: string;
@@ -69,6 +74,21 @@ export default function RentalDetailPage() {
   
   // Add state for copy feedback
   const [copied, setCopied] = useState(false);
+
+
+  // Payment status badge
+  const getPaymentStatusBadge = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Paid</span>;
+      case 'pending':
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>;
+      case 'failed':
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Failed</span>;
+      default:
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{status}</span>;
+    }
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -389,8 +409,6 @@ export default function RentalDetailPage() {
   };
 
   // Remove the handleTestEmail function
-
-
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -474,7 +492,6 @@ export default function RentalDetailPage() {
             {rental?.customer && (
               <div className="bg-green-50/60 border border-green-100 rounded-xl p-5 shadow-sm">
 
-                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
@@ -485,8 +502,7 @@ export default function RentalDetailPage() {
                         </p>
                       </div>
                     </div>
-                    
-                    
+                                        
                     <div className="flex items-center gap-3">
                       <Mail className="h-4 w-4 text-green-600" />
                       <div>
@@ -660,6 +676,31 @@ export default function RentalDetailPage() {
               {error && <div className="text-red-600 text-sm">{error}</div>}
               {success && <div className="text-green-600 text-sm">{success}</div>}
             </form>
+
+            {/* Payment Information SECTION */}
+            <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+              <div className="flex items-center mb-3">
+                <div className="font-semibold text-gray-900 text-lg mr-2">Payment Information</div>
+              </div>
+              <div className="flex flex-col gap-3 divide-y divide-gray-100">
+                <div className="flex items-center gap-2 py-2">
+                  <span className="w-40 text-gray-600 font-medium">Payment Status:</span>
+                  <span className="mt-1">{getPaymentStatusBadge(rental?.payment_status || 'N/A')}</span>
+
+                </div>
+                <div className="flex items-center gap-2 py-2 first:pt-0">
+                  <span className="w-40 text-gray-600 font-medium">Subtotal Amount:</span>
+                  <span className="text-gray-900">${rental?.subtotal_amount || 'N/A'}</span>
+                </div>
+                <div className="flex items-center gap-2 py-2">
+                  <span className="w-40 text-gray-600 font-medium">Tax Amount:</span>
+                  <span className="text-gray-900">${rental?.tax_amount || 'N/A'}</span>
+                </div>
+              </div>
+
+            </div>
+
+
 
             {/* OTHER INFO SECTION */}
             <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
