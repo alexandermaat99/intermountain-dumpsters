@@ -70,21 +70,51 @@ export default function TaxInfoPage() {
     };
 
     if (authLoading) {
-        return <div>Loading...</div>;
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+                <AdminSidebar user={user} />
+                <main className="flex-1 flex items-center justify-center p-4">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                        <p className="text-gray-600">Loading...</p>
+                    </div>
+                </main>
+            </div>
+        );
     }
 
     if (!user) {
-        return <div>Access Denied - Please sign in</div>
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+                <AdminSidebar user={user} />
+                <main className="flex-1 flex items-center justify-center p-4">
+                    <div className="text-center">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
+                        <p className="text-gray-600">Please sign in to access this page</p>
+                    </div>
+                </main>
+            </div>
+        );
     }
 
     if (loading) {
-        return <div>Loading...</div>; 
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+                <AdminSidebar user={user} />
+                <main className="flex-1 flex items-center justify-center p-4">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                        <p className="text-gray-600">Loading tax data...</p>
+                    </div>
+                </main>
+            </div>
+        );
     }
  
     return (
-        <div className="min-h-screen bg-gray-50 flex">
+        <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
             <AdminSidebar user={user} />
-            <div className="flex-1 p-6">
+            <main className="flex-1 p-2 sm:p-4 md:p-8">
                 <div className="max-w-4xl mx-auto">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Tax Information</h1>
@@ -145,7 +175,7 @@ export default function TaxInfoPage() {
                     </Card>
                 </div>
                 </div>
-            </div>
+            </main>
         </div>
     );
 }
