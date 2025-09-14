@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { DollarSign, Receipt } from 'lucide-react';
+import { DollarSign, Receipt, Loader2 } from 'lucide-react';
 import AdminSidebar from '@/components/AdminSidebar';
 
 export default function TaxInfoPage() {
@@ -75,7 +75,7 @@ export default function TaxInfoPage() {
                 <AdminSidebar user={user} />
                 <main className="flex-1 flex items-center justify-center p-4">
                     <div className="text-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
                         <p className="text-gray-600">Loading...</p>
                     </div>
                 </main>
@@ -103,7 +103,7 @@ export default function TaxInfoPage() {
                 <AdminSidebar user={user} />
                 <main className="flex-1 flex items-center justify-center p-4">
                     <div className="text-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
                         <p className="text-gray-600">Loading tax data...</p>
                     </div>
                 </main>
