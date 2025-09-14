@@ -79,7 +79,7 @@ export default function RentalsPage() {
           *,
           customer:customers(first_name, last_name, phone_number, email, business),
           dumpster_type:dumpster_types(name, descriptor, price),
-          dumpster:dumpsters(identification)
+          dumpster:dumpsters!fk_rentals_dumpster_id(identification)
         `)
         .eq('deleted', false)
         .order('delivery_date_requested', { ascending: true });

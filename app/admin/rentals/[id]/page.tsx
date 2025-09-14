@@ -113,7 +113,8 @@ export default function RentalDetailPage() {
           last_name,
           phone_number,
           stripe_customer_id
-        )
+        ),
+        dumpster:dumpsters!fk_rentals_dumpster_id(identification)
       `)
       .eq('id', id)
       .eq('deleted', false)

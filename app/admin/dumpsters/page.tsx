@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Plus, Trash, Package, AlertCircle } from "lucide-react";
+import { Loader2, Plus, Trash, Package, AlertCircle, Edit2, Save, X } from "lucide-react";
 import { Dialog } from '@headlessui/react';
 import AdminSidebar from "@/components/AdminSidebar";
 import { useAuth } from "@/lib/contexts/AuthContext";
@@ -39,6 +39,12 @@ export default function AdminDumpstersPage() {
   const [formError, setFormError] = useState('');
   const [formLoading, setFormLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
+  
+  // Edit state
+  const [editingDumpster, setEditingDumpster] = useState<number | null>(null);
+  const [editIdentification, setEditIdentification] = useState('');
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -182,6 +188,49 @@ export default function AdminDumpstersPage() {
     }
   };
 
+  const handleEditDumpster = (dumpster: Dumpster) => {
+    setEditingDumpster(dumpster.id);
+    setEditIdentification(dumpster.identification);
+    setEditError('');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingDumpster(null);
+    setEditIdentification('');
+    setEditError('');
+  };
+
+  const handleSaveEdit = async (dumpsterId: number) => {
+    if (!editIdentification.trim()) {
+      setEditError('Identification cannot be empty');
+      return;
+    }
+
+    setEditLoading(true);
+    setEditError('');
+
+    try {
+      const { error } = await supabase
+        .from('dumpsters')
+        .update({ identification: editIdentification.trim() })
+        .eq('id', dumpsterId);
+
+      if (error) {
+        throw new Error('Failed to update dumpster');
+      }
+
+      setEditingDumpster(null);
+      setEditIdentification('');
+      
+      // Refresh the data
+      await fetchData();
+    } catch (err) {
+      setEditError(err instanceof Error ? err.message : 'Failed to update dumpster');
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
   const getDumpstersByType = (typeId: number) => {
     return dumpsters.filter(dumpster => dumpster.dumpster_type_id === typeId);
   };
@@ -262,35 +311,93 @@ export default function AdminDumpstersPage() {
                       <div className="space-y-2">
                         <h4 className="font-medium text-sm text-gray-700 mb-3">Individual Units:</h4>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                                                     {getDumpstersByType(type.id).map((dumpster) => (
-                             <div
-                               key={dumpster.id}
-                               className={`flex items-center justify-between p-2 rounded border text-sm ${
-                                 dumpster.is_in_use 
-                                   ? 'bg-yellow-50 border-yellow-200' 
-                                   : 'bg-gray-50 border-gray-200'
-                               }`}
-                             >
-                               <div className="flex items-center gap-2">
-                                 <span className="font-mono text-xs">{dumpster.identification}</span>
-                                 {dumpster.is_in_use && (
-                                   <span className="text-xs bg-yellow-100 text-yellow-800 px-1 py-0.5 rounded">
-                                     In Use
-                                   </span>
-                                 )}
-                               </div>
-                               <Button
-                                 size="sm"
-                                 variant="ghost"
-                                 className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
-                                 onClick={() => handleDeleteDumpster(dumpster.id)}
-                                 disabled={dumpster.is_in_use}
-                                 title={dumpster.is_in_use ? "Cannot delete dumpster that is currently in use" : "Delete dumpster"}
-                               >
-                                 <Trash className="h-3 w-3" />
-                               </Button>
-                             </div>
-                           ))}
+                          {getDumpstersByType(type.id).map((dumpster) => (
+                            <div
+                              key={dumpster.id}
+                              className={`p-2 rounded border text-sm ${
+                                dumpster.is_in_use 
+                                  ? 'bg-yellow-50 border-yellow-200' 
+                                  : 'bg-gray-50 border-gray-200'
+                              }`}
+                            >
+                              {editingDumpster === dumpster.id ? (
+                                // Edit mode
+                                <div className="space-y-2">
+                                  <Input
+                                    value={editIdentification}
+                                    onChange={(e) => setEditIdentification(e.target.value)}
+                                    className="h-7 text-xs font-mono border-blue-300 focus:border-blue-500 focus:ring-blue-500"
+                                    placeholder="Enter ID"
+                                    autoFocus
+                                  />
+                                  {editError && (
+                                    <div className="text-xs text-red-600 bg-red-50 px-2 py-1 rounded border border-red-200">
+                                      {editError}
+                                    </div>
+                                  )}
+                                  <div className="flex gap-1 justify-end">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-6 px-2 text-xs text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                                      onClick={handleCancelEdit}
+                                      disabled={editLoading}
+                                    >
+                                      <X className="h-3 w-3 mr-1" />
+                                      Cancel
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      className="h-6 px-2 text-xs bg-green-600 hover:bg-green-700 text-white"
+                                      onClick={() => handleSaveEdit(dumpster.id)}
+                                      disabled={editLoading}
+                                    >
+                                      {editLoading ? (
+                                        <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                      ) : (
+                                        <Save className="h-3 w-3 mr-1" />
+                                      )}
+                                      Save
+                                    </Button>
+                                  </div>
+                                </div>
+                              ) : (
+                                // View mode
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-mono text-xs">{dumpster.identification}</span>
+                                    {dumpster.is_in_use && (
+                                      <span className="text-xs bg-yellow-100 text-yellow-800 px-1 py-0.5 rounded">
+                                        In Use
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="flex gap-1">
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-6 w-6 p-0 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-md"
+                                      onClick={() => handleEditDumpster(dumpster)}
+                                      disabled={dumpster.is_in_use}
+                                      title={dumpster.is_in_use ? "Cannot edit dumpster that is currently in use" : "Edit dumpster"}
+                                    >
+                                      <Edit2 className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md"
+                                      onClick={() => handleDeleteDumpster(dumpster.id)}
+                                      disabled={dumpster.is_in_use}
+                                      title={dumpster.is_in_use ? "Cannot delete dumpster that is currently in use" : "Delete dumpster"}
+                                    >
+                                      <Trash className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
