@@ -193,7 +193,7 @@ function generateContactEmailHTML(contactData: ContactMessageData): string {
             Reply to Customer
           </a>
           <br>
-          <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/admin/contact-messages" class="action-button">
+          <a href="https://intermountaindumpsters.com/admin/contact-messages" class="action-button">
             View in Admin Panel
           </a>
         </div>
