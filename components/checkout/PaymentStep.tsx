@@ -5,7 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckoutData, CartItem, CartState } from '@/lib/types';
+import { CheckoutData } from '@/lib/types';
+
+// Cart types removed - using external booking system
+type CartState = {
+  items: Array<{ id: number }>;
+  itemCount: number;
+  total: number;
+};
 import { CreditCard, ArrowLeft, CheckCircle, User, MapPin } from 'lucide-react';
 import { useContactInfo } from '@/lib/hooks/useContactInfo';
 import { createPendingOrder } from '@/lib/checkout';

@@ -54,10 +54,7 @@ export async function createPendingOrder(
           delivery_address: checkoutData.delivery.delivery_address,
         },
         insurance_info: checkoutData.insurance,
-        cart_info: {
-          ...checkoutData.cart,
-          dumpster_type_id: checkoutData.cart?.items?.[0]?.id,
-        }, // Store cart data including dumpster_type_id from first item
+        cart_info: {}, // Cart functionality removed - using external booking system
         total_amount: taxInfo.total,
         tax_amount: taxInfo.taxAmount,
         subtotal_amount: taxInfo.subtotal,
