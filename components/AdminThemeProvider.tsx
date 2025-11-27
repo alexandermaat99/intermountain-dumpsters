@@ -31,8 +31,8 @@ export default function AdminThemeProvider({ children }: AdminThemeProviderProps
   return (
     <ThemeProvider
       attribute="class"
-      defaultTheme={isAdminPage ? "light" : "system"}
-      enableSystem={!isAdminPage}
+      defaultTheme="light"
+      enableSystem={true}
       disableTransitionOnChange
       forcedTheme={isAdminPage ? "light" : undefined}
     >

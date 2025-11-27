@@ -61,6 +61,7 @@ export default function AdminDumpsterTypesPage() {
   });
   const [editLoading, setEditLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [editError, setEditError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -112,7 +113,7 @@ export default function AdminDumpsterTypesPage() {
       height: Number(form.height),
       uses: form.uses,
       image_path,
-      price: Number(form.price),
+      price: Math.round(parseFloat(form.price) * 100) / 100,
       long_description: form.long_description,
     });
     if (insertError) {
@@ -141,7 +142,7 @@ export default function AdminDumpsterTypesPage() {
       width: String(type.width),
       height: String(type.height),
       uses: type.uses,
-      price: String(type.price),
+      price: (Math.round(type.price * 100) / 100).toFixed(2),
       descriptor: type.descriptor,
       long_description: type.long_description || '',
       image: null,
@@ -187,7 +188,7 @@ export default function AdminDumpsterTypesPage() {
     }
     await supabase.from('dumpster_types').update({
       name: editForm.name,
-      price: Number(editForm.price),
+      price: Math.round(parseFloat(editForm.price) * 100) / 100,
       descriptor: editForm.descriptor,
       long_description: editForm.long_description,
       length: Number(editForm.length),
@@ -202,11 +203,98 @@ export default function AdminDumpsterTypesPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this dumpster type?')) return;
-    setDeleteLoading(id);
-    await supabase.from('dumpster_types').delete().eq('id', id);
-    setDeleteLoading(null);
-    fetchTypes();
+    setDeleteError(null);
+    
+    try {
+      // First, check if there are any dumpsters using this type
+      const { data: dumpstersData, error: dumpstersError } = await supabase
+        .from('dumpsters')
+        .select('id')
+        .eq('dumpster_type_id', id);
+      
+      if (dumpstersError) {
+        throw new Error('Failed to check for related dumpsters');
+      }
+      
+      if (dumpstersData && dumpstersData.length > 0) {
+        setDeleteError('Cannot delete this dumpster type because there are dumpsters assigned to it. Please remove or reassign those dumpsters first.');
+        return;
+      }
+      
+      // Check if there are any active (non-archived, non-deleted) rentals using this type
+      const { data: activeRentalsData, error: activeRentalsError } = await supabase
+        .from('rentals')
+        .select('id')
+        .eq('dumpster_type_id', id)
+        .eq('deleted', false)
+        .eq('archived', false);
+      
+      if (activeRentalsError) {
+        throw new Error('Failed to check for related rentals');
+      }
+      
+      if (activeRentalsData && activeRentalsData.length > 0) {
+        setDeleteError('Cannot delete this dumpster type because there are active rentals using it. Please archive or delete those rentals first.');
+        return;
+      }
+      
+      // Check how many archived/deleted rentals will be affected
+      const { data: archivedRentalsData, error: archivedRentalsError } = await supabase
+        .from('rentals')
+        .select('id')
+        .eq('dumpster_type_id', id)
+        .or('deleted.eq.true,archived.eq.true');
+      
+      if (archivedRentalsError) {
+        throw new Error('Failed to check for archived rentals');
+      }
+      
+      const archivedRentalsCount = archivedRentalsData?.length || 0;
+      
+      // Show detailed confirmation
+      let confirmMessage = 'Are you sure you want to delete this dumpster type?';
+      if (archivedRentalsCount > 0) {
+        confirmMessage += `\n\nThis will also remove the dumpster type reference from ${archivedRentalsCount} archived or deleted rental(s).`;
+      }
+      confirmMessage += '\n\nThis action cannot be undone.';
+      
+      if (!confirm(confirmMessage)) {
+        return;
+      }
+      
+      setDeleteLoading(id);
+      
+      // Before deleting, set dumpster_type_id to NULL for all rentals (including archived/deleted)
+      // This is necessary to satisfy the foreign key constraint
+      if (archivedRentalsCount > 0) {
+        const { error: updateRentalsError } = await supabase
+          .from('rentals')
+          .update({ dumpster_type_id: null })
+          .eq('dumpster_type_id', id);
+        
+        if (updateRentalsError) {
+          throw new Error('Failed to update related rentals: ' + updateRentalsError.message);
+        }
+      }
+      
+      // Now proceed with deletion
+      const { error: deleteError } = await supabase
+        .from('dumpster_types')
+        .delete()
+        .eq('id', id);
+      
+      if (deleteError) {
+        throw new Error(deleteError.message || 'Failed to delete dumpster type');
+      }
+      
+      // Success - refresh the list
+      await fetchTypes();
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : 'Failed to delete dumpster type');
+      console.error('Error deleting dumpster type:', err);
+    } finally {
+      setDeleteLoading(null);
+    }
   };
 
   if (loading) {
@@ -430,6 +518,19 @@ export default function AdminDumpsterTypesPage() {
           ) : types.length === 0 ? (
             <div className="text-gray-500 text-center py-8">No dumpster types found.</div>
           ) : (
+            <>
+              {deleteError && (
+                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
+                  <p className="font-semibold">Error deleting dumpster type:</p>
+                  <p>{deleteError}</p>
+                  <button
+                    onClick={() => setDeleteError(null)}
+                    className="mt-2 text-sm underline hover:no-underline"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              )}
             <div className="grid gap-4">
               {types.map((type) => (
                 <Card key={type.id} className="flex flex-row items-center gap-4 p-4">
@@ -456,6 +557,7 @@ export default function AdminDumpsterTypesPage() {
                 </Card>
               ))}
             </div>
+            </>
           )}
         </div>
       </main>

@@ -1,22 +1,13 @@
 "use client";
 
 import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Home, Phone } from 'lucide-react';
-import { useCartContext } from '@/lib/contexts/CartContext';
 
 export default function SuccessContent({ phone, baseUrl }: { phone: string, baseUrl: string }) {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
-  const { clearCart } = useCartContext();
-
-  useEffect(() => {
-    if (sessionId) {
-      clearCart();
-    }
-  }, [sessionId, clearCart]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">

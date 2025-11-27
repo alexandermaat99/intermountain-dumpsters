@@ -227,26 +227,41 @@ export default async function AboutPage() {
             <div>
               <h3 className="text-2xl font-semibold mb-6">Our Coverage Area</h3>
               <p className="text-lg text-muted-foreground mb-6">
-                We proudly serve communities throughout Utah, with a focus on the Intermountain region. 
-                Our service area includes major cities and surrounding communities.
+                We proudly serve communities throughout Utah County. 
+                Our service area includes all cities and towns in Utah County.
               </p>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <h4 className="font-semibold">Major Cities:</h4>
+              <div className="space-y-2">
+                <h4 className="font-semibold">Utah County:</h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-1">
                   <ul className="text-muted-foreground space-y-1">
-                    <li>• Salt Lake City</li>
                     <li>• Provo</li>
-                    <li>• Ogden</li>
-                    <li>• West Valley City</li>
+                    <li>• Orem</li>
+                    <li>• Lehi</li>
+                    <li>• American Fork</li>
+                    <li>• Spanish Fork</li>
+                    <li>• Pleasant Grove</li>
+                    <li>• Springville</li>
+                    <li>• Lindon</li>
                   </ul>
-                </div>
-                <div className="space-y-2">
-                  <h4 className="font-semibold">Surrounding Areas:</h4>
                   <ul className="text-muted-foreground space-y-1">
-                    <li>• Sandy</li>
-                    <li>• Murray</li>
-                    <li>• Taylorsville</li>
-                    <li>• And more!</li>
+                    <li>• Payson</li>
+                    <li>• Mapleton</li>
+                    <li>• Salem</li>
+                    <li>• Elk Ridge</li>
+                    <li>• Woodland Hills</li>
+                    <li>• Highland</li>
+                    <li>• Alpine</li>
+                    <li>• Cedar Hills</li>
+                  </ul>
+                  <ul className="text-muted-foreground space-y-1">
+                    <li>• Eagle Mountain</li>
+                    <li>• Saratoga Springs</li>
+                    <li>• Vineyard</li>
+                    <li>• Genola</li>
+                    <li>• Goshen</li>
+                    <li>• Benjamin</li>
+                    <li>• Fairfield</li>
+                    <li>• Santaquin</li>
                   </ul>
                 </div>
               </div>

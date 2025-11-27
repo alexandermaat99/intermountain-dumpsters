@@ -42,12 +42,6 @@ export async function GET() {
       lastmod: currentDate
     },
     {
-      path: "/cart",
-      priority: "0.6",
-      changefreq: "daily",
-      lastmod: currentDate
-    },
-    {
       path: "/success",
       priority: "0.4",
       changefreq: "monthly",

@@ -5,10 +5,8 @@ import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { supabase } from "@/lib/supabaseClient";
-import { useCartContext } from "@/lib/contexts/CartContext";
 import Image from "next/image";
-import { ShoppingCart, Check } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Calendar } from "lucide-react";
 import { DumpsterType } from '@/lib/types';
 import HowItWorksSection from "@/components/HowItWorksSection";
 import AllowedItemsSection from "@/components/AllowedItemsSection";
@@ -85,9 +83,6 @@ export default function BookPageClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
-  const { addToCart, isInCart } = useCartContext();
-  const router = useRouter();
-  const [addingId, setAddingId] = useState<number | null>(null);
 
   const fetchDumpsterTypes = async () => {
     try {
@@ -136,11 +131,8 @@ export default function BookPageClient() {
     fetchDumpsterTypes();
   };
 
-  const handleAddToCart = async (dumpsterType: DumpsterType) => {
-    setAddingId(dumpsterType.id);
-    addToCart(dumpsterType);
-    await new Promise(res => setTimeout(res, 600));
-    router.push('/cart');
+  const handleBookNow = () => {
+    window.location.href = 'https://app.icans.ai/customer-portal/intermountain-dumpsters/book/';
   };
 
   return (
@@ -181,7 +173,6 @@ export default function BookPageClient() {
           {!loading && !error && dumpsterTypes.length > 0 && (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {dumpsterTypes.map((dumpsterType) => {
-                const inCart = isInCart(dumpsterType.id);
                 const isAvailable = dumpsterType.quantity > 0;
                 
                 return (
@@ -214,25 +205,15 @@ export default function BookPageClient() {
                     <CardFooter>
                       <Button 
                         className="w-full" 
-                        onClick={() => handleAddToCart(dumpsterType)}
-                        disabled={inCart || addingId === dumpsterType.id || !isAvailable}
+                        onClick={handleBookNow}
+                        disabled={!isAvailable}
                       >
-                        {addingId === dumpsterType.id ? (
-                          <span className="flex items-center justify-center gap-2">
-                            <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>
-                            Adding...
-                          </span>
-                        ) : inCart ? (
-                          <>
-                            <Check className="w-4 h-4 mr-2" />
-                            Added to Cart
-                          </>
-                        ) : !isAvailable ? (
+                        {!isAvailable ? (
                           'Out of Stock'
                         ) : (
                           <>
-                            <ShoppingCart className="w-4 h-4 mr-2" />
-                            Add to Cart
+                            <Calendar className="w-4 h-4 mr-2" />
+                            Book Now
                           </>
                         )}
                       </Button>

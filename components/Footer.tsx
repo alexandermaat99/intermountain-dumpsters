@@ -71,7 +71,6 @@ export default function Footer() {
                 <p className="text-red-400">Failed to load contact info.</p>
               ) : (
                 <>
-                  <p>{contactInfo.address}</p>
                   <p>
                     <span className="font-semibold text-white">Phone:</span>{" "}
                     <a href={`tel:${contactInfo.phone.replace(/[^\d+]/g, "")}`} className="hover:underline">

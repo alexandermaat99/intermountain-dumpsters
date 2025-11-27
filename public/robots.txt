@@ -13,7 +13,6 @@ Allow: /service-areas
 Allow: /about
 Allow: /contact
 Allow: /privacy-policy
-Allow: /cart
 Allow: /success
 
 # Sitemap location

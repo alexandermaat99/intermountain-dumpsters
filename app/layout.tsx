@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import AdminThemeProvider from "@/components/AdminThemeProvider";
-import { CartProvider } from "@/lib/contexts/CartContext";
 import { AuthProvider } from "@/lib/contexts/AuthContext";
 import ConditionalFooter from "@/components/ConditionalFooter";
 import "./globals.css";
@@ -177,14 +176,12 @@ export default function RootLayout({
 
         <AdminThemeProvider>
           <AuthProvider>
-          <CartProvider>
             <div className="min-h-screen flex flex-col">
               <main className="flex-1">
                 {children}
               </main>
               <ConditionalFooter />
             </div>
-          </CartProvider>
           </AuthProvider>
         </AdminThemeProvider>
         <SpeedInsights />

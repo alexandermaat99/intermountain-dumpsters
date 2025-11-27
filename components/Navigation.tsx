@@ -4,12 +4,11 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { useTheme } from "next-themes";
-import CartIcon from "./CartIcon";
 import AdminLink from "./AdminLink";
 import Image from "next/image";
 
 interface NavigationProps {
-  currentPage: 'home' | 'book' | 'service-areas' | 'contact' | 'cart' | 'admin' | 'about';
+  currentPage: 'home' | 'book' | 'service-areas' | 'contact' | 'admin' | 'about';
 }
 
 export default function Navigation({ currentPage }: NavigationProps) {
@@ -73,12 +72,10 @@ export default function Navigation({ currentPage }: NavigationProps) {
             </Link>
           ))}
           <AdminLink />
-          <CartIcon />
         </div>
 
         {/* Mobile Hamburger Button */}
         <div className="md:hidden flex items-center gap-2">
-          <CartIcon />
           <button
             className="p-2 hover:bg-accent rounded-md transition-all duration-200"
             onClick={toggleMenu}
