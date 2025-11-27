@@ -8,8 +8,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckoutData } from '@/lib/types';
 
 // Cart types removed - using external booking system
+type CartItem = {
+  id: number;
+  name: string;
+  quantity: number;
+  price: number;
+};
+
 type CartState = {
-  items: Array<{ id: number }>;
+  items: CartItem[];
   itemCount: number;
   total: number;
 };
