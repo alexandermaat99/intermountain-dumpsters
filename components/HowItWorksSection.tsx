@@ -71,7 +71,7 @@ const defaultSteps: Step[] = [
   {
     number: 3,
     title: "Fill & Use",
-    description: "Load your waste into the dumpster at your own pace for as long as you need",
+    description: "Load your waste into the dumpster at your own pace for as long as you need. Includes 1000lbs of free disposal!",
     icon: <Package className="w-10 h-10" />
   },
   {
@@ -87,7 +87,7 @@ export default function HowItWorksSection({
   title = "How It Works",
   description = "Getting started is simple and straightforward. Here's how our process works:",
   ctaText = "Get Started Today",
-  ctaHref = "/book",
+  ctaHref = "https://app.icans.ai/customer-portal/intermountain-dumpsters/book/",
   ctaIcon = <Calendar className="w-6 h-6" />,
   backgroundColor = "#2C6B9E",
   textColor = "white"

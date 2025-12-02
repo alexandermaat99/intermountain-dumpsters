@@ -309,13 +309,13 @@ export default async function Home() {
             competitive pricing, and exceptional customer service.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 md:mt-8 w-full max-w-xl justify-center items-center">
-            <Link 
-              href="/book" 
+            <a 
+              href="https://app.icans.ai/customer-portal/intermountain-dumpsters/book/" 
               className="w-full sm:min-w-[210px] flex items-center justify-center gap-2 bg-[#2C6B9E] text-white px-6 py-3 rounded-lg font-medium text-base shadow-md hover:bg-[#22527a] active:bg-[#17405a] transition-all border border-[#2C6B9E] focus:outline-none focus:ring-2 focus:ring-[#2C6B9E]/40 whitespace-nowrap"
             >
               <Calendar className="w-5 h-5 mr-1 opacity-80" />
               Book Online
-            </Link>
+            </a>
             <HeroCallButton />
             <Link 
               href="/service-areas" 
