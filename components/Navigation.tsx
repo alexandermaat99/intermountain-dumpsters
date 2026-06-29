@@ -29,9 +29,17 @@ export default function Navigation({ currentPage }: NavigationProps) {
     setIsMenuOpen(false);
   };
 
+  const ICANS_BOOK_URL =
+    "https://app.icans.ai/customer-portal/intermountain-dumpsters/book/";
+
   const navItems = [
     { href: "/", label: "Home", page: 'home' as const },
-    { href: "/book", label: "Book Now", page: 'book' as const },
+    {
+      href: ICANS_BOOK_URL,
+      label: "Book Now",
+      page: 'book' as const,
+      external: true,
+    },
     { href: "/service-areas", label: "Service Areas", page: 'service-areas' as const },
     { href: "/about", label: "About", page: 'about' as const },
     { href: "/contact", label: "Contact Us", page: 'contact' as const },
@@ -60,17 +68,31 @@ export default function Navigation({ currentPage }: NavigationProps) {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-4">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`hover:underline transition-all duration-200 hover:scale-105 ${
-                currentPage === item.page ? 'font-semibold' : ''
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {navItems.map((item) =>
+            item.external ? (
+              <a
+                key={item.href}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`hover:underline transition-all duration-200 hover:scale-105 ${
+                  currentPage === item.page ? 'font-semibold' : ''
+                }`}
+              >
+                {item.label}
+              </a>
+            ) : (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`hover:underline transition-all duration-200 hover:scale-105 ${
+                  currentPage === item.page ? 'font-semibold' : ''
+                }`}
+              >
+                {item.label}
+              </Link>
+            )
+          )}
           <AdminLink />
         </div>
 
@@ -126,25 +148,47 @@ export default function Navigation({ currentPage }: NavigationProps) {
 
           {/* Mobile Navigation Links */}
           <div className="flex flex-col p-4 space-y-4">
-            {navItems.map((item, index) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`text-lg py-3 px-4 rounded-lg hover:bg-accent transition-all duration-200 transform ${
-                  currentPage === item.page 
-                    ? 'bg-accent font-semibold' 
-                    : ''
-                }`}
-                style={{
-                  transitionDelay: isMenuOpen ? `${index * 50}ms` : '0ms',
-                  transform: isMenuOpen ? 'translateX(0)' : 'translateX(20px)',
-                  opacity: isMenuOpen ? 1 : 0,
-                }}
-                onClick={closeMenu}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navItems.map((item, index) =>
+              item.external ? (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`text-lg py-3 px-4 rounded-lg hover:bg-accent transition-all duration-200 transform ${
+                    currentPage === item.page
+                      ? 'bg-accent font-semibold'
+                      : ''
+                  }`}
+                  style={{
+                    transitionDelay: isMenuOpen ? `${index * 50}ms` : '0ms',
+                    transform: isMenuOpen ? 'translateX(0)' : 'translateX(20px)',
+                    opacity: isMenuOpen ? 1 : 0,
+                  }}
+                  onClick={closeMenu}
+                >
+                  {item.label}
+                </a>
+              ) : (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`text-lg py-3 px-4 rounded-lg hover:bg-accent transition-all duration-200 transform ${
+                    currentPage === item.page
+                      ? 'bg-accent font-semibold'
+                      : ''
+                  }`}
+                  style={{
+                    transitionDelay: isMenuOpen ? `${index * 50}ms` : '0ms',
+                    transform: isMenuOpen ? 'translateX(0)' : 'translateX(20px)',
+                    opacity: isMenuOpen ? 1 : 0,
+                  }}
+                  onClick={closeMenu}
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
             {/* Admin Link for Mobile */}
             <div className="py-3 px-4">
               <AdminLink />
